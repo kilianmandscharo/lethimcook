@@ -1,0 +1,18 @@
+<div>
+  {{if .Recipes}} {{range .Recipes}}
+  <div id="recipe-{{ .ID }}">
+    <p>{{.Title}}</p>
+    <button
+      class="delete-button"
+      hx-target="#recipe-{{ .ID }}"
+      hx-swap="outerHTML"
+      hx-delete="/recipe/{{ .ID }}"
+      hx-trigger="click"
+    >
+      Löschen
+    </button>
+  </div>
+  {{end}} {{else}}
+  <p>Keine Rezepte</p>
+  {{end}}
+</div>
