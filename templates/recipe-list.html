@@ -1,4 +1,13 @@
 <div>
+  <h1>Rezepte</h1>
+  <button
+    class="new-recipe-button"
+    hx-get="/recipe/new"
+    hx-target="#container"
+    hx-trigger="click"
+  >
+    Neues Rezept
+  </button>
   {{if .Recipes}} {{range .Recipes}}
   <div id="recipe-{{ .ID }}">
     <p>{{.Title}}</p>

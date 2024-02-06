@@ -34,18 +34,18 @@ func newTestAuthDatabase() AuthDatabase {
 	return AuthDatabase{handler: db}
 }
 
-func newAuthDatabase() (AuthDatabase, error) {
+func NewAuthDatabase() AuthDatabase {
 	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 
 	if err != nil {
-		return AuthDatabase{}, err
+		log.Fatal("failed to connect auth database")
 	}
 
 	db.AutoMigrate(&Admin{})
 
-	return AuthDatabase{handler: db}, nil
+	return AuthDatabase{handler: db}
 }
 
 func (db *AuthDatabase) doesAdminExist() (bool, error) {
@@ -95,6 +95,16 @@ func (db *AuthDatabase) readAdminPasswordHash() (string, error) {
 	}
 
 	return admin.PasswordHash, nil
+}
+
+func (db *AuthDatabase) validatePassword(password string) (bool, error) {
+	hash, err := db.readAdminPasswordHash()
+
+	if err != nil {
+		return false, err
+	}
+
+	return validatePassword(password, hash), nil
 }
 
 func (db *AuthDatabase) updateAdminPasswordHash(newPasswordHash string) error {

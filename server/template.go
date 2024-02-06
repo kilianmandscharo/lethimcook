@@ -14,3 +14,9 @@ type templateRegistry struct {
 func (t *templateRegistry) Render(w io.Writer, name string, data any, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, data)
 }
+
+func attachTemplates(e *echo.Echo) {
+	e.Renderer = &templateRegistry{
+		templates: template.Must(template.ParseGlob("./templates/*.html")),
+	}
+}

@@ -1,20 +1,19 @@
-package database
+package recipe
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/kilianmandscharo/lethimcook/recipe"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-type Database struct {
+type RecipeDatabase struct {
 	handler *gorm.DB
 }
 
-func NewTestDatabase() Database {
+func NewTestRecipeDatabase() RecipeDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -23,26 +22,26 @@ func NewTestDatabase() Database {
 		log.Fatal("failed to connect test database")
 	}
 
-	db.Migrator().DropTable(&recipe.Recipe{})
+	db.Migrator().DropTable(&Recipe{})
 
-	db.AutoMigrate(&recipe.Recipe{})
+	db.AutoMigrate(&Recipe{})
 
-	return Database{handler: db}
+	return RecipeDatabase{handler: db}
 }
 
-func New() Database {
+func NewRecipeDatabase() RecipeDatabase {
 	db, err := gorm.Open(sqlite.Open("./data.db"), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("failed to connect database")
+		log.Fatal("failed to connect recipe database")
 	}
 
-	db.AutoMigrate(&recipe.Recipe{})
+	db.AutoMigrate(&Recipe{})
 
-	return Database{handler: db}
+	return RecipeDatabase{handler: db}
 }
 
-func (db *Database) CreateRecipe(recipe *recipe.Recipe) error {
+func (db *RecipeDatabase) CreateRecipe(recipe *Recipe) error {
 	if err := db.handler.Create(recipe).Error; err != nil {
 		return err
 	}
@@ -50,8 +49,8 @@ func (db *Database) CreateRecipe(recipe *recipe.Recipe) error {
 	return nil
 }
 
-func (db *Database) DeleteRecipe(id uint) error {
-	result := db.handler.Delete(&recipe.Recipe{}, id)
+func (db *RecipeDatabase) DeleteRecipe(id uint) error {
+	result := db.handler.Delete(&Recipe{}, id)
 
 	if result.Error != nil {
 		return result.Error
@@ -64,7 +63,7 @@ func (db *Database) DeleteRecipe(id uint) error {
 	return nil
 }
 
-func (db *Database) UpdateRecipe(recipe *recipe.Recipe) error {
+func (db *RecipeDatabase) UpdateRecipe(recipe *Recipe) error {
 	if err := db.handler.Save(recipe).Error; err != nil {
 		return err
 	}
@@ -72,8 +71,8 @@ func (db *Database) UpdateRecipe(recipe *recipe.Recipe) error {
 	return nil
 }
 
-func (db *Database) ReadRecipe(id uint) (recipe.Recipe, error) {
-	var recipe recipe.Recipe
+func (db *RecipeDatabase) ReadRecipe(id uint) (Recipe, error) {
+	var recipe Recipe
 
 	if err := db.handler.First(&recipe, id).Error; err != nil {
 		return recipe, err
@@ -82,8 +81,8 @@ func (db *Database) ReadRecipe(id uint) (recipe.Recipe, error) {
 	return recipe, nil
 }
 
-func (db *Database) ReadAllRecipes() ([]recipe.Recipe, error) {
-	var recipes []recipe.Recipe
+func (db *RecipeDatabase) ReadAllRecipes() ([]Recipe, error) {
+	var recipes []Recipe
 
 	if err := db.handler.Find(&recipes).Error; err != nil {
 		return recipes, err

@@ -1,18 +1,16 @@
-package database
+package recipe
 
 import (
-	"testing"
-
-	"github.com/kilianmandscharo/lethimcook/recipe"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestCreateRecipe(t *testing.T) {
 	// Given
-	db := NewTestDatabase()
+	db := NewTestRecipeDatabase()
 
 	// When
-	r := recipe.New("First test recipe", "Test description")
+	r := New("First test recipe", "Test description")
 	err := db.CreateRecipe(&r)
 
 	// Then
@@ -20,7 +18,7 @@ func TestCreateRecipe(t *testing.T) {
 	assert.Equal(t, uint(1), r.ID)
 
 	// When
-	r = recipe.New("Second test recipe", "Test description")
+	r = New("Second test recipe", "Test description")
 	err = db.CreateRecipe(&r)
 
 	// Then
@@ -30,8 +28,8 @@ func TestCreateRecipe(t *testing.T) {
 
 func TestReadRecipe(t *testing.T) {
 	// Given
-	db := NewTestDatabase()
-	r := recipe.Recipe{Title: "Test recipe", Description: "Test description"}
+	db := NewTestRecipeDatabase()
+	r := Recipe{Title: "Test recipe", Description: "Test description"}
 	db.CreateRecipe(&r)
 
 	// When
@@ -44,7 +42,7 @@ func TestReadRecipe(t *testing.T) {
 
 func TestReadAllRecipes(t *testing.T) {
 	// Given
-	db := NewTestDatabase()
+	db := NewTestRecipeDatabase()
 
 	// When
 	recipes, err := db.ReadAllRecipes()
@@ -54,7 +52,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.Equal(t, 0, len(recipes))
 
 	// Given
-	r := recipe.New("Test recipe", "Test description")
+	r := New("Test recipe", "Test description")
 	db.CreateRecipe(&r)
 
 	// When
@@ -68,8 +66,8 @@ func TestReadAllRecipes(t *testing.T) {
 
 func TestDeleteRecipe(t *testing.T) {
 	// Given
-	db := NewTestDatabase()
-	r := recipe.New("Test recipe", "Test description")
+	db := NewTestRecipeDatabase()
+	r := New("Test recipe", "Test description")
 	db.CreateRecipe(&r)
 
 	// When
@@ -93,8 +91,8 @@ func TestDeleteRecipe(t *testing.T) {
 
 func TestUpdateRecipe(t *testing.T) {
 	// Given
-	db := NewTestDatabase()
-	r := recipe.New("Test recipe", "Test description")
+	db := NewTestRecipeDatabase()
+	r := New("Test recipe", "Test description")
 	db.CreateRecipe(&r)
 
 	// When

@@ -1,9 +1,8 @@
 package server
 
 import (
-	"text/template"
-
-	"github.com/kilianmandscharo/lethimcook/database"
+	"github.com/kilianmandscharo/lethimcook/auth"
+	"github.com/kilianmandscharo/lethimcook/recipe"
 	"github.com/labstack/echo/v4"
 )
 
@@ -11,21 +10,26 @@ type Server struct {
 	e *echo.Echo
 }
 
-func New(db *database.Database) Server {
+func New() Server {
+	recipeDatabase := recipe.NewRecipeDatabase()
+	recipeRequestHandler := recipe.NewRecipeRequestHandler(&recipeDatabase)
+
+	authDatabase := auth.NewAuthDatabase()
+	authRequestHandler := auth.NewAuthRequestHandler(&authDatabase)
+
 	e := echo.New()
-	r := newRequestHandler(db)
+	e.Static("/static", "static")
+	attachTemplates(e)
 
-  e.Static("/static", "static")
+	e.GET("/", recipeRequestHandler.HandleHome)
+	e.GET("/recipe/new", recipeRequestHandler.HandleNewRecipe)
+	e.POST("/recipe", recipeRequestHandler.HandleCreateRecipe)
+	e.GET("/recipe/all", recipeRequestHandler.HandleReadAllRecipes)
+	e.PUT("/recipe", recipeRequestHandler.HandleUpdateRecipe)
+	e.DELETE("/recipe/:id", recipeRequestHandler.HandleDeleteRecipe)
 
-	e.Renderer = &templateRegistry{
-		templates: template.Must(template.ParseGlob("./templates/*.html")),
-	}
-
-	e.GET("/", r.handleHome)
-	e.POST("/recipe", r.handleCreateRecipe)
-	e.GET("/recipes", r.handleReadAllRecipes)
-	e.PUT("/recipe", r.handleUpdateRecipe)
-	e.DELETE("/recipe/:id", r.handleDeleteRecipe)
+	e.POST("/auth/login", authRequestHandler.HandleLogin)
+	e.PUT("/auth/password", authRequestHandler.HandleUpdatePassword)
 
 	return Server{
 		e: e,

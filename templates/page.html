@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="/static/styles.css"></link>
   </head>
   <body>
-    <h1>Let Him Cook</h1>
-    <div id="container" hx-get="/recipes" hx-trigger="load">
-      <p class="htmx-indicator">Laden...</p>
-    </div>
+    <div id="container" hx-get="/recipe/all" hx-trigger="load"></div>
   </body>
 </html>

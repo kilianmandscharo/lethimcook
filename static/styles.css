@@ -1,13 +1,51 @@
-body {
-  background-color: #111827;
-  color: rgba(255, 255, 255, 0.9);
-} 
+:root {
+  --color-dark: #111827;
+  --color-primary: #a855f7;
+  --color-danger: #ef4444;
+}
 
-.delete-button {
+body {
+  background-color: var(--color-dark);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 896px;
+  margin: 0 auto;
+}
+
+button {
   border: none;
-  background-color: #ef4444;
   padding: 8px;
-  color: white;
   border-radius: 4px;
   cursor: pointer;
-} 
+  color: inherit;
+  height: 40px;
+}
+
+.new-recipe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.new-recipe-form > textarea {
+  height: 400px;
+}
+
+.new-recipe-form > :last-child {
+  background-color: var(--color-primary);
+  border: none;
+  cursor: pointer;
+  height: 40px;
+  color: inherit;
+}
+
+input {
+  padding: 0.5rem;
+}
+
+.delete-button {
+  background-color: var(--color-danger);
+}
+
+.new-recipe-button {
+  background-color: blue;
+}
