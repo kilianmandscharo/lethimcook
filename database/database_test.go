@@ -15,7 +15,7 @@ func TestCreateRecipe(t *testing.T) {
 	r := recipe.New("First test recipe", "Test description")
 	err := db.CreateRecipe(&r)
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, uint(1), r.ID)
 
@@ -23,7 +23,7 @@ func TestCreateRecipe(t *testing.T) {
 	r = recipe.New("Second test recipe", "Test description")
 	err = db.CreateRecipe(&r)
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, uint(2), r.ID)
 }
@@ -37,7 +37,7 @@ func TestReadRecipe(t *testing.T) {
 	// When
 	retrievedRecipe, err := db.ReadRecipe(r.ID)
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.True(t, retrievedRecipe.Eq(&r))
 }
@@ -49,7 +49,7 @@ func TestReadAllRecipes(t *testing.T) {
 	// When
 	recipes, err := db.ReadAllRecipes()
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(recipes))
 
@@ -60,7 +60,7 @@ func TestReadAllRecipes(t *testing.T) {
 	// When
 	recipes, err = db.ReadAllRecipes()
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(recipes))
 	assert.True(t, recipes[0].Eq(&r))
@@ -75,19 +75,19 @@ func TestDeleteRecipe(t *testing.T) {
 	// When
 	err := db.DeleteRecipe(r.ID)
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 
 	// When
 	_, err = db.ReadRecipe(r.ID)
 
-	// Expect
+	// Then
 	assert.Error(t, err)
 
 	// When
 	err = db.DeleteRecipe(r.ID)
 
-	// Expect
+	// Then
 	assert.Error(t, err)
 }
 
@@ -102,7 +102,7 @@ func TestUpdateRecipe(t *testing.T) {
 	err := db.UpdateRecipe(&r)
 	retrievedRecipe, _ := db.ReadRecipe(r.ID)
 
-	// Expect
+	// Then
 	assert.NoError(t, err)
 	assert.True(t, retrievedRecipe.Eq(&r))
 }

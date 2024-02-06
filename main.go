@@ -1,15 +1,34 @@
 package main
 
 import (
-	// "log"
+	"flag"
+	"log"
+	"os"
 
-	"github.com/kilianmandscharo/lethimcook/database"
-	// "github.com/kilianmandscharo/lethimcook/recipe"
-	"github.com/kilianmandscharo/lethimcook/server"
+	"github.com/kilianmandscharo/lethimcook/auth"
 )
 
 func main() {
-	db := database.New()
+	password := flag.String("init-admin", "", "a secure password")
+	flag.Parse()
+
+	authorizer := auth.NewAuthorizer()
+
+	if authorizer.DoesAdminExist() {
+		if len(*password) != 0 {
+			log.Println("Existing admin found, ignoring -init-admin")
+		}
+	} else {
+		if len(*password) == 0 {
+			log.Println("Create an admin before starting the server")
+			log.Printf("Usage %s: -init-admin=<password>", os.Args[0])
+			os.Exit(1)
+		} else {
+			authorizer.CreateAdmin(*password)
+		}
+	}
+
+	// db := database.New()
 
 	// recipes := []recipe.Recipe{
 	// 	recipe.New("Spaghetti aglio e olio", "empty"),
@@ -24,6 +43,6 @@ func main() {
 	// 	}
 	// }
 
-	server := server.New(&db)
-	server.Start()
+	// server := server.New(&db)
+	// server.Start()
 }
