@@ -1,9 +1,14 @@
 <div>
-  <h1>Neues Rezept</h1>
-  <form class="new-recipe-form">
-    <input placeholder="Titel" type="text" />
-    <input placeholder="Beschreibung" type="text" />
-    <textarea placeholder="Rezept"></textarea>
-    <input type="submit" value="Rezept erstellen" />
+  <header>
+    <h1>Neues Rezept</h1>
+    <button hx-trigger="click" hx-target="#container" hx-get="/recipe/all">
+      Zurück
+    </button>
+  </header>
+  <form class="new-recipe-form" hx-post="/recipe">
+    <input placeholder="Titel" type="text" name="title" />
+    <input placeholder="Beschreibung" type="text" name="description" />
+    <textarea placeholder="Rezept" name="markdown"></textarea>
+    <input type="submit" value="Rezept erstellen" name="submit" />
   </form>
 </div>

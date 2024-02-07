@@ -1,0 +1,19 @@
+<div>
+  <header>
+    <h1>{{ .Title }}</h1>
+    <div>
+      <button
+        hx-trigger="click"
+        hx-target="#container"
+        hx-get="/recipe/edit/{{ .ID }}"
+      >
+        Bearbeiten
+      </button>
+      <button hx-trigger="click" hx-target="#container" hx-get="/recipe/all">
+        Zurück
+      </button>
+    </div>
+  </header>
+  <p>{{ .Description }}</p>
+  <p>{{ .Markdown }}</p>
+</div>

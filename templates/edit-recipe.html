@@ -1,0 +1,23 @@
+<div>
+  <header>
+    <h1>Rezept bearbeiten</h1>
+    <button
+      hx-trigger="click"
+      hx-target="#container"
+      hx-get="/recipe/{{ .ID }}"
+    >
+      Zurück
+    </button>
+  </header>
+  <form class="new-recipe-form" hx-put="/recipe/{{ .ID }}">
+    <input placeholder="Titel" value="{{ .Title }}" type="text" name="title" />
+    <input
+      placeholder="Beschreibung"
+      value="{{ .Description }}"
+      type="text"
+      name="description"
+    />
+    <textarea placeholder="Rezept" name="markdown">{{ .Markdown }}</textarea>
+    <input type="submit" value="Rezept aktualisieren" name="submit" />
+  </form>
+</div>

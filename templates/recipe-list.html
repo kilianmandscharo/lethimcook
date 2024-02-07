@@ -1,27 +1,32 @@
 <div>
-  <h1>Rezepte</h1>
-  <button
-    class="new-recipe-button"
-    hx-get="/recipe/new"
-    hx-target="#container"
-    hx-trigger="click"
-  >
-    Neues Rezept
-  </button>
-  {{if .Recipes}} {{range .Recipes}}
-  <div id="recipe-{{ .ID }}">
-    <p>{{.Title}}</p>
-    <button
-      class="delete-button"
-      hx-target="#recipe-{{ .ID }}"
-      hx-swap="outerHTML"
-      hx-delete="/recipe/{{ .ID }}"
-      hx-trigger="click"
-    >
-      Löschen
+  <header>
+    <h1>Rezepte</h1>
+    <button hx-get="/recipe/new" hx-target="#container" hx-trigger="click">
+      Neues Rezept
     </button>
+  </header>
+  <div class="recipe-list">
+    {{if .Recipes}} {{range .Recipes}}
+    <div id="recipe-{{ .ID }}" class="recipe-list-item">
+      <button
+        hx-target="#container"
+        hx-trigger="click"
+        hx-get="/recipe/{{ .ID }}"
+      >
+        {{.Title}}
+      </button>
+      <button
+        class="delete-button"
+        hx-target="#recipe-{{ .ID }}"
+        hx-swap="outerHTML"
+        hx-delete="/recipe/{{ .ID }}"
+        hx-trigger="click"
+      >
+        Löschen
+      </button>
+    </div>
+    {{end}} {{else}}
+    <p>Keine Rezepte</p>
+    {{end}}
   </div>
-  {{end}} {{else}}
-  <p>Keine Rezepte</p>
-  {{end}}
 </div>

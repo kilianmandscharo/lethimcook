@@ -11,11 +11,8 @@ type Server struct {
 }
 
 func New() Server {
-	recipeDatabase := recipe.NewRecipeDatabase()
-	recipeRequestHandler := recipe.NewRecipeRequestHandler(&recipeDatabase)
-
-	authDatabase := auth.NewAuthDatabase()
-	authRequestHandler := auth.NewAuthRequestHandler(&authDatabase)
+	recipeRequestHandler := recipe.NewRecipeRequestHandler()
+	authRequestHandler := auth.NewAuthRequestHandler()
 
 	e := echo.New()
 	e.Static("/static", "static")
@@ -23,9 +20,11 @@ func New() Server {
 
 	e.GET("/", recipeRequestHandler.HandleHome)
 	e.GET("/recipe/new", recipeRequestHandler.HandleNewRecipe)
+	e.GET("/recipe/edit/:id", recipeRequestHandler.HandleEditRecipe)
 	e.POST("/recipe", recipeRequestHandler.HandleCreateRecipe)
 	e.GET("/recipe/all", recipeRequestHandler.HandleReadAllRecipes)
-	e.PUT("/recipe", recipeRequestHandler.HandleUpdateRecipe)
+	e.GET("/recipe/:id", recipeRequestHandler.HandleReadRecipe)
+	e.PUT("/recipe/:id", recipeRequestHandler.HandleUpdateRecipe)
 	e.DELETE("/recipe/:id", recipeRequestHandler.HandleDeleteRecipe)
 
 	e.POST("/auth/login", authRequestHandler.HandleLogin)

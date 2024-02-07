@@ -1,5 +1,7 @@
 package recipe
 
+import "fmt"
+
 type Recipe struct {
 	ID          uint
 	Title       string
@@ -14,4 +16,8 @@ func New(title, description string) Recipe {
 
 func (r *Recipe) Eq(other *Recipe) bool {
 	return r.ID == other.ID && r.Title == other.Title && r.Description == other.Description
+}
+
+func (r *Recipe) fileName() string {
+	return fmt.Sprintf("recipe_%d.md", r.ID)
 }

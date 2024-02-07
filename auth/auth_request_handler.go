@@ -7,12 +7,12 @@ import (
 )
 
 type AuthRequestHandler struct {
-	db *AuthDatabase
+	db AuthDatabase
 }
 
-func NewAuthRequestHandler(db *AuthDatabase) AuthRequestHandler {
+func NewAuthRequestHandler() AuthRequestHandler {
 	return AuthRequestHandler{
-		db: db,
+		db: NewAuthDatabase(),
 	}
 }
 
@@ -62,11 +62,11 @@ func (r *AuthRequestHandler) HandleUpdatePassword(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "wrong password")
 	}
 
-  err = r.db.updateAdminPasswordHash(passwordUpdate.NewPassword)
+	err = r.db.updateAdminPasswordHash(passwordUpdate.NewPassword)
 
-  if err != nil {
+	if err != nil {
 		return c.String(http.StatusInternalServerError, "error updating password")
-  }
+	}
 
 	return c.String(http.StatusOK, "password updated successfully")
 }
