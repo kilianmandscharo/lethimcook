@@ -18,6 +18,8 @@ func New() Server {
 	e.Static("/static", "static")
 	attachTemplates(e)
 
+	// e.Use(Log)
+
 	e.GET("/", recipeRequestHandler.HandleHome)
 	e.GET("/recipe/new", recipeRequestHandler.HandleNewRecipe)
 	e.GET("/recipe/edit/:id", recipeRequestHandler.HandleEditRecipe)
@@ -38,3 +40,10 @@ func New() Server {
 func (s *Server) Start() {
 	s.e.Logger.Fatal(s.e.Start(":8080"))
 }
+
+// func Log(next echo.HandlerFunc) echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		log.Println("Hx-Request:", c.Request().Header["Hx-Request"])
+// 		return next(c)
+// 	}
+// }

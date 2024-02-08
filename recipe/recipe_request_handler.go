@@ -8,15 +8,17 @@ import (
 )
 
 type RecipeRequestHandler struct {
-	db             RecipeDatabase
-	markdownLoader recipeMarkdownLoader
+	db RecipeDatabase
 }
 
 func NewRecipeRequestHandler() RecipeRequestHandler {
 	return RecipeRequestHandler{
-		db:             NewRecipeDatabase(),
-		markdownLoader: newRecipeMarkdownLoader(),
+		db: NewRecipeDatabase(),
 	}
+}
+
+func (r *RecipeRequestHandler) RenderRecipeList(c echo.Context) error {
+	return nil
 }
 
 func (r *RecipeRequestHandler) HandleHome(c echo.Context) error {
@@ -38,7 +40,6 @@ func (r *RecipeRequestHandler) HandleEditRecipe(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "failed to read recipe")
 	}
 
-	markdown, err := r.markdownLoader.readRecipe(recipe.fileName())
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "failed to read recipe")
 	}
@@ -50,7 +51,6 @@ func (r *RecipeRequestHandler) HandleEditRecipe(c echo.Context) error {
 		ID:          recipe.ID,
 		Title:       recipe.Title,
 		Description: recipe.Description,
-		Markdown:    markdown,
 	}
 
 	return c.Render(http.StatusOK, "edit-recipe.html", data)
@@ -63,15 +63,10 @@ func (r *RecipeRequestHandler) HandleCreateRecipe(c echo.Context) error {
 
 	title := c.Request().FormValue("title")
 	description := c.Request().FormValue("description")
-	markdown := c.Request().FormValue("markdown")
 
 	newRecipe := Recipe{Title: title, Description: description}
 
 	if err := r.db.CreateRecipe(&newRecipe); err != nil {
-		return c.String(http.StatusInternalServerError, "failed to create new recipe")
-	}
-
-	if err := r.markdownLoader.writeRecipe(newRecipe.fileName(), markdown); err != nil {
 		return c.String(http.StatusInternalServerError, "failed to create new recipe")
 	}
 
@@ -89,11 +84,6 @@ func (r *RecipeRequestHandler) HandleReadRecipe(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "failed to read recipe")
 	}
 
-	markdown, err := r.markdownLoader.readRecipe(recipe.fileName())
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "failed to read recipe")
-	}
-
 	data := struct {
 		ID                           uint
 		Title, Description, Markdown string
@@ -101,7 +91,6 @@ func (r *RecipeRequestHandler) HandleReadRecipe(c echo.Context) error {
 		ID:          recipe.ID,
 		Title:       recipe.Title,
 		Description: recipe.Description,
-		Markdown:    markdown,
 	}
 
 	return c.Render(http.StatusOK, "recipe.html", data)
@@ -131,15 +120,10 @@ func (r *RecipeRequestHandler) HandleUpdateRecipe(c echo.Context) error {
 
 	title := c.Request().FormValue("title")
 	description := c.Request().FormValue("description")
-	markdown := c.Request().FormValue("markdown")
 
 	updatedRecipe := Recipe{ID: uint(id), Title: title, Description: description}
 
 	if err := r.db.UpdateRecipe(&updatedRecipe); err != nil {
-		return c.String(http.StatusInternalServerError, "failed to update recipe")
-	}
-
-	if err := r.markdownLoader.writeRecipe(updatedRecipe.fileName(), markdown); err != nil {
 		return c.String(http.StatusInternalServerError, "failed to update recipe")
 	}
 
@@ -160,4 +144,9 @@ func (r *RecipeRequestHandler) HandleDeleteRecipe(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "")
+}
+
+func isHxRequest(c echo.Context) bool {
+	hxRequestEntry := c.Request().Header["Hx-Request"]
+	return len(hxRequestEntry) > 0 && hxRequestEntry[0] == "true"
 }

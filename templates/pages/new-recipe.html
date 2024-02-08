@@ -1,7 +1,12 @@
 <div>
   <header>
     <h1>Neues Rezept</h1>
-    <button hx-trigger="click" hx-target="#container" hx-get="/recipe/all">
+    <button
+      hx-get="/recipe/all"
+      hx-trigger="click"
+      hx-target="#main"
+      hx-push-url="true"
+    >
       Zurück
     </button>
   </header>

@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="/static/styles.css"></link>
   </head>
   <body>
-    <div id="container">
-      <div hx-get="/recipe/all" hx-trigger="load" hx-target="#container"></div>
-    </div>
+    <main id="main">
+      <div hx-get="/recipe/all" hx-trigger="load" hx-target="#main" hx-push-url="true"></div>
+    </main>
   </body>
 </html>

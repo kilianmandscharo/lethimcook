@@ -2,6 +2,8 @@ package server
 
 import (
 	"io"
+	"log"
+	"path/filepath"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
@@ -16,7 +18,23 @@ func (t *templateRegistry) Render(w io.Writer, name string, data any, c echo.Con
 }
 
 func attachTemplates(e *echo.Echo) {
+	files, err := filepath.Glob("./templates/*.html")
+
+  if err != nil {
+    log.Fatal("failed to find template files")
+  }
+
+	pages, err := filepath.Glob("./templates/**/*.html")
+
+  if err != nil {
+    log.Fatal("failed to find template files")
+  }
+
+  files = append(files, pages...)
+
+	log.Println(files)
+
 	e.Renderer = &templateRegistry{
-		templates: template.Must(template.ParseGlob("./templates/*.html")),
+		templates: template.Must(template.ParseFiles(files...)),
 	}
 }

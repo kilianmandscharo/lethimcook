@@ -1,7 +1,12 @@
 <div>
   <header>
     <h1>Rezepte</h1>
-    <button hx-get="/recipe/new" hx-target="#container" hx-trigger="click">
+    <button
+      hx-get="/recipe/new"
+      hx-target="#main"
+      hx-trigger="click"
+      hx-push-url="true"
+    >
       Neues Rezept
     </button>
   </header>
@@ -9,9 +14,10 @@
     {{if .Recipes}} {{range .Recipes}}
     <div id="recipe-{{ .ID }}" class="recipe-list-item">
       <button
-        hx-target="#container"
+        hx-target="#main"
         hx-trigger="click"
         hx-get="/recipe/{{ .ID }}"
+        hx-push-url="true"
       >
         {{.Title}}
       </button>

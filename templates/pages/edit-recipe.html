@@ -2,9 +2,10 @@
   <header>
     <h1>Rezept bearbeiten</h1>
     <button
-      hx-trigger="click"
-      hx-target="#container"
       hx-get="/recipe/{{ .ID }}"
+      hx-trigger="click"
+      hx-target="#main"
+      hx-push-url="true"
     >
       Zurück
     </button>

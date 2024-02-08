@@ -3,13 +3,19 @@
     <h1>{{ .Title }}</h1>
     <div>
       <button
-        hx-trigger="click"
-        hx-target="#container"
         hx-get="/recipe/edit/{{ .ID }}"
+        hx-trigger="click"
+        hx-target="#main"
+        hx-push-url="true"
       >
         Bearbeiten
       </button>
-      <button hx-trigger="click" hx-target="#container" hx-get="/recipe/all">
+      <button
+        hx-get="/recipe/all"
+        hx-trigger="click"
+        hx-target="#main"
+        hx-push-url="true"
+      >
         Zurück
       </button>
     </div>
