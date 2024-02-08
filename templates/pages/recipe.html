@@ -1,3 +1,4 @@
+{{ define "content" }}
 <div>
   <header>
     <h1>{{ .Title }}</h1>
@@ -11,7 +12,7 @@
         Bearbeiten
       </button>
       <button
-        hx-get="/recipe/all"
+        hx-get="/"
         hx-trigger="click"
         hx-target="#main"
         hx-push-url="true"
@@ -23,3 +24,4 @@
   <p>{{ .Description }}</p>
   <p>{{ .Markdown }}</p>
 </div>
+{{ end }}

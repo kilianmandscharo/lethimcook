@@ -17,29 +17,37 @@ func NewRecipeRequestHandler() RecipeRequestHandler {
 	}
 }
 
-func (r *RecipeRequestHandler) RenderRecipeList(c echo.Context) error {
-	return nil
+func (r *RecipeRequestHandler) RenderRecipeListPage(c echo.Context) error {
+	recipes, err := r.db.ReadAllRecipes()
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "failed to read recipes")
+	}
+
+	data := struct{ Recipes Recipes }{Recipes: recipes}
+
+	if isHxRequest(c) {
+		return c.Render(http.StatusOK, fragmentName(templateNameRecipeList), data)
+	}
+
+	return c.Render(http.StatusOK, pageName(templateNameRecipeList), data)
 }
 
-func (r *RecipeRequestHandler) HandleHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "page.html", nil)
+func (r *RecipeRequestHandler) RenderNewRecipePage(c echo.Context) error {
+	if isHxRequest(c) {
+		return c.Render(http.StatusOK, fragmentName(templateNameRecipeNew), nil)
+	}
+
+	return c.Render(http.StatusOK, pageName(templateNameRecipeNew), nil)
 }
 
-func (r *RecipeRequestHandler) HandleNewRecipe(c echo.Context) error {
-	return c.Render(http.StatusOK, "new-recipe.html", nil)
-}
-
-func (r *RecipeRequestHandler) HandleEditRecipe(c echo.Context) error {
+func (r *RecipeRequestHandler) RenderEditRecipePage(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "invalid path parameter")
 	}
 
 	recipe, err := r.db.ReadRecipe(uint(id))
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "failed to read recipe")
-	}
-
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "failed to read recipe")
 	}
@@ -53,7 +61,38 @@ func (r *RecipeRequestHandler) HandleEditRecipe(c echo.Context) error {
 		Description: recipe.Description,
 	}
 
-	return c.Render(http.StatusOK, "edit-recipe.html", data)
+	if isHxRequest(c) {
+		return c.Render(http.StatusOK, fragmentName(templateNameRecipeEdit), data)
+	}
+
+	return c.Render(http.StatusOK, pageName(templateNameRecipeEdit), data)
+}
+
+func (r *RecipeRequestHandler) RenderRecipePage(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "invalid path parameter")
+	}
+
+	recipe, err := r.db.ReadRecipe(uint(id))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "failed to read recipe")
+	}
+
+	data := struct {
+		ID                           uint
+		Title, Description, Markdown string
+	}{
+		ID:          recipe.ID,
+		Title:       recipe.Title,
+		Description: recipe.Description,
+	}
+
+	if isHxRequest(c) {
+		return c.Render(http.StatusOK, fragmentName(templateNameRecipe), data)
+	}
+
+	return c.Render(http.StatusOK, pageName(templateNameRecipe), data)
 }
 
 func (r *RecipeRequestHandler) HandleCreateRecipe(c echo.Context) error {
@@ -71,29 +110,6 @@ func (r *RecipeRequestHandler) HandleCreateRecipe(c echo.Context) error {
 	}
 
 	return c.String(http.StatusOK, "created recipe")
-}
-
-func (r *RecipeRequestHandler) HandleReadRecipe(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.String(http.StatusBadRequest, "invalid path parameter")
-	}
-
-	recipe, err := r.db.ReadRecipe(uint(id))
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "failed to read recipe")
-	}
-
-	data := struct {
-		ID                           uint
-		Title, Description, Markdown string
-	}{
-		ID:          recipe.ID,
-		Title:       recipe.Title,
-		Description: recipe.Description,
-	}
-
-	return c.Render(http.StatusOK, "recipe.html", data)
 }
 
 func (r *RecipeRequestHandler) HandleReadAllRecipes(c echo.Context) error {

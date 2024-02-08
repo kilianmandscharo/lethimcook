@@ -1,12 +1,8 @@
+{{ define "content" }}
 <div>
   <header>
     <h1>Neues Rezept</h1>
-    <button
-      hx-get="/recipe/all"
-      hx-trigger="click"
-      hx-target="#main"
-      hx-push-url="true"
-    >
+    <button hx-get="/" hx-trigger="click" hx-target="#main" hx-push-url="true">
       Zurück
     </button>
   </header>
@@ -17,3 +13,4 @@
     <input type="submit" value="Rezept erstellen" name="submit" />
   </form>
 </div>
+{{ end }}

@@ -16,19 +16,21 @@ func New() Server {
 
 	e := echo.New()
 	e.Static("/static", "static")
-	attachTemplates(e)
+	recipe.AttachTemplates(e)
 
-	// e.Use(Log)
+	// Pages
+	e.GET("/", recipeRequestHandler.RenderRecipeListPage)
+	e.GET("/recipe/:id", recipeRequestHandler.RenderRecipePage)
+	e.GET("/recipe/edit/:id", recipeRequestHandler.RenderEditRecipePage)
+	e.GET("/recipe/new", recipeRequestHandler.RenderNewRecipePage)
 
-	e.GET("/", recipeRequestHandler.HandleHome)
-	e.GET("/recipe/new", recipeRequestHandler.HandleNewRecipe)
-	e.GET("/recipe/edit/:id", recipeRequestHandler.HandleEditRecipe)
+	// Actions
 	e.POST("/recipe", recipeRequestHandler.HandleCreateRecipe)
 	e.GET("/recipe/all", recipeRequestHandler.HandleReadAllRecipes)
-	e.GET("/recipe/:id", recipeRequestHandler.HandleReadRecipe)
 	e.PUT("/recipe/:id", recipeRequestHandler.HandleUpdateRecipe)
 	e.DELETE("/recipe/:id", recipeRequestHandler.HandleDeleteRecipe)
 
+	// Auth
 	e.POST("/auth/login", authRequestHandler.HandleLogin)
 	e.PUT("/auth/password", authRequestHandler.HandleUpdatePassword)
 
@@ -40,10 +42,3 @@ func New() Server {
 func (s *Server) Start() {
 	s.e.Logger.Fatal(s.e.Start(":8080"))
 }
-
-// func Log(next echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		log.Println("Hx-Request:", c.Request().Header["Hx-Request"])
-// 		return next(c)
-// 	}
-// }
