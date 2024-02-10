@@ -3,6 +3,7 @@
   <header>
     <h1>{{ .Recipe.Title }}</h1>
     <div>
+      {{ if .IsAdmin }}
       <button
         hx-get="/recipe/edit/{{ .Recipe.ID }}"
         hx-trigger="click"
@@ -11,6 +12,7 @@
       >
         Bearbeiten
       </button>
+      {{ end }}
       <button
         hx-get="/"
         hx-trigger="click"

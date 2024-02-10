@@ -11,7 +11,7 @@ func TestCreateAdmin(t *testing.T) {
 	db := newTestAuthDatabase()
 
 	// When
-	admin := Admin{PasswordHash: "test hash"}
+	admin := admin{PasswordHash: "test hash"}
 	err := db.createAdmin(&admin)
 
 	// Then
@@ -19,7 +19,6 @@ func TestCreateAdmin(t *testing.T) {
 	assert.Equal(t, uint(1), admin.ID)
 
 	// When
-	admin = Admin{PasswordHash: "test hash"}
 	err = db.createAdmin(&admin)
 
 	// Then
@@ -38,7 +37,7 @@ func TestDoesAdminExist(t *testing.T) {
 	assert.False(t, doesAdminExist)
 
 	// Given
-	admin := Admin{PasswordHash: "test hash"}
+	admin := admin{PasswordHash: "test hash"}
 	db.createAdmin(&admin)
 
 	// When
@@ -60,7 +59,7 @@ func TestReadAdmin(t *testing.T) {
 	assert.Error(t, err)
 
 	// Given
-	admin := Admin{PasswordHash: "test hash"}
+	admin := admin{PasswordHash: "test hash"}
 	db.createAdmin(&admin)
 
 	// When
@@ -82,7 +81,7 @@ func TestReadAdminPasswordHash(t *testing.T) {
 	assert.Error(t, err)
 
 	// Given
-	admin := Admin{PasswordHash: "test hash"}
+	admin := admin{PasswordHash: "test hash"}
 	db.createAdmin(&admin)
 
 	// When
@@ -105,7 +104,7 @@ func TestUpdateAdminPassortHash(t *testing.T) {
 	assert.Error(t, err)
 
 	// Given
-	admin := Admin{PasswordHash: "test hash"}
+	admin := admin{PasswordHash: "test hash"}
 	db.createAdmin(&admin)
 
 	// When

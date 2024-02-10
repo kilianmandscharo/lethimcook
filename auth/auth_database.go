@@ -4,21 +4,26 @@ import (
 	"errors"
 	"log"
 
+	"github.com/kilianmandscharo/lethimcook/errutil"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-type Admin struct {
+type admin struct {
 	ID           uint
 	PasswordHash string
 }
 
-type AuthDatabase struct {
+func newAdmin(passwordHash string) admin {
+	return admin{PasswordHash: passwordHash}
+}
+
+type authDatabase struct {
 	handler *gorm.DB
 }
 
-func newTestAuthDatabase() AuthDatabase {
+func newTestAuthDatabase() authDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -27,14 +32,14 @@ func newTestAuthDatabase() AuthDatabase {
 		log.Fatal("failed to connect test database")
 	}
 
-	db.Migrator().DropTable(&Admin{})
+	db.Migrator().DropTable(&admin{})
 
-	db.AutoMigrate(&Admin{})
+	db.AutoMigrate(&admin{})
 
-	return AuthDatabase{handler: db}
+	return authDatabase{handler: db}
 }
 
-func NewAuthDatabase() AuthDatabase {
+func newAuthDatabase() authDatabase {
 	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -43,13 +48,13 @@ func NewAuthDatabase() AuthDatabase {
 		log.Fatal("failed to connect auth database")
 	}
 
-	db.AutoMigrate(&Admin{})
+	db.AutoMigrate(&admin{})
 
-	return AuthDatabase{handler: db}
+	return authDatabase{handler: db}
 }
 
-func (db *AuthDatabase) doesAdminExist() (bool, error) {
-	if err := db.handler.First(&Admin{}).Error; err != nil {
+func (db *authDatabase) doesAdminExist() (bool, error) {
+	if err := db.handler.First(&admin{}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
@@ -59,15 +64,13 @@ func (db *AuthDatabase) doesAdminExist() (bool, error) {
 	return true, nil
 }
 
-func (db *AuthDatabase) createAdmin(admin *Admin) error {
+func (db *authDatabase) createAdmin(admin *admin) error {
 	doesAdminExist, err := db.doesAdminExist()
-
 	if err != nil {
 		return err
 	}
-
 	if doesAdminExist {
-		return errors.New("there can only be one admin")
+		return errutil.AuthErrorAdminAlreadyExists
 	}
 
 	if err := db.handler.Create(admin).Error; err != nil {
@@ -77,17 +80,20 @@ func (db *AuthDatabase) createAdmin(admin *Admin) error {
 	return nil
 }
 
-func (db *AuthDatabase) readAdmin() (Admin, error) {
-	var admin Admin
+func (db *authDatabase) readAdmin() (admin, errutil.AuthError) {
+	var admin admin
 
 	if err := db.handler.First(&admin).Error; err != nil {
-		return admin, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return admin, errutil.AuthErrorNoAdminFound
+		}
+		return admin, errutil.AuthErrorDatabaseFailure
 	}
 
 	return admin, nil
 }
 
-func (db *AuthDatabase) readAdminPasswordHash() (string, error) {
+func (db *authDatabase) readAdminPasswordHash() (string, errutil.AuthError) {
 	admin, err := db.readAdmin()
 
 	if err != nil {
@@ -97,27 +103,15 @@ func (db *AuthDatabase) readAdminPasswordHash() (string, error) {
 	return admin.PasswordHash, nil
 }
 
-func (db *AuthDatabase) validatePassword(password string) (bool, error) {
-	hash, err := db.readAdminPasswordHash()
-
-	if err != nil {
-		return false, err
-	}
-
-	return validatePassword(password, hash), nil
-}
-
-func (db *AuthDatabase) updateAdminPasswordHash(newPasswordHash string) error {
+func (db *authDatabase) updateAdminPasswordHash(newPasswordHash string) errutil.AuthError {
 	admin, err := db.readAdmin()
-
 	if err != nil {
 		return err
 	}
 
 	admin.PasswordHash = newPasswordHash
-
 	if err := db.handler.Save(&admin).Error; err != nil {
-		return err
+		return errutil.AuthErrorDatabaseFailure
 	}
 
 	return nil

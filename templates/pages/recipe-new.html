@@ -1,4 +1,4 @@
-{{ define "content" }}
+{{ define "content" }} {{ if . }}
 <div>
   <header>
     <h1>Neues Rezept</h1>
@@ -6,11 +6,15 @@
       Zurück
     </button>
   </header>
-  <form class="new-recipe-form" hx-post="/recipe">
+  <form hx-post="/recipe" hx-target="#main">
     <input placeholder="Titel" type="text" name="title" />
     <input placeholder="Beschreibung" type="text" name="description" />
-    <textarea placeholder="Rezept" name="markdown"></textarea>
+    <input placeholder="Kochdauer (Minuten)" type="number" name="duration" />
+    <textarea placeholder="Zutaten" name="ingredients"></textarea>
+    <textarea placeholder="Anleitung" name="instructions"></textarea>
     <input type="submit" value="Rezept erstellen" name="submit" />
   </form>
 </div>
-{{ end }}
+{{ else }}
+<p>Keine Berechtigung</p>
+{{ end }} {{ end }}

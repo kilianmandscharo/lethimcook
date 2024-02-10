@@ -1,9 +1,9 @@
-{{ define "content" }}
+{{ define "content" }} {{ if .IsAdmin }}
 <div>
   <header>
     <h1>Rezept bearbeiten</h1>
     <button
-      hx-get="/recipe/{{ .ID }}"
+      hx-get="/recipe/{{ .Recipe.ID }}"
       hx-trigger="click"
       hx-target="#main"
       hx-push-url="true"
@@ -11,16 +11,34 @@
       Zurück
     </button>
   </header>
-  <form class="new-recipe-form" hx-put="/recipe/{{ .ID }}">
-    <input placeholder="Titel" value="{{ .Title }}" type="text" name="title" />
+  <form hx-put="/recipe/{{ .Recipe.ID }}" hx-target="#main">
+    <input
+      placeholder="Titel"
+      value="{{ .Recipe.Title }}"
+      type="text"
+      name="title"
+    />
     <input
       placeholder="Beschreibung"
-      value="{{ .Description }}"
+      value="{{ .Recipe.Description }}"
       type="text"
       name="description"
     />
-    <textarea placeholder="Rezept" name="markdown">{{ .Markdown }}</textarea>
+    <input
+      placeholder="Kochdauer (Minuten)"
+      type="number"
+      name="duration"
+      value="{{ .Recipe.Duration }}"
+    />
+    <textarea placeholder="Zutaten" name="ingredients">
+{{ .Recipe.Ingredients }}</textarea
+    >
+    <textarea placeholder="Anleitung" name="instructions">
+{{ .Recipe.Instructions }}</textarea
+    >
     <input type="submit" value="Rezept aktualisieren" name="submit" />
   </form>
 </div>
-{{ end }}
+{{ else }}
+<p>Kein Berechtigung</p>
+{{ end }} {{ end }}

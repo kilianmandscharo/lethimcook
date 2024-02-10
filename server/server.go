@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/kilianmandscharo/lethimcook/auth"
 	"github.com/kilianmandscharo/lethimcook/recipe"
+	"github.com/kilianmandscharo/lethimcook/routes"
 	"github.com/labstack/echo/v4"
 )
 
@@ -10,28 +11,33 @@ type Server struct {
 	e *echo.Echo
 }
 
-func New() Server {
-	recipeRequestHandler := recipe.NewRecipeRequestHandler()
-	authRequestHandler := auth.NewAuthRequestHandler()
+func New(authService auth.AuthService) Server {
+	recipeController := recipe.NewRecipeController()
+	authController := auth.NewAuthController(authService)
 
 	e := echo.New()
+	e.Use(authController.ValidateToken)
 	e.Static("/static", "static")
-	recipe.AttachTemplates(e)
+	routes.AttachTemplates(e)
 
 	// Pages
-	e.GET("/", recipeRequestHandler.RenderRecipeListPage)
-	e.GET("/recipe/edit/:id", recipeRequestHandler.RenderEditRecipePage)
-	e.GET("/recipe/new", recipeRequestHandler.RenderNewRecipePage)
-	e.GET("/recipe/:id", recipeRequestHandler.RenderRecipePage)
+	e.GET("/", recipeController.RenderRecipeListPage)
+	e.GET("/recipe/edit/:id", recipeController.RenderRecipeEditPage)
+	e.GET("/recipe/new", recipeController.RenderRecipeNewPage)
+	e.GET("/recipe/:id", recipeController.RenderRecipePage)
 
 	// Actions
-	e.POST("/recipe", recipeRequestHandler.HandleCreateRecipe)
-	e.PUT("/recipe/:id", recipeRequestHandler.HandleUpdateRecipe)
-	e.DELETE("/recipe/:id", recipeRequestHandler.HandleDeleteRecipe)
+	e.POST("/recipe", recipeController.HandleCreateRecipe)
+	e.PUT("/recipe/:id", recipeController.HandleUpdateRecipe)
+	e.DELETE("/recipe/:id", recipeController.HandleDeleteRecipe)
 
-	// Auth
-	e.POST("/auth/login", authRequestHandler.HandleLogin)
-	e.PUT("/auth/password", authRequestHandler.HandleUpdatePassword)
+	// Pages
+	e.GET("/auth/admin", authController.RenderAdminPage)
+
+	// Actions
+	e.POST("/auth/login", authController.HandleLogin)
+	e.POST("/auth/logout", authController.HandleLogout)
+	e.PUT("/auth/password", authController.HandleUpdatePassword)
 
 	return Server{
 		e: e,

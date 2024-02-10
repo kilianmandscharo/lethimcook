@@ -14,6 +14,37 @@ body {
   font-family: sans-serif;
 }
 
+main {
+  min-height: calc(100vh - 48px - 2rem - 2rem);
+}
+
+footer {
+  margin-top: 2rem;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+footer > button {
+  all: unset;
+  cursor: pointer;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: border 250ms ease;
+}
+
+footer > button:hover {
+  border-bottom: 1px solid var(--color-primary);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 button {
   border: none;
   padding: 8px;
@@ -34,6 +65,11 @@ header {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 3rem;
+}
+
+header > div {
+  display: flex;
+  gap: 1rem;
 }
 
 input {
@@ -66,13 +102,7 @@ textarea {
   cursor: pointer;
 }
 
-.new-recipe-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.new-recipe-form > :last-child {
+form > :last-child {
   background-color: var(--color-primary);
   border: none;
   cursor: pointer;
@@ -81,6 +111,11 @@ textarea {
   border-radius: 4px;
 }
 
-.delete-button {
+.button-danger {
   background-color: var(--color-danger);
+}
+
+.button-disabled {
+  cursor: default !important;
+  opacity: 0.6;
 }

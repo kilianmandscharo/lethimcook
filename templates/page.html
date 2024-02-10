@@ -11,5 +11,10 @@
     <main id="main">
       {{ template "content" . }}
     </main>
+    <footer>
+      <button>Impressum</button>
+      <button>Datenschutzerklärung</button>
+      <button hx-trigger="click" hx-target="#main" hx-get="auth/admin" hx-push-url="true">Admin</button>
+    </footer>
   </body>
 </html>

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/kilianmandscharo/lethimcook/errutil"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -41,54 +42,54 @@ func newRecipeDatabase() recipeDatabase {
 	return recipeDatabase{handler: db}
 }
 
-func (db *recipeDatabase) createRecipe(recipe *recipe) recipeError {
+func (db *recipeDatabase) createRecipe(recipe *recipe) errutil.RecipeError {
 	if err := db.handler.Create(recipe).Error; err != nil {
-		return recipeErrorDatabaseFailure
+		return errutil.RecipeErrorDatabaseFailure
 	}
 
 	return nil
 }
 
-func (db *recipeDatabase) deleteRecipe(id uint) recipeError {
+func (db *recipeDatabase) deleteRecipe(id uint) errutil.RecipeError {
 	result := db.handler.Delete(&recipe{}, id)
 
 	if result.Error != nil {
-		return recipeErrorDatabaseFailure
+		return errutil.RecipeErrorDatabaseFailure
 	}
 
 	if result.RowsAffected == 0 {
-		return recipeErrorNotFound
+		return errutil.RecipeErrorNotFound
 	}
 
 	return nil
 }
 
-func (db *recipeDatabase) updateRecipe(recipe *recipe) recipeError {
+func (db *recipeDatabase) updateRecipe(recipe *recipe) errutil.RecipeError {
 	if err := db.handler.Save(recipe).Error; err != nil {
-		return recipeErrorDatabaseFailure
+		return errutil.RecipeErrorDatabaseFailure
 	}
 
 	return nil
 }
 
-func (db *recipeDatabase) readRecipe(id uint) (recipe, recipeError) {
+func (db *recipeDatabase) readRecipe(id uint) (recipe, errutil.RecipeError) {
 	var recipe recipe
 
 	if err := db.handler.First(&recipe, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return recipe, recipeErrorNotFound
+			return recipe, errutil.RecipeErrorNotFound
 		}
-		return recipe, recipeErrorDatabaseFailure
+		return recipe, errutil.RecipeErrorDatabaseFailure
 	}
 
 	return recipe, nil
 }
 
-func (db *recipeDatabase) readAllRecipes() ([]recipe, recipeError) {
+func (db *recipeDatabase) readAllRecipes() ([]recipe, errutil.RecipeError) {
 	var recipes []recipe
 
 	if err := db.handler.Find(&recipes).Error; err != nil {
-		return recipes, recipeErrorDatabaseFailure
+		return recipes, errutil.RecipeErrorDatabaseFailure
 	}
 
 	return recipes, nil

@@ -1,4 +1,4 @@
-package recipe
+package routes
 
 import (
 	"errors"
@@ -11,18 +11,11 @@ import (
 
 type templateName = string
 
-const (
-	templateNameRecipe     templateName = "recipe"
-	templateNameRecipeList templateName = "recipe-list"
-	templateNameRecipeEdit templateName = "recipe-edit"
-	templateNameRecipeNew  templateName = "recipe-new"
-)
-
-func pageName(name templateName) string {
+func PageName(name templateName) string {
 	return name + "-page"
 }
 
-func fragmentName(name templateName) string {
+func FragmentName(name templateName) string {
 	return name + "-fragment"
 }
 
@@ -46,19 +39,28 @@ func newCustomTemplate(baseName string, templates *template.Template) customTemp
 	}
 }
 
-func registerTemplate(tmap map[string]customTemplate, name templateName) {
+func registerPageTemplate(tmap map[string]customTemplate, name templateName) {
 	pathToFragment := path.Join("templates/pages", htmlName(name))
 
 	// Register full page
-	tmap[pageName(name)] = newCustomTemplate(
+	tmap[PageName(name)] = newCustomTemplate(
 		"page.html",
 		template.Must(template.ParseFiles("templates/page.html", pathToFragment)),
 	)
 
 	// Register fragment
-	tmap[fragmentName(name)] = newCustomTemplate(
+	tmap[FragmentName(name)] = newCustomTemplate(
 		"fragment.html",
 		template.Must(template.ParseFiles("templates/fragment.html", pathToFragment)),
+	)
+}
+
+func registerComponentTemplate(tmap map[string]customTemplate, name templateName) {
+	pathToFragment := path.Join("templates/components", htmlName(name))
+
+	tmap[FragmentName(name)] = newCustomTemplate(
+		htmlName(name),
+		template.Must(template.ParseFiles(pathToFragment)),
 	)
 }
 
@@ -73,10 +75,15 @@ func (t *templateRegistry) Render(w io.Writer, name string, data any, c echo.Con
 func AttachTemplates(e *echo.Echo) {
 	templates := make(map[string]customTemplate)
 
-	registerTemplate(templates, templateNameRecipeList)
-	registerTemplate(templates, templateNameRecipe)
-	registerTemplate(templates, templateNameRecipeNew)
-	registerTemplate(templates, templateNameRecipeEdit)
+	// Recipe
+	registerPageTemplate(templates, TemplateNameRecipeList)
+	registerPageTemplate(templates, TemplateNameRecipe)
+	registerPageTemplate(templates, TemplateNameRecipeNew)
+	registerPageTemplate(templates, TemplateNameRecipeEdit)
+
+	// Auth
+	registerPageTemplate(templates, TemplateNameAdmin)
+	registerComponentTemplate(templates, TemplateNameLoginSuccessful)
 
 	e.Renderer = &templateRegistry{
 		templates: templates,
