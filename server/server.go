@@ -20,13 +20,12 @@ func New() Server {
 
 	// Pages
 	e.GET("/", recipeRequestHandler.RenderRecipeListPage)
-	e.GET("/recipe/:id", recipeRequestHandler.RenderRecipePage)
 	e.GET("/recipe/edit/:id", recipeRequestHandler.RenderEditRecipePage)
 	e.GET("/recipe/new", recipeRequestHandler.RenderNewRecipePage)
+	e.GET("/recipe/:id", recipeRequestHandler.RenderRecipePage)
 
 	// Actions
 	e.POST("/recipe", recipeRequestHandler.HandleCreateRecipe)
-	e.GET("/recipe/all", recipeRequestHandler.HandleReadAllRecipes)
 	e.PUT("/recipe/:id", recipeRequestHandler.HandleUpdateRecipe)
 	e.DELETE("/recipe/:id", recipeRequestHandler.HandleDeleteRecipe)
 

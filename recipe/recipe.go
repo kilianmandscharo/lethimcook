@@ -1,6 +1,6 @@
 package recipe
 
-type Recipe struct {
+type recipe struct {
 	ID           uint
 	Title        string
 	Description  string
@@ -9,12 +9,12 @@ type Recipe struct {
 	Instructions string
 }
 
-type Recipes = []Recipe
+type recipes = []recipe
 
-func New(title, description string) Recipe {
-	return Recipe{Title: title, Description: description}
+func newRecipe(title, description string) recipe {
+	return recipe{Title: title, Description: description}
 }
 
-func (r *Recipe) Eq(other *Recipe) bool {
+func (r *recipe) eq(other *recipe) bool {
 	return r.ID == other.ID && r.Title == other.Title && r.Description == other.Description
 }
