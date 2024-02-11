@@ -57,6 +57,10 @@ func (r *RecipeController) RenderRecipePage(c echo.Context) error {
 		return r.renderError(c, err)
 	}
 
+	if err := recipe.renderMarkdown(); err != nil {
+		return r.renderError(c, err)
+	}
+
 	return r.renderTemplate(c, routes.TemplateNameRecipe, recipeTemplateData{Recipe: recipe, IsAdmin: r.isAdmin(c)})
 }
 
