@@ -9,13 +9,36 @@ body {
   background-color: var(--color-dark);
   color: rgba(255, 255, 255, 0.9);
   max-width: 896px;
+  min-width: 300px;
   margin: 0 auto;
   padding: 1rem;
   font-family: sans-serif;
+  position: relative;
 }
 
 main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#content {
   min-height: calc(100vh - 48px - 2rem - 2rem);
+}
+
+#notification {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 1rem;
+  right: 50%;
+  transform: translateX(50%);
+  border-radius: 4px;
+  height: 40px;
+  padding: 0 1rem;
+  opacity: 0;
+  color: var(--color-danger);
 }
 
 footer {
@@ -118,4 +141,52 @@ form > :last-child {
 .button-disabled {
   cursor: default !important;
   opacity: 0.6;
+}
+
+.loading {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  width: 56px;
+  height: 56px;
+}
+
+.loading svg {
+  animation: 2s linear infinite svg-animation;
+}
+
+.loading circle {
+  stroke: var(--color-primary);
+  stroke-linecap: round;
+  transform-origin: 50% 50%;
+  animation: 1.4s ease-in-out infinite both circle-animation;
+}
+
+@keyframes circle-animation {
+  0%,
+  25% {
+    stroke-dashoffset: 200;
+    transform: rotate(0);
+  }
+
+  50%,
+  75% {
+    stroke-dashoffset: 55;
+    transform: rotate(45deg);
+  }
+
+  100% {
+    stroke-dashoffset: 200;
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes svg-animation {
+  0% {
+    transform: rotateZ(0deg);
+  }
+
+  100% {
+    transform: rotateZ(360deg);
+  }
 }

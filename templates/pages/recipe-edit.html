@@ -5,13 +5,13 @@
     <button
       hx-get="/recipe/{{ .Recipe.ID }}"
       hx-trigger="click"
-      hx-target="#main"
+      hx-target="#content"
       hx-push-url="true"
     >
       Zurück
     </button>
   </header>
-  <form hx-put="/recipe/{{ .Recipe.ID }}" hx-target="#main">
+  <form hx-put="/recipe/{{ .Recipe.ID }}" hx-target="#content">
     <input
       placeholder="Titel"
       value="{{ .Recipe.Title }}"

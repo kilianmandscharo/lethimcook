@@ -26,7 +26,7 @@ var AuthErrorHttpCodes = map[RecipeError]int{
 	AuthErrorNoAdminFound:         http.StatusNotFound,
 	AuthErrorDatabaseFailure:      http.StatusInternalServerError,
 	AuthErrorInvalidBody:          http.StatusBadRequest,
-	AuthErrorInvalidPassword:      http.StatusBadRequest,
+	AuthErrorInvalidPassword:      http.StatusUnauthorized,
 	AuthErrorPasswordTooLong:      http.StatusBadRequest,
 	AuthErrorPasswordTooShort:     http.StatusBadRequest,
 	AuthErrorAdminAlreadyExists:   http.StatusConflict,

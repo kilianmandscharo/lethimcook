@@ -5,7 +5,7 @@
     {{ if .IsAdmin }}
     <button
       hx-get="/recipe/new"
-      hx-target="#main"
+      hx-target="#content"
       hx-trigger="click"
       hx-push-url="true"
     >
@@ -17,7 +17,7 @@
     {{ if .Recipes }} {{ range .Recipes }}
     <div id="recipe-{{ .ID }}" class="recipe-list-item">
       <button
-        hx-target="#main"
+        hx-target="#content"
         hx-trigger="click"
         hx-get="/recipe/{{ .ID }}"
         hx-push-url="true"

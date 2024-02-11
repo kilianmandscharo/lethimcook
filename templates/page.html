@@ -1,20 +1,46 @@
 <!doctype html>
 <html lang="de">
-  <head>
-    <title>Let Him Cook</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="/static/htmx.min.js" defer></script>
-    <link rel="stylesheet" href="/static/styles.css"></link>
-  </head>
-  <body>
-    <main id="main">
-      {{ template "content" . }}
-    </main>
-    <footer>
-      <button>Impressum</button>
-      <button>Datenschutzerklärung</button>
-      <button hx-trigger="click" hx-target="#main" hx-get="auth/admin" hx-push-url="true">Admin</button>
-    </footer>
-  </body>
+
+<head>
+  <title>Let Him Cook</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/static/htmx.min.js" defer></script>
+  <link rel="stylesheet" href="/static/styles.css">
+  </link>
+</head>
+
+<body>
+  <div id="content">
+    {{ template "content" . }}
+  </div>
+  <div id="loading" class="htmx-indicator loading">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="32" stroke-width="10" fill="transparent" stroke-dasharray="201"
+        stroke-dashoffset="55" />
+    </svg>
+  </div>
+  <div id="notification">
+    Hinweis
+  </div>
+  <footer>
+    <button>Impressum</button>
+    <button>Datenschutzerklärung</button>
+    <button hx-trigger="click" hx-target="#content" hx-get="auth/admin" hx-push-url="true">Admin</button>
+  </footer>
+  <script>
+    document.body.addEventListener("htmx:responseError", function (event) {
+      const response = event.detail.xhr.response;
+      const notification = document.getElementById("notification")
+
+      notification.innerText = response;
+      notification.style.opacity = 1;
+
+      setTimeout(() => {
+        notification.style.opacity = 0;
+      }, 3000)
+    })
+  </script>
+</body>
+
 </html>

@@ -2,11 +2,11 @@
 <div>
   <header>
     <h1>Neues Rezept</h1>
-    <button hx-get="/" hx-trigger="click" hx-target="#main" hx-push-url="true">
+    <button hx-get="/" hx-trigger="click" hx-target="#content" hx-push-url="true">
       Zurück
     </button>
   </header>
-  <form hx-post="/recipe" hx-target="#main">
+  <form hx-post="/recipe" hx-target="#content">
     <input placeholder="Titel" type="text" name="title" />
     <input placeholder="Beschreibung" type="text" name="description" />
     <input placeholder="Kochdauer (Minuten)" type="number" name="duration" />

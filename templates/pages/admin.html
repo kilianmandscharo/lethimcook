@@ -8,7 +8,7 @@
         class="button-danger"
         hx-post="/auth/logout"
         hx-trigger="click"
-        hx-target="#main"
+        hx-target="#content"
       >
         Abmelden
       </button>
@@ -16,51 +16,64 @@
       <button
         hx-get="/"
         hx-trigger="click"
-        hx-target="#main"
+        hx-target="#content"
         hx-push-url="true"
       >
         Startseite
       </button>
     </div>
   </header>
-  <h2>Anmelden</h2>
-  <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#main">
-    <input
-      placeholder="Passwort"
-      type="password"
-      name="password"
-      {{
-      if
-      .
-      }}disabled{{
-      end
-      }}
-    />
-    <input
-      {{
-      if
-      .
-      }}class="button-disabled"
-      {{
-      end
-      }}
-      type="submit"
-      value="Anmelden"
-      name="submit"
-      {{
-      if
-      .
-      }}disabled{{
-      end
-      }}
-    />
-  </form>
-  <h2>Passwort ändern</h2>
-  <form hx-put="/auth/password" hx-indicator="#loading">
-    <input placeholder="altes Passwort" type="password" name="oldPassword" />
-    <input placeholder="neues Passwort" type="password" name="newPassword" />
-    <input type="submit" value="Bestätigen" name="submit" />
-  </form>
-  <p id="loading" class="htmx-indicator">Laden...</p>
+  <main>
+    <div>
+      <h2>Anmelden</h2>
+      <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
+        <input
+          placeholder="Passwort"
+          type="password"
+          name="password"
+          {{
+          if
+          .
+          }}disabled{{
+          end
+          }}
+        />
+        <input
+          {{
+          if
+          .
+          }}class="button-disabled"
+          {{
+          end
+          }}
+          type="submit"
+          value="Anmelden"
+          name="submit"
+          {{
+          if
+          .
+          }}disabled{{
+          end
+          }}
+        />
+      </form>
+    </div>
+    <div>
+      <h2>Passwort ändern</h2>
+      <form hx-put="/auth/password" hx-indicator="#loading">
+        <input
+          placeholder="altes Passwort"
+          type="password"
+          name="oldPassword"
+        />
+        <input
+          placeholder="neues Passwort"
+          type="password"
+          name="newPassword"
+        />
+        <input type="submit" value="Bestätigen" name="submit" />
+      </form>
+    </div>
+  </main>
 </div>
 {{ end }}
