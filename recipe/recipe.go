@@ -22,10 +22,6 @@ func newRecipe(title, description string) recipe {
 	return recipe{Title: title, Description: description}
 }
 
-func (r *recipe) eq(other *recipe) bool {
-	return r.ID == other.ID && r.Title == other.Title && r.Description == other.Description
-}
-
 func (r *recipe) renderMarkdown() errutil.RecipeError {
 	var buf bytes.Buffer
 

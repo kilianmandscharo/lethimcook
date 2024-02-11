@@ -15,7 +15,6 @@ var (
 	AuthErrorPasswordTooLong      AuthError = errors.New("the maximum password length is 72 bytes")
 	AuthErrorPasswordTooShort     AuthError = errors.New("the minimum password length is 5 bytes")
 	AuthErrorAdminAlreadyExists   AuthError = errors.New("there can only be one admin")
-	AuthErrorEnvLoadingFailure    AuthError = errors.New("failed to load private key from .env")
 	AuthErrorTokenCreationFailure AuthError = errors.New("failed to create token")
 	AuthErrorInvalidAuthHeader    AuthError = errors.New("invalid auth header provided")
 	AuthErrorInvalidToken         AuthError = errors.New("invalid token provided")
@@ -30,7 +29,6 @@ var AuthErrorHttpCodes = map[RecipeError]int{
 	AuthErrorPasswordTooLong:      http.StatusBadRequest,
 	AuthErrorPasswordTooShort:     http.StatusBadRequest,
 	AuthErrorAdminAlreadyExists:   http.StatusConflict,
-	AuthErrorEnvLoadingFailure:    http.StatusInternalServerError,
 	AuthErrorTokenCreationFailure: http.StatusInternalServerError,
 	AuthErrorInvalidAuthHeader:    http.StatusBadRequest,
 	AuthErrorInvalidToken:         http.StatusUnauthorized,

@@ -3,6 +3,7 @@ package auth
 import (
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,7 +12,7 @@ func TestCreateAdmin(t *testing.T) {
 	db := newTestAuthDatabase()
 
 	// When
-	admin := admin{PasswordHash: "test hash"}
+	admin := newTestAdmin()
 	err := db.createAdmin(&admin)
 
 	// Then
@@ -22,7 +23,7 @@ func TestCreateAdmin(t *testing.T) {
 	err = db.createAdmin(&admin)
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.AuthErrorAdminAlreadyExists)
 }
 
 func TestDoesAdminExist(t *testing.T) {
@@ -37,8 +38,8 @@ func TestDoesAdminExist(t *testing.T) {
 	assert.False(t, doesAdminExist)
 
 	// Given
-	admin := admin{PasswordHash: "test hash"}
-	db.createAdmin(&admin)
+	admin := newTestAdmin()
+	assert.NoError(t, db.createAdmin(&admin))
 
 	// When
 	doesAdminExist, err = db.doesAdminExist()
@@ -56,17 +57,18 @@ func TestReadAdmin(t *testing.T) {
 	_, err := db.readAdmin()
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
 
 	// Given
-	admin := admin{PasswordHash: "test hash"}
-	db.createAdmin(&admin)
+	admin := newTestAdmin()
+	assert.NoError(t, db.createAdmin(&admin))
 
 	// When
 	retrievedAdmin, err := db.readAdmin()
 
 	// Then
 	assert.NoError(t, err)
+	assert.Equal(t, admin.ID, retrievedAdmin.ID)
 	assert.Equal(t, admin.PasswordHash, retrievedAdmin.PasswordHash)
 }
 
@@ -78,11 +80,11 @@ func TestReadAdminPasswordHash(t *testing.T) {
 	_, err := db.readAdmin()
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
 
 	// Given
-	admin := admin{PasswordHash: "test hash"}
-	db.createAdmin(&admin)
+	admin := newTestAdmin()
+	assert.NoError(t, db.createAdmin(&admin))
 
 	// When
 	passwordHash, err := db.readAdminPasswordHash()
@@ -95,21 +97,26 @@ func TestReadAdminPasswordHash(t *testing.T) {
 func TestUpdateAdminPassortHash(t *testing.T) {
 	// Given
 	db := newTestAuthDatabase()
+	updatedHash := "updated test hash"
 
 	// When
-	updatedHash := "updated test hash"
 	err := db.updateAdminPasswordHash(updatedHash)
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
 
 	// Given
-	admin := admin{PasswordHash: "test hash"}
-	db.createAdmin(&admin)
+	admin := newTestAdmin()
+	assert.NoError(t, db.createAdmin(&admin))
 
 	// When
 	err = db.updateAdminPasswordHash(updatedHash)
-	retrievedAdmin, _ := db.readAdmin()
+
+	// Then
+	assert.NoError(t, err)
+
+	// When
+	retrievedAdmin, err := db.readAdmin()
 
 	// Then
 	assert.NoError(t, err)

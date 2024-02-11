@@ -1,8 +1,10 @@
 package recipe
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateRecipe(t *testing.T) {
@@ -10,7 +12,7 @@ func TestCreateRecipe(t *testing.T) {
 	db := newTestRecipeDatabase()
 
 	// When
-	r := newRecipe("First test recipe", "Test description")
+	r := newTestRecipe()
 	err := db.createRecipe(&r)
 
 	// Then
@@ -18,7 +20,7 @@ func TestCreateRecipe(t *testing.T) {
 	assert.Equal(t, uint(1), r.ID)
 
 	// When
-	r = newRecipe("Second test recipe", "Test description")
+	r = newTestRecipe()
 	err = db.createRecipe(&r)
 
 	// Then
@@ -29,15 +31,23 @@ func TestCreateRecipe(t *testing.T) {
 func TestReadRecipe(t *testing.T) {
 	// Given
 	db := newTestRecipeDatabase()
-	r := recipe{Title: "Test recipe", Description: "Test description"}
-	db.createRecipe(&r)
+
+	// When
+	_, err := db.readRecipe(uint(1))
+
+	// Then
+	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
+
+	// Given
+	r := newTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
 
 	// When
 	retrievedRecipe, err := db.readRecipe(r.ID)
 
 	// Then
 	assert.NoError(t, err)
-	assert.True(t, retrievedRecipe.eq(&r))
+	assertRecipesEqual(t, r, retrievedRecipe)
 }
 
 func TestReadAllRecipes(t *testing.T) {
@@ -52,8 +62,8 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.Equal(t, 0, len(recipes))
 
 	// Given
-	r := newRecipe("Test recipe", "Test description")
-	db.createRecipe(&r)
+	r := newTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
 
 	// When
 	recipes, err = db.readAllRecipes()
@@ -61,14 +71,14 @@ func TestReadAllRecipes(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(recipes))
-	assert.True(t, recipes[0].eq(&r))
+	assertRecipesEqual(t, r, recipes[0])
 }
 
 func TestDeleteRecipe(t *testing.T) {
 	// Given
 	db := newTestRecipeDatabase()
-	r := newRecipe("Test recipe", "Test description")
-	db.createRecipe(&r)
+	r := newTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
 
 	// When
 	err := db.deleteRecipe(r.ID)
@@ -80,20 +90,20 @@ func TestDeleteRecipe(t *testing.T) {
 	_, err = db.readRecipe(r.ID)
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
 
 	// When
 	err = db.deleteRecipe(r.ID)
 
 	// Then
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
 }
 
 func TestUpdateRecipe(t *testing.T) {
 	// Given
 	db := newTestRecipeDatabase()
-	r := newRecipe("Test recipe", "Test description")
-	db.createRecipe(&r)
+	r := newTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
 
 	// When
 	r.Title = "Test recipe title modified"
@@ -102,5 +112,5 @@ func TestUpdateRecipe(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assert.True(t, retrievedRecipe.eq(&r))
+	assertRecipesEqual(t, r, retrievedRecipe)
 }

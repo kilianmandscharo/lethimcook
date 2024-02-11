@@ -2,7 +2,8 @@ package auth
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"gorm.io/driver/sqlite"
@@ -29,7 +30,8 @@ func newTestAuthDatabase() authDatabase {
 	})
 
 	if err != nil {
-		log.Fatal("failed to connect test database")
+		fmt.Println("failed to connect test database: ", err)
+		os.Exit(1)
 	}
 
 	db.Migrator().DropTable(&admin{})
@@ -45,23 +47,13 @@ func newAuthDatabase() authDatabase {
 	})
 
 	if err != nil {
-		log.Fatal("failed to connect auth database")
+		fmt.Println("failed to connect auth database: ", err)
+		os.Exit(1)
 	}
 
 	db.AutoMigrate(&admin{})
 
 	return authDatabase{handler: db}
-}
-
-func (db *authDatabase) doesAdminExist() (bool, error) {
-	if err := db.handler.First(&admin{}).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
-		return false, err
-	}
-
-	return true, nil
 }
 
 func (db *authDatabase) createAdmin(admin *admin) error {
@@ -78,6 +70,17 @@ func (db *authDatabase) createAdmin(admin *admin) error {
 	}
 
 	return nil
+}
+
+func (db *authDatabase) doesAdminExist() (bool, error) {
+	if err := db.handler.First(&admin{}).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, errutil.AuthErrorDatabaseFailure
+	}
+
+	return true, nil
 }
 
 func (db *authDatabase) readAdmin() (admin, errutil.AuthError) {

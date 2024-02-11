@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
+	"github.com/kilianmandscharo/lethimcook/env"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,10 +17,17 @@ type AuthService struct {
 	privateKey string
 }
 
+func newTestAuthService() AuthService {
+	return AuthService{
+		db:         newTestAuthDatabase(),
+		privateKey: "test_private_key",
+	}
+}
+
 func NewAuthService() AuthService {
 	return AuthService{
 		db:         newAuthDatabase(),
-		privateKey: loadPrivateKeyFromEnv(),
+		privateKey: env.Get(env.EnvKeyJWTPrivateKey),
 	}
 }
 
@@ -43,7 +50,7 @@ func (a *AuthService) CreateAdminIfDoesNotExist(password string) {
 
 func (a *AuthService) updateAdminPasswordHash(newPassword string) errutil.AuthError {
 	if len(newPassword) < 5 {
-		return errutil.AuthErrorPasswordTooLong
+		return errutil.AuthErrorPasswordTooShort
 	}
 
 	newPasswordHash, err := a.hashPassword(newPassword)
@@ -70,7 +77,7 @@ func (a *AuthService) validatePassword(password string) errutil.AuthError {
 func (a *AuthService) doesAdminExist() bool {
 	doesAdminExist, err := a.db.doesAdminExist()
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -80,13 +87,13 @@ func (a *AuthService) doesAdminExist() bool {
 func (a *AuthService) createAdmin(password string) {
 	passwordHash, err := a.hashPassword(password)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	err = a.db.createAdmin(&admin{PasswordHash: passwordHash})
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -127,14 +134,4 @@ func (a *AuthService) newTokenCookie(token string, expires time.Time) http.Cooki
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
 	}
-}
-
-func loadPrivateKeyFromEnv() string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println(errutil.AuthErrorEnvLoadingFailure.Error())
-		os.Exit(1)
-	}
-
-	return os.Getenv("JWT_PRIVATE_KEY")
 }

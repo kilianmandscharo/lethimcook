@@ -2,7 +2,8 @@ package recipe
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"gorm.io/driver/sqlite"
@@ -20,7 +21,8 @@ func newTestRecipeDatabase() recipeDatabase {
 	})
 
 	if err != nil {
-		log.Fatal("failed to connect test database")
+    fmt.Println("failed to connect test database: ", err)
+		os.Exit(1)
 	}
 
 	db.Migrator().DropTable(&recipe{})
@@ -31,10 +33,11 @@ func newTestRecipeDatabase() recipeDatabase {
 }
 
 func newRecipeDatabase() recipeDatabase {
-	db, err := gorm.Open(sqlite.Open("./data.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("./recipe.db"), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("failed to connect recipe database")
+		fmt.Println("failed to connect recipe database: ", err)
+		os.Exit(1)
 	}
 
 	db.AutoMigrate(&recipe{})
@@ -44,28 +47,6 @@ func newRecipeDatabase() recipeDatabase {
 
 func (db *recipeDatabase) createRecipe(recipe *recipe) errutil.RecipeError {
 	if err := db.handler.Create(recipe).Error; err != nil {
-		return errutil.RecipeErrorDatabaseFailure
-	}
-
-	return nil
-}
-
-func (db *recipeDatabase) deleteRecipe(id uint) errutil.RecipeError {
-	result := db.handler.Delete(&recipe{}, id)
-
-	if result.Error != nil {
-		return errutil.RecipeErrorDatabaseFailure
-	}
-
-	if result.RowsAffected == 0 {
-		return errutil.RecipeErrorNotFound
-	}
-
-	return nil
-}
-
-func (db *recipeDatabase) updateRecipe(recipe *recipe) errutil.RecipeError {
-	if err := db.handler.Save(recipe).Error; err != nil {
 		return errutil.RecipeErrorDatabaseFailure
 	}
 
@@ -93,4 +74,26 @@ func (db *recipeDatabase) readAllRecipes() ([]recipe, errutil.RecipeError) {
 	}
 
 	return recipes, nil
+}
+
+func (db *recipeDatabase) deleteRecipe(id uint) errutil.RecipeError {
+	result := db.handler.Delete(&recipe{}, id)
+
+	if result.Error != nil {
+		return errutil.RecipeErrorDatabaseFailure
+	}
+
+	if result.RowsAffected == 0 {
+		return errutil.RecipeErrorNotFound
+	}
+
+	return nil
+}
+
+func (db *recipeDatabase) updateRecipe(recipe *recipe) errutil.RecipeError {
+	if err := db.handler.Save(recipe).Error; err != nil {
+		return errutil.RecipeErrorDatabaseFailure
+	}
+
+	return nil
 }
