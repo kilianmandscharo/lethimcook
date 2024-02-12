@@ -9,6 +9,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type recipeTemplateData struct {
+	Recipe  recipe
+	IsAdmin bool
+}
+
+type recipeTemplateListData struct {
+	Recipes recipes
+	IsAdmin bool
+}
+
 type RecipeController struct {
 	db recipeDatabase
 }
@@ -19,14 +29,17 @@ func NewRecipeController() RecipeController {
 	}
 }
 
-type recipeTemplateData struct {
-	Recipe  recipe
-	IsAdmin bool
-}
+func (r *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
+	// Pages
+	e.GET("/", r.RenderRecipeListPage)
+	e.GET("/recipe/edit/:id", r.RenderRecipeEditPage)
+	e.GET("/recipe/new", r.RenderRecipeNewPage)
+	e.GET("/recipe/:id", r.RenderRecipePage)
 
-type recipeTemplateListData struct {
-	Recipes recipes
-	IsAdmin bool
+	// Actions
+	e.POST("/recipe", r.HandleCreateRecipe)
+	e.PUT("/recipe/:id", r.HandleUpdateRecipe)
+	e.DELETE("/recipe/:id", r.HandleDeleteRecipe)
 }
 
 func (r *RecipeController) RenderRecipeListPage(c echo.Context) error {

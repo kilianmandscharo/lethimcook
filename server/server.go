@@ -27,24 +27,8 @@ func New(authService auth.AuthService) Server {
 	e.Static("/static", "static")
 	routes.AttachTemplates(e)
 
-	// Pages
-	e.GET("/", recipeController.RenderRecipeListPage)
-	e.GET("/recipe/edit/:id", recipeController.RenderRecipeEditPage)
-	e.GET("/recipe/new", recipeController.RenderRecipeNewPage)
-	e.GET("/recipe/:id", recipeController.RenderRecipePage)
-
-	// Actions
-	e.POST("/recipe", recipeController.HandleCreateRecipe)
-	e.PUT("/recipe/:id", recipeController.HandleUpdateRecipe)
-	e.DELETE("/recipe/:id", recipeController.HandleDeleteRecipe)
-
-	// Pages
-	e.GET("/auth/admin", authController.RenderAdminPage)
-
-	// Actions
-	e.POST("/auth/login", authController.HandleLogin)
-	e.POST("/auth/logout", authController.HandleLogout)
-	e.PUT("/auth/password", authController.HandleUpdatePassword)
+	recipeController.AttachHandlerFunctions(e)
+	authController.AttachHandlerFunctions(e)
 
 	return Server{
 		e: e,

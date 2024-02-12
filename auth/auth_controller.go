@@ -20,6 +20,16 @@ func NewAuthController(authService AuthService) AuthController {
 	}
 }
 
+func (a *AuthController) AttachHandlerFunctions(e *echo.Echo) {
+	// Pages
+	e.GET("/auth/admin", a.RenderAdminPage)
+
+	// Actions
+	e.POST("/auth/login", a.HandleLogin)
+	e.POST("/auth/logout", a.HandleLogout)
+	e.PUT("/auth/password", a.HandleUpdatePassword)
+}
+
 func (r *AuthController) RenderAdminPage(c echo.Context) error {
 	return r.renderTemplate(c, routes.TemplateNameAdmin, r.isAdmin(c))
 }
