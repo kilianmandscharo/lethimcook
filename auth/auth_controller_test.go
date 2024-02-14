@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -69,10 +70,14 @@ func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseReco
 
 	c := e.NewContext(req, w)
 	if options.withCookie {
-		c.SetCookie(&options.cookie)
+		if options.authController.authService.validCookieToken(&options.cookie) {
+			c.Set("authorized", true)
+		} else {
+			c.Set("authorized", false)
+		}
 	}
 
-	options.authController.ValidateToken(options.handlerFunc)(c)
+	options.handlerFunc(c)
 
 	assert.Equal(t, options.statusWant, w.Code)
 
@@ -178,34 +183,131 @@ func TestHandleLogin(t *testing.T) {
 	})
 }
 
-// func TestHandleLogout(t *testing.T) {
-// 	a := newTestAuthController(controllerOptions{withAdmin: true})
-//
-// 	t.Run("no cookie", func(t *testing.T) {
-// 		assertRequest(
-// 			t,
-// 			requestOptions{
-// 				authController: &a,
-// 				handlerFunc:    a.HandleLogout,
-// 				method:         http.MethodPost,
-// 				route:          "/auth/logout",
-// 				statusWant:     http.StatusUnauthorized,
-// 			},
-// 		)
-// 	})
-//
-// 	t.Run("successful logout", func(t *testing.T) {
-// 		assertRequest(
-// 			t,
-// 			requestOptions{
-// 				authController: &a,
-// 				handlerFunc:    a.HandleLogout,
-// 				method:         http.MethodPost,
-// 				route:          "/auth/logout",
-// 				statusWant:     http.StatusOK,
-// 				withCookie:     true,
-// 				cookie:         newTestCookie(t, &a),
-// 			},
-// 		)
-// 	})
-// }
+func TestHandleLogout(t *testing.T) {
+	a := newTestAuthController(controllerOptions{withAdmin: true})
+
+	t.Run("no cookie", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleLogout,
+				method:         http.MethodPost,
+				route:          "/auth/logout",
+				statusWant:     http.StatusUnauthorized,
+			},
+		)
+	})
+
+	t.Run("successful logout", func(t *testing.T) {
+		_, c := assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleLogout,
+				method:         http.MethodPost,
+				route:          "/auth/logout",
+				statusWant:     http.StatusOK,
+				withCookie:     true,
+				cookie:         newTestCookie(t, &a),
+			},
+		)
+		assert.False(t, isAuthorized(c))
+	})
+}
+
+func TestHandleUpdatePassword(t *testing.T) {
+	a := newTestAuthController(controllerOptions{})
+
+	t.Run("no admin", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusNotFound,
+				withFormData:   true,
+				formData:       "oldPassword=test&newPassword=test",
+			},
+		)
+	})
+
+	a = newTestAuthController(controllerOptions{withAdmin: true})
+
+	t.Run("wrong old password", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusUnauthorized,
+				withFormData:   true,
+				formData:       "oldPassword=invalid_password&newPassword=test",
+			},
+		)
+	})
+
+	t.Run("wrong old password key", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusUnauthorized,
+				withFormData:   true,
+				formData:       fmt.Sprintf("wrongKey=%s&newPassword=test", testPassword),
+			},
+		)
+	})
+
+	t.Run("wrong new password key", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusBadRequest,
+				withFormData:   true,
+				formData:       fmt.Sprintf("oldPassword=%s&wrongKey=test", testPassword),
+			},
+		)
+	})
+
+	t.Run("new password too short", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusBadRequest,
+				withFormData:   true,
+				formData:       fmt.Sprintf("oldPassword=%s&newPassword=new", testPassword),
+			},
+		)
+	})
+
+	t.Run("succesful password update", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				authController: &a,
+				handlerFunc:    a.HandleUpdatePassword,
+				method:         http.MethodPut,
+				route:          "/auth/password",
+				statusWant:     http.StatusOK,
+				withFormData:   true,
+				formData:       fmt.Sprintf("oldPassword=%s&newPassword=updated", testPassword),
+			},
+		)
+	})
+}

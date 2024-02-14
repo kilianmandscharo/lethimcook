@@ -18,10 +18,6 @@ type recipe struct {
 
 type recipes = []recipe
 
-func newRecipe(title, description string) recipe {
-	return recipe{Title: title, Description: description}
-}
-
 func (r *recipe) renderMarkdown() errutil.RecipeError {
 	var buf bytes.Buffer
 

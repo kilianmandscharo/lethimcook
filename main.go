@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	env.LoadEnvironment()
+	env.LoadEnvironment(".env")
 
 	var password = flag.String("init-admin", "", "the admin password")
 	flag.Parse()

@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"net/http"
 	"os"
 	"os/exec"
 	"testing"
+	"time"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/stretchr/testify/assert"
@@ -126,19 +128,50 @@ func TestHashPassword(t *testing.T) {
 func TestMatchPassword(t *testing.T) {
 	// Given
 	a := newTestAuthService()
-	testPassword := "test_password"
-
-	// When
-	hash, err := a.hashPassword(testPassword)
+	validPassword := "test_password"
+	hash, err := a.hashPassword(validPassword)
 	assert.NoError(t, err)
-	match := a.matchPassword(testPassword, hash)
 
-	// Then
-	assert.True(t, match)
+	testCases := []struct {
+		password      string
+		shouldBeValid bool
+	}{
+		{
+			password:      validPassword,
+			shouldBeValid: true,
+		},
+		{
+			password:      "invalid_password",
+			shouldBeValid: false,
+		},
+	}
 
-	// When
-	match = a.matchPassword("invalid_password", hash)
+	for _, test := range testCases {
+		assert.Equal(t, test.shouldBeValid, a.matchPassword(test.password, hash))
+	}
+}
 
-	// Then
-	assert.False(t, match)
+func TestValidCookieToken(t *testing.T) {
+	// Given
+	a := newTestAuthService()
+	token, err := a.createToken()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		cookie    http.Cookie
+		wantValid bool
+	}{
+		{
+			cookie:    a.newTokenCookie(token, time.Now().Add(60*time.Minute)),
+			wantValid: true,
+		},
+		{
+			cookie:    a.newTokenCookie("invalid_token", time.Now().Add(60*time.Minute)),
+			wantValid: false,
+		},
+	}
+
+	for _, test := range testCases {
+		assert.Equal(t, test.wantValid, a.validCookieToken(&test.cookie))
+	}
 }

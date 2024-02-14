@@ -135,3 +135,11 @@ func (a *AuthService) newTokenCookie(token string, expires time.Time) http.Cooki
 		SameSite: http.SameSiteLaxMode,
 	}
 }
+
+func (r *AuthService) validCookieToken(cookie *http.Cookie) bool {
+	token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
+		return []byte(r.privateKey), nil
+	})
+
+	return err == nil && token.Valid
+}

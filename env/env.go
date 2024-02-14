@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/kilianmandscharo/lethimcook/projectpath"
 )
 
 const (
@@ -13,10 +14,10 @@ const (
 	EnvKeyJWTPrivateKey = "JWT_PRIVATE_KEY"
 )
 
-func LoadEnvironment() {
-	err := godotenv.Load(".env")
+func LoadEnvironment(envName string) {
+	err := godotenv.Load(projectpath.Absolute(envName))
 	if err != nil {
-		fmt.Println("failed to load .env")
+		fmt.Println("failed to load ", envName)
 		os.Exit(1)
 	}
 }

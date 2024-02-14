@@ -23,7 +23,7 @@ func New(authService auth.AuthService) Server {
 	authController := auth.NewAuthController(authService)
 
 	e := echo.New()
-	e.Use(authController.ValidateToken)
+	e.Use(authController.ValidateTokenMiddleware)
 	e.Static("/static", "static")
 	routes.AttachTemplates(e)
 
@@ -47,7 +47,7 @@ func (s *Server) Start() {
 }
 
 func (s *Server) startDev() {
-	if err := s.e.Start(":80"); err != nil {
+	if err := s.e.Start(":8080"); err != nil {
 		s.e.Logger.Fatal("Error starting development server: ", err)
 	}
 }

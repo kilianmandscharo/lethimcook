@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/routes"
 	"github.com/labstack/echo/v4"
@@ -88,19 +87,15 @@ func (r *AuthController) HandleUpdatePassword(c echo.Context) error {
 	return c.String(http.StatusOK, "Passwort erfolgreich geändert")
 }
 
-func (r *AuthController) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
+func (r *AuthController) ValidateTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cookie, err := c.Cookie("token")
-		if err != nil {
+		if err != nil || !r.authService.validCookieToken(cookie) {
 			c.Set("authorized", false)
 			return next(c)
 		}
 
-		token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
-			return []byte(r.authService.privateKey), nil
-		})
-
-		c.Set("authorized", token.Valid)
+		c.Set("authorized", true)
 
 		return next(c)
 	}
