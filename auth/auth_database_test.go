@@ -7,6 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newTestAdmin() admin {
+	return admin{PasswordHash: "test hash"}
+}
+
 func TestCreateAdmin(t *testing.T) {
 	// Given
 	db := newTestAuthDatabase()
