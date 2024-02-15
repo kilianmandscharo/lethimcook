@@ -1,11 +1,33 @@
 package recipe
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+func newTestRecipeDatabase() recipeDatabase {
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+
+	if err != nil {
+		fmt.Println("failed to connect test database: ", err)
+		os.Exit(1)
+	}
+
+	db.Migrator().DropTable(&recipe{})
+
+	db.AutoMigrate(&recipe{})
+
+	return recipeDatabase{handler: db}
+}
 
 func TestCreateRecipe(t *testing.T) {
 	// Given

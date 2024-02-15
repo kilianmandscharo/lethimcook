@@ -11,11 +11,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newTestAuthService() AuthService {
+	return AuthService{
+		db:         newTestAuthDatabase(),
+		privateKey: "test_private_key",
+	}
+}
+
 func TestCreateAdminIfDoesNotExistCrash(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 	if os.Getenv("BE_CRASHER") == "1" {
-		a.CreateAdminIfDoesNotExist("")
+		authService.CreateAdminIfDoesNotExist("")
 	}
 
 	// When
@@ -31,36 +38,36 @@ func TestCreateAdminIfDoesNotExistCrash(t *testing.T) {
 
 func TestCreateAdminIfDoesNotExist(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 
 	// Then
-	a.CreateAdminIfDoesNotExist("test_password")
-	a.CreateAdminIfDoesNotExist("test_password")
-	a.CreateAdminIfDoesNotExist("")
+	authService.CreateAdminIfDoesNotExist("test_password")
+	authService.CreateAdminIfDoesNotExist("test_password")
+	authService.CreateAdminIfDoesNotExist("")
 }
 
 func TestUpdateAdminPasswordHash(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 
 	// When
-	err := a.updateAdminPasswordHash("test_password")
+	err := authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
 
 	// Given
 	admin := newTestAdmin()
-	assert.NoError(t, a.db.createAdmin(&admin))
+	assert.NoError(t, authService.db.createAdmin(&admin))
 
 	// When
-	err = a.updateAdminPasswordHash("aaaa")
+	err = authService.updateAdminPasswordHash("aaaa")
 
 	// Then
 	assert.ErrorIs(t, err, errutil.AuthErrorPasswordTooShort)
 
 	// When
-	err = a.updateAdminPasswordHash("test_password")
+	err = authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.NoError(t, err)
@@ -68,28 +75,28 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 
 func TestValidatePassword(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 
 	// When
-	err := a.validatePassword("test_password")
+	err := authService.validatePassword("test_password")
 
 	// Then
 	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
 
 	// Given
-	testHash, err := a.hashPassword("test_password")
+	testHash, err := authService.hashPassword("test_password")
 	assert.NoError(t, err)
 	admin := admin{PasswordHash: testHash}
-	assert.NoError(t, a.db.createAdmin(&admin))
+	assert.NoError(t, authService.db.createAdmin(&admin))
 
 	// When
-	err = a.validatePassword("test_password")
+	err = authService.validatePassword("test_password")
 
 	// Then
 	assert.NoError(t, err)
 
 	// When
-	err = a.validatePassword("invalid_password")
+	err = authService.validatePassword("invalid_password")
 
 	// Then
 	assert.ErrorIs(t, err, errutil.AuthErrorInvalidPassword)
@@ -97,10 +104,10 @@ func TestValidatePassword(t *testing.T) {
 
 func TestCreateToken(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 
 	// When
-	token, err := a.createToken()
+	token, err := authService.createToken()
 
 	// Then
 	assert.NoError(t, err)
@@ -109,17 +116,17 @@ func TestCreateToken(t *testing.T) {
 
 func TestHashPassword(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 
 	// When
-	hash, err := a.hashPassword("test_password")
+	hash, err := authService.hashPassword("test_password")
 
 	// Then
 	assert.NoError(t, err)
 	assert.True(t, len(hash) != 0)
 
 	// When
-	hash, err = a.hashPassword("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	hash, err = authService.hashPassword("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 	// Then
 	assert.ErrorIs(t, err, errutil.AuthErrorPasswordTooLong)
@@ -127,9 +134,9 @@ func TestHashPassword(t *testing.T) {
 
 func TestMatchPassword(t *testing.T) {
 	// Given
-	a := newTestAuthService()
+	authService := newTestAuthService()
 	validPassword := "test_password"
-	hash, err := a.hashPassword(validPassword)
+	hash, err := authService.hashPassword(validPassword)
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -147,14 +154,14 @@ func TestMatchPassword(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		assert.Equal(t, test.shouldBeValid, a.matchPassword(test.password, hash))
+		assert.Equal(t, test.shouldBeValid, authService.matchPassword(test.password, hash))
 	}
 }
 
 func TestValidCookieToken(t *testing.T) {
 	// Given
-	a := newTestAuthService()
-	token, err := a.createToken()
+	authService := newTestAuthService()
+	token, err := authService.createToken()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -162,16 +169,16 @@ func TestValidCookieToken(t *testing.T) {
 		wantValid bool
 	}{
 		{
-			cookie:    a.newTokenCookie(token, time.Now().Add(60*time.Minute)),
+			cookie:    authService.newTokenCookie(token, time.Now().Add(60*time.Minute)),
 			wantValid: true,
 		},
 		{
-			cookie:    a.newTokenCookie("invalid_token", time.Now().Add(60*time.Minute)),
+			cookie:    authService.newTokenCookie("invalid_token", time.Now().Add(60*time.Minute)),
 			wantValid: false,
 		},
 	}
 
 	for _, test := range testCases {
-		assert.Equal(t, test.wantValid, a.validCookieToken(&test.cookie))
+		assert.Equal(t, test.wantValid, authService.validCookieToken(&test.cookie))
 	}
 }

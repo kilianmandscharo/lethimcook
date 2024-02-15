@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,10 +32,10 @@ func newTestAuthController(options controllerOptions) AuthController {
 	return NewAuthController(authService)
 }
 
-func newTestCookie(t *testing.T, a *AuthController) http.Cookie {
-	token, err := a.authService.createToken()
+func newTestCookie(t *testing.T, authController *AuthController) http.Cookie {
+	token, err := authController.authService.createToken()
 	assert.NoError(t, err)
-	return a.authService.newTokenCookie(token, time.Now().Add(60*time.Minute))
+	return authController.authService.newTokenCookie(token, time.Now().Add(60*time.Minute))
 }
 
 type requestOptions struct {
@@ -84,23 +85,15 @@ func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseReco
 	return w, c
 }
 
-func isAuthorized(c echo.Context) bool {
-	valueInterface := c.Get("authorized")
-	if value, ok := valueInterface.(bool); ok {
-		return value
-	}
-	return false
-}
-
 func TestRenderAdminPage(t *testing.T) {
-	a := newTestAuthController(controllerOptions{})
+	authController := newTestAuthController(controllerOptions{})
 
 	t.Run("valid request", func(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.RenderAdminPage,
+				authController: &authController,
+				handlerFunc:    authController.RenderAdminPage,
 				method:         http.MethodGet,
 				route:          "/auth/admin",
 				statusWant:     http.StatusOK,
@@ -110,14 +103,14 @@ func TestRenderAdminPage(t *testing.T) {
 }
 
 func TestHandleLogin(t *testing.T) {
-	a := newTestAuthController(controllerOptions{})
+	authController := newTestAuthController(controllerOptions{})
 
 	t.Run("no admin", func(t *testing.T) {
 		w, c := assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogin,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogin,
 				method:         http.MethodPost,
 				route:          "/auth/login",
 				statusWant:     http.StatusNotFound,
@@ -126,17 +119,17 @@ func TestHandleLogin(t *testing.T) {
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
-		assert.False(t, isAuthorized(c))
+		assert.False(t, servutil.IsAuthorized(c))
 	})
 
-	a = newTestAuthController(controllerOptions{withAdmin: true})
+	authController = newTestAuthController(controllerOptions{withAdmin: true})
 
 	t.Run("invalid form key", func(t *testing.T) {
 		w, c := assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogin,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogin,
 				method:         http.MethodPost,
 				route:          "/auth/login",
 				statusWant:     http.StatusUnauthorized,
@@ -145,15 +138,15 @@ func TestHandleLogin(t *testing.T) {
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
-		assert.False(t, isAuthorized(c))
+		assert.False(t, servutil.IsAuthorized(c))
 	})
 
 	t.Run("invalid password", func(t *testing.T) {
 		w, c := assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogin,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogin,
 				method:         http.MethodPost,
 				route:          "/auth/login",
 				statusWant:     http.StatusUnauthorized,
@@ -162,15 +155,15 @@ func TestHandleLogin(t *testing.T) {
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
-		assert.False(t, isAuthorized(c))
+		assert.False(t, servutil.IsAuthorized(c))
 	})
 
 	t.Run("valid password", func(t *testing.T) {
 		w, c := assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogin,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogin,
 				method:         http.MethodPost,
 				route:          "/auth/login",
 				statusWant:     http.StatusOK,
@@ -179,19 +172,19 @@ func TestHandleLogin(t *testing.T) {
 			},
 		)
 		assert.Equal(t, 1, len(w.Result().Cookies()))
-		assert.True(t, isAuthorized(c))
+		assert.True(t, servutil.IsAuthorized(c))
 	})
 }
 
 func TestHandleLogout(t *testing.T) {
-	a := newTestAuthController(controllerOptions{withAdmin: true})
+	authController := newTestAuthController(controllerOptions{withAdmin: true})
 
 	t.Run("no cookie", func(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogout,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogout,
 				method:         http.MethodPost,
 				route:          "/auth/logout",
 				statusWant:     http.StatusUnauthorized,
@@ -203,28 +196,28 @@ func TestHandleLogout(t *testing.T) {
 		_, c := assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleLogout,
+				authController: &authController,
+				handlerFunc:    authController.HandleLogout,
 				method:         http.MethodPost,
 				route:          "/auth/logout",
 				statusWant:     http.StatusOK,
 				withCookie:     true,
-				cookie:         newTestCookie(t, &a),
+				cookie:         newTestCookie(t, &authController),
 			},
 		)
-		assert.False(t, isAuthorized(c))
+		assert.False(t, servutil.IsAuthorized(c))
 	})
 }
 
 func TestHandleUpdatePassword(t *testing.T) {
-	a := newTestAuthController(controllerOptions{})
+	authController := newTestAuthController(controllerOptions{})
 
 	t.Run("no admin", func(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusNotFound,
@@ -234,14 +227,14 @@ func TestHandleUpdatePassword(t *testing.T) {
 		)
 	})
 
-	a = newTestAuthController(controllerOptions{withAdmin: true})
+	authController = newTestAuthController(controllerOptions{withAdmin: true})
 
 	t.Run("wrong old password", func(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusUnauthorized,
@@ -255,8 +248,8 @@ func TestHandleUpdatePassword(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusUnauthorized,
@@ -270,8 +263,8 @@ func TestHandleUpdatePassword(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusBadRequest,
@@ -285,8 +278,8 @@ func TestHandleUpdatePassword(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusBadRequest,
@@ -300,8 +293,8 @@ func TestHandleUpdatePassword(t *testing.T) {
 		assertRequest(
 			t,
 			requestOptions{
-				authController: &a,
-				handlerFunc:    a.HandleUpdatePassword,
+				authController: &authController,
+				handlerFunc:    authController.HandleUpdatePassword,
 				method:         http.MethodPut,
 				route:          "/auth/password",
 				statusWant:     http.StatusOK,

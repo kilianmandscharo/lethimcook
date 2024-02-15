@@ -19,9 +19,20 @@ var (
 	AuthErrorInvalidAuthHeader    AuthError = errors.New("invalid auth header provided")
 	AuthErrorInvalidToken         AuthError = errors.New("invalid token provided")
 	AuthErrorInvalidForm          AuthError = errors.New("invalid form")
+	AuthErrorNotAuthorized        AuthError = errors.New("not authorized")
 )
 
-var AuthErrorHttpCodes = map[RecipeError]int{
+type RecipeError = error
+
+var (
+	RecipeErrorInvalidParam    RecipeError = errors.New("invalid path parameter")
+	RecipeErrorInvalidFormData RecipeError = errors.New("invalid form data")
+	RecipeErrorNotFound        RecipeError = errors.New("no recipe found")
+	RecipeErrorDatabaseFailure RecipeError = errors.New("database error")
+	RecipeErrorMarkdownFailure RecipeError = errors.New("error parsing markdown")
+)
+
+var ErrorHttpCodes = map[error]int{
 	AuthErrorNoAdminFound:         http.StatusNotFound,
 	AuthErrorDatabaseFailure:      http.StatusInternalServerError,
 	AuthErrorInvalidBody:          http.StatusBadRequest,
@@ -33,4 +44,10 @@ var AuthErrorHttpCodes = map[RecipeError]int{
 	AuthErrorInvalidAuthHeader:    http.StatusBadRequest,
 	AuthErrorInvalidToken:         http.StatusUnauthorized,
 	AuthErrorInvalidForm:          http.StatusBadRequest,
+	AuthErrorNotAuthorized:        http.StatusUnauthorized,
+
+	RecipeErrorInvalidParam:    http.StatusBadRequest,
+	RecipeErrorInvalidFormData: http.StatusBadRequest,
+	RecipeErrorNotFound:        http.StatusNotFound,
+	RecipeErrorDatabaseFailure: http.StatusInternalServerError,
 }
