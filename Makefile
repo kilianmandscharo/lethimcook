@@ -1,7 +1,6 @@
 # Compiler options
 GO := go
 GOCMD := $(GO) build
-GOFMT := $(GO) fmt
 
 # Directories
 BUILD_DIR := build
