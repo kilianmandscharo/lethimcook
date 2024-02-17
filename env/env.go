@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/kilianmandscharo/lethimcook/projectpath"
 )
 
 const (
@@ -15,10 +14,9 @@ const (
 )
 
 func LoadEnvironment(envName string) {
-	path := projectpath.Absolute(envName)
-	err := godotenv.Load(path)
+	err := godotenv.Load(envName)
 	if err != nil {
-		fmt.Println("failed to load", path)
+		fmt.Println("failed to load", envName)
 		os.Exit(1)
 	}
 }

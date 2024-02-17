@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,7 +25,7 @@ func New(authService auth.AuthService) Server {
 
 	e := echo.New()
 	e.Use(authController.ValidateTokenMiddleware)
-	e.Static("/static", "static")
+	e.Static("/static", "./static")
 	templutils.AttachTemplates(e)
 
 	recipeController.AttachHandlerFunctions(e)
@@ -48,7 +49,7 @@ func (s *Server) Start() {
 
 func (s *Server) startDev() {
 	go func() {
-		s.e.Logger.Fatal(s.e.Start(":8080"))
+		log.Fatal(s.e.Start(":8080"))
 	}()
 
 	s.listenForShutdown()
@@ -60,7 +61,7 @@ func (s *Server) startProd(certFilePath, keyFilePath string) {
 	}()
 
 	go func() {
-		s.e.Logger.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "https://"+req.Host+req.URL.String(), http.StatusMovedPermanently)
 		})))
 	}()
@@ -75,6 +76,6 @@ func (s *Server) listenForShutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := s.e.Shutdown(ctx); err != nil {
-		s.e.Logger.Fatal("Error shutting down server: ", err)
+		log.Fatal("Error shutting down server: ", err)
 	}
 }

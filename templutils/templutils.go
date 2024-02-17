@@ -6,7 +6,6 @@ import (
 	"path"
 	"text/template"
 
-	"github.com/kilianmandscharo/lethimcook/projectpath"
 	"github.com/labstack/echo/v4"
 )
 
@@ -53,23 +52,23 @@ func newCustomTemplate(baseName string, templates *template.Template) customTemp
 }
 
 func registerPageTemplate(tmap map[string]customTemplate, name templateName) {
-	pathToFragment := path.Join(projectpath.Root, "templates/pages", htmlName(name))
+	pathToFragment := path.Join("./templates/pages", htmlName(name))
 
 	// Register full page
 	tmap[PageName(name)] = newCustomTemplate(
 		"page.html",
-		template.Must(template.ParseFiles(projectpath.Absolute("templates/page.html"), pathToFragment)),
+		template.Must(template.ParseFiles("./templates/page.html", pathToFragment)),
 	)
 
 	// Register fragment
 	tmap[FragmentName(name)] = newCustomTemplate(
 		"fragment.html",
-		template.Must(template.ParseFiles(projectpath.Absolute("templates/fragment.html"), pathToFragment)),
+		template.Must(template.ParseFiles("./templates/fragment.html", pathToFragment)),
 	)
 }
 
 func registerComponentTemplate(tmap map[string]customTemplate, name templateName) {
-	pathToFragment := path.Join(projectpath.Root, "templates/components", htmlName(name))
+	pathToFragment := path.Join("./templates/components", htmlName(name))
 
 	tmap[FragmentName(name)] = newCustomTemplate(
 		htmlName(name),

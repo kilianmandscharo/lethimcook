@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kilianmandscharo/lethimcook/projectpath"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,15 +15,13 @@ const (
 	testJWTPrivateKey = "test_jwt_private_key"
 )
 
-var testFilePath = projectpath.Absolute(testFileName)
-
 func TestEnvironment(t *testing.T) {
 	// Given
 	envString := fmt.Sprintf("%s=%s", EnvKeyCertFilePath, testCertFilePath) +
 		fmt.Sprintf("\n%s=%s", EnvKeyKeyFilePath, testKeyFilePath) +
 		fmt.Sprintf("\n%s=%s", EnvKeyJWTPrivateKey, testJWTPrivateKey)
 
-	err := os.WriteFile(testFilePath, []byte(envString), 0644)
+	err := os.WriteFile(testFileName, []byte(envString), 0644)
 	assert.NoError(t, err)
 
 	// Then
@@ -40,6 +37,6 @@ func TestEnvironment(t *testing.T) {
 	assert.Equal(t, testKeyFilePath, Get(EnvKeyKeyFilePath))
 	assert.Equal(t, testJWTPrivateKey, Get(EnvKeyJWTPrivateKey))
 
-	err = os.Remove(testFilePath)
+	err = os.Remove(testFileName)
 	assert.NoError(t, err)
 }
