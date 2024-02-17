@@ -46,4 +46,4 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           source: ${{ steps.bundle.outputs.BUNDLE_NAME }}
-          target: "~/builds"
+          target: ${{ secrets.TARGET_DIR }}
