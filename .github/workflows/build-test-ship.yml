@@ -36,14 +36,12 @@ jobs:
         run: |
           FILENAME="build_$(date +"%Y%m%d_%H%M%S").tar.gz"
           tar -zcvf $FILENAME build
-          echo "BUNDLE_NAME=$FILENAME"
+          echo "BUNDLE_NAME=$FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Debug
         run: |
           echo "NAME:"
           echo ${{ steps.bundle.outputs.BUNDLE_NAME }}
-          echo "LS:"
-          ls
 
       - name: Ship
         uses: appleboy/scp-action@v0.1.7
