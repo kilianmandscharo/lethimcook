@@ -38,6 +38,13 @@ jobs:
           tar -zcvf $FILENAME build
           echo "BUNDLE_NAME=$FILENAME"
 
+      - name: Debug
+        run: |
+          echo "NAME:"
+          echo ${{ steps.bundle.outputs.BUNDLE_NAME }}
+          echo "LS:"
+          ls
+
       - name: Ship
         uses: appleboy/scp-action@v0.1.7
         with:
