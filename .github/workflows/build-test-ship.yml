@@ -30,3 +30,20 @@ jobs:
 
       - name: Test
         run: go test -v ./...
+
+      - name: Bundle
+        id: bundle
+        run: |
+          FILENAME="build_$(date +"%Y%m%d_%H%M%S").tar.gz"
+          tar -zcvf $FILENAME build
+          echo "BUNDLE_NAME=$FILENAME"
+
+      - name: Ship
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          source: ${{ steps.bundle.outputs.BUNDLE_NAME }}
+          target: "~/builds"
