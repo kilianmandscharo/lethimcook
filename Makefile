@@ -17,7 +17,7 @@ TARGET := $(BUILD_DIR)/lethimcook
 .PHONY: all clean
 
 # Default target
-all: $(TARGET) copy_templates copy_static copy_env
+all: $(TARGET) copy_templates copy_static
 
 # Build target
 $(TARGET): $(SOURCES)
@@ -32,9 +32,6 @@ copy_templates:
 copy_static:
 	mkdir -p $(BUILD_DIR)/$(STATIC_DIR)
 	cp -r $(STATIC_DIR)/* $(BUILD_DIR)/$(STATIC_DIR)
-
-copy_env:
-	cp .env $(BUILD_DIR)/
 
 # Clean target
 clean:
