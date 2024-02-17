@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Protest+Riot&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
 :root {
   --color-dark: #111827;
   --color-semi-dark: #374151;
@@ -8,11 +11,11 @@
 body {
   background-color: var(--color-dark);
   color: rgba(255, 255, 255, 0.9);
-  max-width: 896px;
+  max-width: 672px;
   min-width: 300px;
   margin: 0 auto;
   padding: 1rem;
-  font-family: sans-serif;
+  font-family: "Noto Sans", sans-serif;
   position: relative;
 }
 
@@ -50,7 +53,7 @@ footer {
   gap: 2rem;
 }
 
-footer > button {
+footer>button {
   all: unset;
   cursor: pointer;
   padding-bottom: 2px;
@@ -58,7 +61,7 @@ footer > button {
   transition: border 250ms ease;
 }
 
-footer > button:hover {
+footer>button:hover {
   border-bottom: 1px solid var(--color-primary);
 }
 
@@ -79,8 +82,19 @@ button {
   min-width: 100px;
 }
 
+a {
+  color: var(--color-primary);
+}
+
 h1 {
+  font-size: 40px;
+  text-shadow: 2px 2px 1px var(--color-primary);
+  font-family: "Protest Riot", sans-serif;
   margin: 0;
+}
+
+h4 {
+  font-style: italic;
 }
 
 header {
@@ -90,7 +104,7 @@ header {
   margin-bottom: 3rem;
 }
 
-header > div {
+header>div {
   display: flex;
   gap: 1rem;
 }
@@ -120,12 +134,12 @@ textarea {
   font-size: 18px;
 }
 
-.recipe-list-item > :first-child {
+.recipe-list-item> :first-child {
   all: unset;
   cursor: pointer;
 }
 
-form > :last-child {
+form> :last-child {
   background-color: var(--color-primary);
   border: none;
   cursor: pointer;
@@ -163,6 +177,7 @@ form > :last-child {
 }
 
 @keyframes circle-animation {
+
   0%,
   25% {
     stroke-dashoffset: 200;

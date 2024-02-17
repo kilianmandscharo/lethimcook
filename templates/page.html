@@ -24,9 +24,10 @@
     Hinweis
   </div>
   <footer>
-    <button>Impressum</button>
-    <button>Datenschutzerklärung</button>
-    <button hx-trigger="click" hx-target="#content" hx-get="auth/admin" hx-push-url="true">Admin</button>
+    <button hx-get="/imprint" hx-trigger="click" hx-target="#content" hx-push-url="true">Impressum</button>
+    <button hx-get="/privacy-notice" hx-trigger="click" hx-target="#content"
+      hx-push-url="true">Datenschutzerklärung</button>
+    <button hx-get="/admin" hx-trigger="click" hx-target="#content" hx-push-url="true">Admin</button>
   </footer>
   <script>
     document.body.addEventListener("htmx:responseError", function (event) {

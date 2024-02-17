@@ -11,7 +11,8 @@ import (
 	"github.com/kilianmandscharo/lethimcook/auth"
 	"github.com/kilianmandscharo/lethimcook/env"
 	"github.com/kilianmandscharo/lethimcook/recipe"
-	"github.com/kilianmandscharo/lethimcook/templutils"
+	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/templutil"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,10 +25,12 @@ func New(authService auth.AuthService) Server {
 	authController := auth.NewAuthController(authService)
 
 	e := echo.New()
+
 	e.Use(authController.ValidateTokenMiddleware)
 	e.Static("/static", "./static")
-	templutils.AttachTemplates(e)
+	templutil.AttachTemplates(e)
 
+	servutil.AttachHandlerFunctions(e)
 	recipeController.AttachHandlerFunctions(e)
 	authController.AttachHandlerFunctions(e)
 

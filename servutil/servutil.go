@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
-	"github.com/kilianmandscharo/lethimcook/templutils"
+	"github.com/kilianmandscharo/lethimcook/templutil"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,12 +21,25 @@ func IsAuthorized(c echo.Context) bool {
 	return false
 }
 
+func AttachHandlerFunctions(e *echo.Echo) {
+	e.GET("/imprint", renderImprint)
+	e.GET("/privacy-notice", renderPrivacyNotice)
+}
+
+func renderImprint(c echo.Context) error {
+	return RenderTemplate(c, templutil.TemplateNameImprint, nil)
+}
+
+func renderPrivacyNotice(c echo.Context) error {
+	return RenderTemplate(c, templutil.TemplateNamePrivacyNotice, nil)
+}
+
 func RenderTemplate(c echo.Context, templateName string, data any) error {
 	if isHxRequest(c) {
-		return c.Render(http.StatusOK, templutils.FragmentName(templateName), data)
+		return c.Render(http.StatusOK, templutil.FragmentName(templateName), data)
 	}
 
-	return c.Render(http.StatusOK, templutils.PageName(templateName), data)
+	return c.Render(http.StatusOK, templutil.PageName(templateName), data)
 }
 
 func RenderError(c echo.Context, err error) error {

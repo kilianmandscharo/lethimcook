@@ -1,4 +1,4 @@
-package templutils
+package templutil
 
 import (
 	"errors"
@@ -10,6 +10,11 @@ import (
 )
 
 type templateName = string
+
+const (
+	TemplateNameImprint       templateName = "imprint"
+	TemplateNamePrivacyNotice templateName = "privacy-notice"
+)
 
 const (
 	TemplateNameAdmin           templateName = "admin"
@@ -86,6 +91,10 @@ func (t *templateRegistry) Render(w io.Writer, name string, data any, c echo.Con
 
 func AttachTemplates(e *echo.Echo) {
 	templates := make(map[string]customTemplate)
+
+	// General
+	registerPageTemplate(templates, TemplateNameImprint)
+	registerPageTemplate(templates, TemplateNamePrivacyNotice)
 
 	// Recipe
 	registerPageTemplate(templates, TemplateNameRecipeList)
