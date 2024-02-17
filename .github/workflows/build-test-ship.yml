@@ -36,7 +36,6 @@ jobs:
         run: |
           FILENAME="build_$(date +"%Y%m%d_%H%M%S").tar.gz"
           tar -zcvf $FILENAME build
-          chmod 664 $FILENAME
           echo "BUNDLE_NAME=$FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Ship
