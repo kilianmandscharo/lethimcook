@@ -1,4 +1,4 @@
-package routes
+package templutils
 
 import (
 	"errors"
@@ -11,6 +11,18 @@ import (
 )
 
 type templateName = string
+
+const (
+	TemplateNameAdmin           templateName = "admin"
+	TemplateNameLoginSuccessful templateName = "login-successful"
+)
+
+const (
+	TemplateNameRecipe     templateName = "recipe"
+	TemplateNameRecipeList templateName = "recipe-list"
+	TemplateNameRecipeEdit templateName = "recipe-edit"
+	TemplateNameRecipeNew  templateName = "recipe-new"
+)
 
 func PageName(name templateName) string {
 	return name + "-page"

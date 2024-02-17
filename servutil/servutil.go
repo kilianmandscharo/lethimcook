@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
-	"github.com/kilianmandscharo/lethimcook/routes"
+	"github.com/kilianmandscharo/lethimcook/templutils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,10 +23,10 @@ func IsAuthorized(c echo.Context) bool {
 
 func RenderTemplate(c echo.Context, templateName string, data any) error {
 	if isHxRequest(c) {
-		return c.Render(http.StatusOK, routes.FragmentName(templateName), data)
+		return c.Render(http.StatusOK, templutils.FragmentName(templateName), data)
 	}
 
-	return c.Render(http.StatusOK, routes.PageName(templateName), data)
+	return c.Render(http.StatusOK, templutils.PageName(templateName), data)
 }
 
 func RenderError(c echo.Context, err error) error {

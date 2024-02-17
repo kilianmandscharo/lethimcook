@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
-	"github.com/kilianmandscharo/lethimcook/routes"
 	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/templutils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -31,7 +31,7 @@ func (ac *AuthController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (ac *AuthController) RenderAdminPage(c echo.Context) error {
-	return servutil.RenderTemplate(c, routes.TemplateNameAdmin, servutil.IsAuthorized(c))
+	return servutil.RenderTemplate(c, templutils.TemplateNameAdmin, servutil.IsAuthorized(c))
 }
 
 func (ac *AuthController) HandleLogin(c echo.Context) error {

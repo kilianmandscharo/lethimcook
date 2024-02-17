@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
-	"github.com/kilianmandscharo/lethimcook/routes"
 	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/templutils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -50,7 +50,7 @@ func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		routes.TemplateNameRecipeList,
+		templutils.TemplateNameRecipeList,
 		recipeTemplateListData{Recipes: recipes, IsAdmin: servutil.IsAuthorized(c)},
 	)
 }
@@ -62,7 +62,7 @@ func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		routes.TemplateNameRecipeNew,
+		templutils.TemplateNameRecipeNew,
 		servutil.IsAuthorized(c),
 	)
 }
@@ -79,7 +79,7 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		routes.TemplateNameRecipeEdit,
+		templutils.TemplateNameRecipeEdit,
 		recipeTemplateData{Recipe: recipe, IsAdmin: servutil.IsAuthorized(c)},
 	)
 }
@@ -96,7 +96,7 @@ func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		routes.TemplateNameRecipe,
+		templutils.TemplateNameRecipe,
 		recipeTemplateData{Recipe: recipe, IsAdmin: servutil.IsAuthorized(c)},
 	)
 }

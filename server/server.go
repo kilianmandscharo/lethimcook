@@ -10,7 +10,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/auth"
 	"github.com/kilianmandscharo/lethimcook/env"
 	"github.com/kilianmandscharo/lethimcook/recipe"
-	"github.com/kilianmandscharo/lethimcook/routes"
+	"github.com/kilianmandscharo/lethimcook/templutils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,7 +25,7 @@ func New(authService auth.AuthService) Server {
 	e := echo.New()
 	e.Use(authController.ValidateTokenMiddleware)
 	e.Static("/static", "static")
-	routes.AttachTemplates(e)
+	templutils.AttachTemplates(e)
 
 	recipeController.AttachHandlerFunctions(e)
 	authController.AttachHandlerFunctions(e)
@@ -47,27 +47,28 @@ func (s *Server) Start() {
 }
 
 func (s *Server) startDev() {
-	if err := s.e.Start(":8080"); err != nil {
-		s.e.Logger.Fatal("Error starting development server: ", err)
-	}
+	go func() {
+		s.e.Logger.Fatal(s.e.Start(":8080"))
+	}()
+
+	s.listenForShutdown()
 }
 
 func (s *Server) startProd(certFilePath, keyFilePath string) {
 	go func() {
-		if err := s.e.StartTLS(":443", certFilePath, keyFilePath); err != nil {
-			s.e.Logger.Fatal("Error starting server: ", err)
-		}
+		s.e.Logger.Fatal(s.e.StartTLS(":443", certFilePath, keyFilePath))
 	}()
 
 	go func() {
-		if err := http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		s.e.Logger.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "https://"+req.Host+req.URL.String(), http.StatusMovedPermanently)
-		})); err != nil {
-			s.e.Logger.Fatal("Error starting redirect server: ", err)
-		}
+		})))
 	}()
 
-	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds
+	s.listenForShutdown()
+}
+
+func (s *Server) listenForShutdown() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
