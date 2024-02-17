@@ -15,9 +15,10 @@ const (
 )
 
 func LoadEnvironment(envName string) {
-	err := godotenv.Load(projectpath.Absolute(envName))
+	path := projectpath.Absolute(envName)
+	err := godotenv.Load(path)
 	if err != nil {
-		fmt.Println("failed to load ", envName)
+		fmt.Println("failed to load", path)
 		os.Exit(1)
 	}
 }
