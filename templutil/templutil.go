@@ -17,8 +17,7 @@ const (
 )
 
 const (
-	TemplateNameAdmin           templateName = "admin"
-	TemplateNameLoginSuccessful templateName = "login-successful"
+	TemplateNameAdmin templateName = "admin"
 )
 
 const (
@@ -56,28 +55,37 @@ func newCustomTemplate(baseName string, templates *template.Template) customTemp
 	}
 }
 
-func registerPageTemplate(tmap map[string]customTemplate, name templateName) {
+func getComponentPaths(components []string) []string {
+	var componentPaths []string
+
+	for _, component := range components {
+		componentPaths = append(
+			componentPaths,
+			path.Join("./templates/components", htmlName(component)),
+		)
+	}
+
+	return componentPaths
+}
+
+func registerPageTemplate(tmap map[string]customTemplate, name templateName, components ...string) {
 	pathToFragment := path.Join("./templates/pages", htmlName(name))
+	componentPaths := getComponentPaths(components)
+
+	paths := append([]string{"./templates/page.html", pathToFragment}, componentPaths...)
 
 	// Register full page
 	tmap[PageName(name)] = newCustomTemplate(
 		"page.html",
-		template.Must(template.ParseFiles("./templates/page.html", pathToFragment)),
+		template.Must(template.ParseFiles(paths...)),
 	)
+
+	paths = append([]string{"./templates/fragment.html", pathToFragment}, componentPaths...)
 
 	// Register fragment
 	tmap[FragmentName(name)] = newCustomTemplate(
 		"fragment.html",
-		template.Must(template.ParseFiles("./templates/fragment.html", pathToFragment)),
-	)
-}
-
-func registerComponentTemplate(tmap map[string]customTemplate, name templateName) {
-	pathToFragment := path.Join("./templates/components", htmlName(name))
-
-	tmap[FragmentName(name)] = newCustomTemplate(
-		htmlName(name),
-		template.Must(template.ParseFiles(pathToFragment)),
+		template.Must(template.ParseFiles(paths...)),
 	)
 }
 
@@ -93,18 +101,17 @@ func AttachTemplates(e *echo.Echo) {
 	templates := make(map[string]customTemplate)
 
 	// General
-	registerPageTemplate(templates, TemplateNameImprint)
-	registerPageTemplate(templates, TemplateNamePrivacyNotice)
+	registerPageTemplate(templates, TemplateNameImprint, "home-button", "admin-button")
+	registerPageTemplate(templates, TemplateNamePrivacyNotice, "home-button", "admin-button")
 
 	// Recipe
-	registerPageTemplate(templates, TemplateNameRecipeList)
-	registerPageTemplate(templates, TemplateNameRecipe)
-	registerPageTemplate(templates, TemplateNameRecipeNew)
-	registerPageTemplate(templates, TemplateNameRecipeEdit)
+	registerPageTemplate(templates, TemplateNameRecipeList, "admin-button", "new-recipe-button", "home-button")
+	registerPageTemplate(templates, TemplateNameRecipe, "admin-button", "home-button")
+	registerPageTemplate(templates, TemplateNameRecipeNew, "admin-button", "home-button")
+	registerPageTemplate(templates, TemplateNameRecipeEdit, "admin-button", "home-button")
 
 	// Auth
-	registerPageTemplate(templates, TemplateNameAdmin)
-	registerComponentTemplate(templates, TemplateNameLoginSuccessful)
+	registerPageTemplate(templates, TemplateNameAdmin, "home-button", "logout-button", "admin-button")
 
 	e.Renderer = &templateRegistry{
 		templates: templates,

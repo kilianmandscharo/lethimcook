@@ -1,31 +1,30 @@
 {{ define "content" }}
-<div>
-  <header>
-    <h1>{{ .Recipe.Title }}</h1>
+<header>
+  <div>
+    <h1>Rezept</h1>
     <div>
       {{ if .IsAdmin }}
-      <button
-        hx-get="/recipe/edit/{{ .Recipe.ID }}"
-        hx-trigger="click"
-        hx-target="#content"
-        hx-push-url="true"
-      >
-        Bearbeiten
+      <button class="icon-button" hx-get="/recipe/edit/{{ .Recipe.ID }}" hx-trigger="click" hx-target="#content"
+        hx-push-url="true">
+        <i class="fa-solid fa-pen-to-square fa-xl"></i>
       </button>
-      {{ end }}
-      <button
-        hx-get="/"
-        hx-trigger="click"
-        hx-target="#content"
-        hx-push-url="true"
-      >
-        Zurück
-      </button>
+      {{ end }} {{ template "admin-button" . }} {{ template "home-button" . }}
     </div>
-  </header>
-  <p>{{ .Recipe.Description }}</p>
-  <p>{{ .Recipe.Duration }}</p>
-  <div>{{ .Recipe.Ingredients }}</div>
-  <div>{{ .Recipe.Instructions }}</div>
-</div>
+  </div>
+</header>
+<main>
+  <section>
+    <h2>{{ .Recipe.Title }}</h2>
+    <p class="recipe-description">{{ .Recipe.Description }}</p>
+    <p>Zubereitungszeit: {{ .Recipe.Duration }} Minuten</p>
+  </section>
+  <section>
+    <h3>Zutaten</h3>
+    <div>{{ .Recipe.Ingredients }}</div>
+  </section>
+  <section>
+    <h3>Anweisungen</h3>
+    <div>{{ .Recipe.Instructions }}</div>
+  </section>
+</main>
 {{ end }}

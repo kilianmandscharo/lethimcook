@@ -1,44 +1,35 @@
 {{ define "content" }}
-<div>
-  <header>
+<header>
+  <div>
     <h1>Rezepte</h1>
-    {{ if .IsAdmin }}
-    <button
-      hx-get="/recipe/new"
-      hx-target="#content"
-      hx-trigger="click"
-      hx-push-url="true"
-    >
-      Neues Rezept
-    </button>
-    {{ end }}
-  </header>
+    <div>
+      {{ if .IsAdmin }} {{ template "new-recipe-button" . }} {{ end }} {{
+      template "admin-button" . }} {{ template "home-button" . }}
+    </div>
+  </div>
+</header>
+<main>
   <div class="recipe-list">
     {{ if .Recipes }} {{ range .Recipes }}
-    <div id="recipe-{{ .ID }}" class="recipe-list-item">
-      <button
-        hx-target="#content"
-        hx-trigger="click"
-        hx-get="/recipe/{{ .ID }}"
-        hx-push-url="true"
-      >
-        {{ .Title }}
-      </button>
-      {{ if $.IsAdmin }}
-      <button
-        class="button-danger"
-        hx-target="#recipe-{{ .ID }}"
-        hx-swap="outerHTML"
-        hx-delete="/recipe/{{ .ID }}"
-        hx-trigger="click"
-      >
-        Löschen
-      </button>
-      {{ end }}
+    <div class="recipe-list-item" id="recipe-{{ .ID }}" hx-target="#content" hx-trigger="click"
+      hx-get="/recipe/{{ .ID }}" hx-push-url="true">
+      <div>
+        <div>
+          {{ if $.IsAdmin }}
+          <button class="icon-button" hx-target="#recipe-{{ .ID }}" hx-swap="outerHTML" hx-delete="/recipe/{{ .ID }}"
+            hx-trigger="click">
+            <i class="fa-solid fa-trash fa-xl danger"></i>
+          </button>
+          {{ end }}
+          <p class="recipe-list-item-title">{{ .Title }}</p>
+        </div>
+        <p>{{ .Duration }} Minuten</p>
+      </div>
+      <p class="recipe-list-item-description">{{ .Description }}</p>
     </div>
     {{ end }} {{ else }}
     <p>Keine Rezepte</p>
     {{ end }}
   </div>
-</div>
+</main>
 {{ end }}

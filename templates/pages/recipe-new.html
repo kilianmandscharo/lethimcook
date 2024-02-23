@@ -1,11 +1,11 @@
-{{ define "content" }} {{ if . }}
-<div>
-  <header>
-    <h1>Neues Rezept</h1>
-    <button hx-get="/" hx-trigger="click" hx-target="#content" hx-push-url="true">
-      Zurück
-    </button>
-  </header>
+{{ define "content" }}
+<header>
+  <div>
+    <h1>Neu</h1>
+    <div>{{ template "admin-button" }} {{ template "home-button" }}</div>
+  </div>
+</header>
+<main>
   <form hx-post="/recipe" hx-target="#content">
     <input placeholder="Titel" type="text" name="title" />
     <input placeholder="Beschreibung" type="text" name="description" />
@@ -14,7 +14,5 @@
     <textarea placeholder="Anleitung" name="instructions"></textarea>
     <input type="submit" value="Rezept erstellen" name="submit" />
   </form>
-</div>
-{{ else }}
-<p>Keine Berechtigung</p>
-{{ end }} {{ end }}
+</main>
+{{ end }}

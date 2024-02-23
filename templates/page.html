@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/static/htmx.min.js" defer></script>
   <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://kit.fontawesome.com/329c51f4dc.js" crossorigin="anonymous"></script>
   </link>
 </head>
 
@@ -21,25 +22,27 @@
     </svg>
   </div>
   <div id="notification">
-    Hinweis
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <p id="notification-text">Hinweis</p>
   </div>
   <footer>
     <button hx-get="/imprint" hx-trigger="click" hx-target="#content" hx-push-url="true">Impressum</button>
-    <button hx-get="/privacy-notice" hx-trigger="click" hx-target="#content"
-      hx-push-url="true">Datenschutzerklärung</button>
-    <button hx-get="/admin" hx-trigger="click" hx-target="#content" hx-push-url="true">Admin</button>
+    <button hx-get="/privacy-notice" hx-trigger="click" hx-target="#content" hx-push-url="true">Datenschutz</button>
   </footer>
   <script>
     document.body.addEventListener("htmx:responseError", function (event) {
       const response = event.detail.xhr.response;
-      const notification = document.getElementById("notification")
+      const notification = document.getElementById("notification");
+      const notificationText = document.getElementById("notification-text");
 
-      notification.innerText = response;
-      notification.style.opacity = 1;
+      if (notification && notificationText) {
+        notificationText.innerText = response;
+        notification.style.opacity = 1;
 
-      setTimeout(() => {
-        notification.style.opacity = 0;
-      }, 3000)
+        setTimeout(() => {
+          notification.style.opacity = 0;
+        }, 3000)
+      }
     })
   </script>
 </body>
