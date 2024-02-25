@@ -31,7 +31,7 @@ func (ac *AuthController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (ac *AuthController) RenderAdminPage(c echo.Context) error {
-	return servutil.RenderTemplate(c, templutil.TemplateNameAdmin, servutil.IsAuthorized(c))
+	return servutil.RenderTemplate(c, templutil.PageAdmin, servutil.IsAuthorized(c))
 }
 
 func (ac *AuthController) HandleLogin(c echo.Context) error {

@@ -1,0 +1,52 @@
+{{ define "recipe-card" }} {{ if .Deleting }}
+<div class="recipe-list-item" id="recipe-{{ .ID }}">
+  <p class="recipe-list-item-title">{{ .Title }}</p>
+  <div class="recipe-list-item-delete-container">
+    <button
+      class="danger-button"
+      hx-target="#recipe-{{ .ID }}"
+      hx-swap="outerHTML"
+      hx-delete="/recipe/{{ .ID }}?force=true"
+      hx-trigger="click"
+    >
+      Löschen bestätigen
+    </button>
+    <button
+      hx-target="#recipe-{{ .ID }}"
+      hx-swap="outerHTML"
+      hx-delete="/recipe/{{ .ID }}?cancel=true"
+      hx-trigger="click"
+    >
+      Abbrechen
+    </button>
+  </div>
+</div>
+{{ else }}
+<div
+  class="recipe-list-item"
+  id="recipe-{{ .ID }}"
+  hx-target="#content"
+  hx-trigger="click"
+  hx-get="/recipe/{{ .ID }}"
+>
+  <div>
+    <div>
+      {{ if .IsAdmin }}
+      <button
+        class="icon-button"
+        hx-target="#recipe-{{ .ID }}"
+        hx-swap="outerHTML"
+        hx-delete="/recipe/{{ .ID }}"
+        hx-trigger="click"
+        onclick="event.stopPropagation(); event.preventDefault();"
+      >
+        <i class="fa-solid fa-trash fa-xl danger"></i>
+      </button>
+      {{ end }}
+      <p class="recipe-list-item-title">{{ .Title }}</p>
+    </div>
+    <p>{{ .Duration }} Minuten</p>
+  </div>
+  <p class="recipe-list-item-description">{{ .Description }}</p>
+</div>
+{{ end }} {{ end }}

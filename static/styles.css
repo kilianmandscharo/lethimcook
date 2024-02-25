@@ -26,9 +26,10 @@ header {
   position: fixed;
   height: var(--header-height);
   width: 100%;
+  box-shadow: 2px 2px 10px black;
 }
 
-header > div {
+header>div {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -39,7 +40,7 @@ header > div {
   padding: 0 0.5rem;
 }
 
-header > div > div {
+header>div>div {
   display: flex;
   gap: 1rem;
 }
@@ -52,7 +53,7 @@ main {
   min-width: 300px;
   margin: 0 auto;
   padding: 0 0.5rem;
-  padding-top: calc(var(--header-height) + 1rem);
+  padding-top: calc(var(--header-height) + 1.5rem);
 }
 
 #content {
@@ -85,7 +86,7 @@ footer {
   gap: 2rem;
 }
 
-footer > button {
+footer>button {
   all: unset;
   cursor: pointer;
   padding-bottom: 2px;
@@ -93,7 +94,7 @@ footer > button {
   transition: border 250ms ease;
 }
 
-footer > button:hover {
+footer>button:hover {
   border-bottom: 1px solid var(--color-primary);
 }
 
@@ -114,9 +115,32 @@ button {
   min-width: 100px;
 }
 
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: end;
+  position: relative;
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 500px;
+  padding-right: 2.5rem;
+}
+
+.search-bar i {
+  position: absolute;
+  right: 0.5rem;
+}
+
 .icon-button {
   all: unset;
   cursor: pointer;
+}
+
+.danger-button {
+  background-color: var(--color-danger);
 }
 
 a {
@@ -168,10 +192,14 @@ textarea {
   font-family: inherit;
 }
 
-.recipe-list {
+.recipe-list>div {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.recipe-list>p {
+  text-align: right;
 }
 
 .recipe-list-item {
@@ -185,16 +213,21 @@ textarea {
   border-radius: 4px;
 }
 
-.recipe-list-item > div:first-child {
+.recipe-list-item>div:first-child {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.recipe-list-item > div:first-child > div {
+.recipe-list-item>div:first-child>div {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.recipe-list-item-delete-container {
+  display: flex;
+  gap: 1rem;
 }
 
 .recipe-list-item-title {
@@ -214,7 +247,7 @@ textarea {
   font-style: italic;
 }
 
-form > :last-child {
+form> :last-child {
   background-color: var(--color-primary);
   border: none;
   cursor: pointer;
@@ -253,6 +286,7 @@ form > :last-child {
 }
 
 @keyframes circle-animation {
+
   0%,
   25% {
     stroke-dashoffset: 200;

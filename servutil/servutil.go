@@ -27,11 +27,11 @@ func AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func renderImprint(c echo.Context) error {
-	return RenderTemplate(c, templutil.TemplateNameImprint, nil)
+	return RenderTemplate(c, templutil.PageImprint, nil)
 }
 
 func renderPrivacyNotice(c echo.Context) error {
-	return RenderTemplate(c, templutil.TemplateNamePrivacyNotice, nil)
+	return RenderTemplate(c, templutil.PagePrivacyNotice, nil)
 }
 
 func RenderTemplate(c echo.Context, templateName string, data any) error {
@@ -40,6 +40,10 @@ func RenderTemplate(c echo.Context, templateName string, data any) error {
 	}
 
 	return c.Render(http.StatusOK, templutil.PageName(templateName), data)
+}
+
+func RenderTemplateComponent(c echo.Context, templateName string, data any) error {
+	return c.Render(http.StatusOK, templutil.FragmentName(templateName), data)
 }
 
 func RenderError(c echo.Context, err error) error {

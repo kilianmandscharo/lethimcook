@@ -1,0 +1,11 @@
+{{ define "recipe-list" }}
+<div id="recipe-list" class="recipe-list">
+  {{ if .Recipes }}
+  <p>{{ len .Recipes }} Rezepte</p>
+  <div>
+    {{ range .Recipes }} {{ template "recipe-card" . }} {{ end }} {{ else }}
+  </div>
+  <p>Keine Rezepte</p>
+  {{ end }}
+</div>
+{{ end }}

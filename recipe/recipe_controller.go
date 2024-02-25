@@ -1,7 +1,9 @@
 package recipe
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/servutil"
@@ -14,8 +16,14 @@ type recipeTemplateData struct {
 	IsAdmin bool
 }
 
+type recipeTemplateListItemData struct {
+	recipe
+	IsAdmin  bool
+	Deleting bool
+}
+
 type recipeTemplateListData struct {
-	Recipes recipes
+	Recipes []recipeTemplateListItemData
 	IsAdmin bool
 }
 
@@ -37,6 +45,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.GET("/recipe/:id", rc.RenderRecipePage)
 
 	// Actions
+	e.POST("/search", rc.HandleSearchRecipe)
 	e.POST("/recipe", rc.HandleCreateRecipe)
 	e.PUT("/recipe/:id", rc.HandleUpdateRecipe)
 	e.DELETE("/recipe/:id", rc.HandleDeleteRecipe)
@@ -48,10 +57,20 @@ func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
+	isAdmin := servutil.IsAuthorized(c)
+	recipeData := make([]recipeTemplateListItemData, len(recipes))
+
+	for i, recipe := range recipes {
+		recipeData[i] = recipeTemplateListItemData{
+			recipe:  recipe,
+			IsAdmin: isAdmin,
+		}
+	}
+
 	return servutil.RenderTemplate(
 		c,
-		templutil.TemplateNameRecipeList,
-		recipeTemplateListData{Recipes: recipes, IsAdmin: servutil.IsAuthorized(c)},
+		templutil.PageRecipeList,
+		recipeTemplateListData{Recipes: recipeData, IsAdmin: isAdmin},
 	)
 }
 
@@ -62,7 +81,7 @@ func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		templutil.TemplateNameRecipeNew,
+		templutil.PageRecipeNew,
 		servutil.IsAuthorized(c),
 	)
 }
@@ -79,7 +98,7 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 
 	return servutil.RenderTemplate(
 		c,
-		templutil.TemplateNameRecipeEdit,
+		templutil.PageRecipeEdit,
 		recipeTemplateData{Recipe: recipe, IsAdmin: servutil.IsAuthorized(c)},
 	)
 }
@@ -94,10 +113,47 @@ func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
+	c.Response().Header().Set("HX-Push-Url", fmt.Sprintf("/recipe/%d", recipe.ID))
+
 	return servutil.RenderTemplate(
 		c,
-		templutil.TemplateNameRecipe,
+		templutil.PageRecipe,
 		recipeTemplateData{Recipe: recipe, IsAdmin: servutil.IsAuthorized(c)},
+	)
+}
+
+func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
+	if err := c.Request().ParseForm(); err != nil {
+		servutil.RenderError(c, err)
+	}
+	query := strings.ToLower(c.FormValue("query"))
+
+	recipes, err := rc.recipeService.readAllRecipes()
+	if err != nil {
+		return servutil.RenderError(c, err)
+	}
+
+	var filteredRecipes []recipe
+	for _, recipe := range recipes {
+		if strings.Contains(strings.ToLower(recipe.Title), query) {
+			filteredRecipes = append(filteredRecipes, recipe)
+		}
+	}
+
+	isAdmin := servutil.IsAuthorized(c)
+	recipeData := make([]recipeTemplateListItemData, len(filteredRecipes))
+
+	for i, recipe := range filteredRecipes {
+		recipeData[i] = recipeTemplateListItemData{
+			recipe:  recipe,
+			IsAdmin: isAdmin,
+		}
+	}
+
+	return servutil.RenderTemplateComponent(
+		c,
+		templutil.ComponentRecipeList,
+		recipeTemplateListData{Recipes: recipeData, IsAdmin: isAdmin},
 	)
 }
 
@@ -145,10 +201,32 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	err = rc.recipeService.deleteRecipe(id)
+	if c.QueryParam("force") == "true" {
+		err = rc.recipeService.deleteRecipe(id)
+		if err != nil {
+			return servutil.RenderError(c, err)
+		}
+
+		return c.String(http.StatusOK, "")
+	}
+
+	recipe, err := rc.recipeService.readRecipe(id)
 	if err != nil {
 		return servutil.RenderError(c, err)
 	}
 
-	return c.String(http.StatusOK, "")
+	var deleting = true
+
+	if c.QueryParam("cancel") == "true" {
+		deleting = false
+	}
+
+	return servutil.RenderTemplateComponent(
+		c,
+		templutil.ComponentRecipeCard,
+		recipeTemplateListItemData{
+			recipe:   recipe,
+			IsAdmin:  servutil.IsAuthorized(c),
+			Deleting: deleting,
+		})
 }
