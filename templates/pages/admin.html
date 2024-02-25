@@ -1,20 +1,43 @@
 {{ define "content" }}
 <header>
   <div>
-    <h1>Admin</h1>
-    <div>
-      {{ if . }} {{ template "logout-button" . }} {{ end }} {{ template
-      "admin-button" . }}{{ template "home-button" . }}
-    </div>
+    <h1>Lethimcook</h1>
+    <div>{{ template "admin-button" . }}{{ template "home-button" . }}</div>
   </div>
 </header>
 <main>
   <div>
     <h2>Anmelden</h2>
     <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
-      <input placeholder="Passwort" type="password" name="password" {{ if . }}disabled{{ end }} />
-      <input {{ if . }}class="button-disabled" {{ end }} type="submit" value="Anmelden" name="submit" {{ if .
-        }}disabled{{ end }} />
+      <input
+        placeholder="Passwort"
+        type="password"
+        name="password"
+        {{
+        if
+        .
+        }}disabled{{
+        end
+        }}
+      />
+      <input
+        {{
+        if
+        .
+        }}class="button-disabled"
+        {{
+        end
+        }}
+        type="submit"
+        value="Anmelden"
+        name="submit"
+        {{
+        if
+        .
+        }}disabled{{
+        end
+        }}
+      />
     </form>
   </div>
   <div>
@@ -25,5 +48,17 @@
       <input type="submit" value="Bestätigen" name="submit" />
     </form>
   </div>
+  {{ if . }}
+  <div class="logout-section">
+    <button
+      class="danger-button"
+      hx-post="/auth/logout"
+      hx-trigger="click"
+      hx-target="#content"
+    >
+      Abmelden
+    </button>
+  </div>
+  {{ end }}
 </main>
 {{ end }}

@@ -29,7 +29,6 @@ const (
 	ComponentAdminButton     = "admin-button"
 	ComponentHomeButton      = "home-button"
 	ComponentNewRecipeButton = "new-recipe-button"
-	ComponentLogoutButton    = "logout-button"
 	ComponentRecipeCard      = "recipe-card"
 	ComponentRecipeList      = "recipe-list"
 )
@@ -185,7 +184,6 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(tmap,
 		PageAdmin,
 		ComponentHomeButton,
-		ComponentLogoutButton,
 		ComponentAdminButton,
 	)
 }
