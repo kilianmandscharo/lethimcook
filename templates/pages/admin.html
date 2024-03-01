@@ -1,7 +1,7 @@
 {{ define "content" }}
 <header>
   <div>
-    <h1>Lethimcook</h1>
+    {{ template "heading" . }}
     <div>{{ template "admin-button" . }}{{ template "home-button" . }}</div>
   </div>
 </header>
@@ -9,53 +9,25 @@
   <div>
     <h2>Anmelden</h2>
     <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
-      <input
-        placeholder="Passwort"
-        type="password"
-        name="password"
-        {{
-        if
-        .
-        }}disabled{{
-        end
-        }}
-      />
-      <input
-        {{
-        if
-        .
-        }}class="button-disabled"
-        {{
-        end
-        }}
-        type="submit"
-        value="Anmelden"
-        name="submit"
-        {{
-        if
-        .
-        }}disabled{{
-        end
-        }}
-      />
+      <label for="password">Passwort:</label>
+      <input id="password" placeholder="Passwort" type="password" name="password" {{ if . }}disabled{{ end }} />
+      <input {{ if . }}class="button-disabled" {{ end }} type="submit" value="Anmelden" name="submit" {{ if .
+        }}disabled{{ end }} />
     </form>
   </div>
   <div>
     <h2>Passwort ändern</h2>
     <form hx-put="/auth/password" hx-indicator="#loading">
-      <input placeholder="altes Passwort" type="password" name="oldPassword" />
-      <input placeholder="neues Passwort" type="password" name="newPassword" />
+      <label for="old-password">Altes Passwort:</label>
+      <input id="old-password" placeholder="Altes Passwort" type="password" name="oldPassword" />
+      <label for="new-password">Neues Passwort:</label>
+      <input id="new-password" placeholder="Neues Passwort" type="password" name="newPassword" />
       <input type="submit" value="Bestätigen" name="submit" />
     </form>
   </div>
   {{ if . }}
   <div class="logout-section">
-    <button
-      class="danger-button"
-      hx-post="/auth/logout"
-      hx-trigger="click"
-      hx-target="#content"
-    >
+    <button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
       Abmelden
     </button>
   </div>

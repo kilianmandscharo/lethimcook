@@ -1,7 +1,7 @@
 {{ define "content" }}
 <header>
   <div>
-    <h1>Lethimcook</h1>
+    {{ template "heading" . }}
     <div>
       {{ if .IsAdmin }} {{ template "new-recipe-button" . }} {{ end }} {{
       template "admin-button" . }} {{ template "home-button" . }}
@@ -11,15 +11,8 @@
 <main>
   <div class="search-bar">
     <i class="fa-solid fa-magnifying-glass fa-xl"></i>
-    <input
-      placeholder="Rezept suchen..."
-      type="text"
-      name="query"
-      hx-trigger="keyup delay:500ms"
-      hx-post="/search"
-      hx-target="#recipe-list"
-      hx-swap="outerHTML"
-    />
+    <input placeholder="Rezept suchen..." type="text" name="query" hx-trigger="keyup delay:500ms" hx-post="/search"
+      hx-target="#recipe-list" hx-swap="outerHTML" />
   </div>
   {{ template "recipe-list" . }}
 </main>

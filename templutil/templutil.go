@@ -26,6 +26,7 @@ const (
 )
 
 const (
+	ComponentHeading         = "heading"
 	ComponentAdminButton     = "admin-button"
 	ComponentHomeButton      = "home-button"
 	ComponentNewRecipeButton = "new-recipe-button"
@@ -147,12 +148,14 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 		PageImprint,
 		ComponentHomeButton,
 		ComponentAdminButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(
 		tmap,
 		PagePrivacyNotice,
 		ComponentHomeButton,
 		ComponentAdminButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(
 		tmap,
@@ -162,28 +165,33 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 		ComponentAdminButton,
 		ComponentNewRecipeButton,
 		ComponentHomeButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(
 		tmap,
 		PageRecipe,
 		ComponentAdminButton,
 		ComponentHomeButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(
 		tmap,
 		PageRecipeNew,
 		ComponentAdminButton,
 		ComponentHomeButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(
 		tmap,
 		PageRecipeEdit,
 		ComponentAdminButton,
 		ComponentHomeButton,
+		ComponentHeading,
 	)
 	registerPageTemplate(tmap,
 		PageAdmin,
 		ComponentHomeButton,
 		ComponentAdminButton,
+		ComponentHeading,
 	)
 }

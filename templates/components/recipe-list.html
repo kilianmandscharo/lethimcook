@@ -2,9 +2,8 @@
 <div id="recipe-list" class="recipe-list">
   {{ if .Recipes }}
   <p>{{ len .Recipes }} Rezepte</p>
-  <div>
-    {{ range .Recipes }} {{ template "recipe-card" . }} {{ end }} {{ else }}
-  </div>
+  <div>{{ range .Recipes }} {{ template "recipe-card" . }} {{ end }}</div>
+  {{ else }}
   <p>Keine Rezepte</p>
   {{ end }}
 </div>

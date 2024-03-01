@@ -1,7 +1,7 @@
 {{ define "content" }}
 <header>
   <div>
-    <h1>Lethimcook</h1>
+    {{ template "heading" . }}
     <div>
       {{ if .IsAdmin }}
       <button class="icon-button" hx-get="/recipe/edit/{{ .Recipe.ID }}" hx-trigger="click" hx-target="#content"

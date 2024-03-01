@@ -135,7 +135,8 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 
 	var filteredRecipes []recipe
 	for _, recipe := range recipes {
-		if strings.Contains(strings.ToLower(recipe.Title), query) {
+		if strings.Contains(strings.ToLower(recipe.Title), query) ||
+			strings.Contains(strings.ToLower(recipe.Description), query) {
 			filteredRecipes = append(filteredRecipes, recipe)
 		}
 	}

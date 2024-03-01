@@ -1,16 +1,26 @@
 :root {
-  --color-dark: #111827;
-  --color-semi-dark: #374151;
-  --color-primary: #0284c7;
   --color-danger: #ef4444;
 
   --header-height: 60px;
   --footer-height: 48px;
   --footer-margin-top: 2rem;
+
+  --color-primary-100: #4caf50;
+  --color-primary-200: #63b863;
+  --color-primary-300: #79c176;
+  --color-primary-400: #8dca89;
+  --color-primary-500: #a0d39c;
+  --color-primary-600: #b4dcb0;
+
+  --color-surface-100: #121212;
+  --color-surface-200: #282828;
+  --color-surface-300: #3f3f3f;
+  --color-surface-400: #575757;
+  --color-surface-500: #717171;
 }
 
 body {
-  background-color: var(--color-dark);
+  background-color: var(--color-surface-100);
   color: rgba(255, 255, 255, 0.9);
   font-family: "Noto Sans", sans-serif;
   margin: 0;
@@ -20,11 +30,12 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--color-semi-dark);
+  background-color: var(--color-surface-200);
   position: fixed;
   height: var(--header-height);
   width: 100%;
-  box-shadow: 2px 2px 10px black;
+  box-shadow: 2px 2px 12px black;
+  z-index: 100;
 }
 
 header > div {
@@ -41,6 +52,7 @@ header > div {
 header > div > div {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 
 main {
@@ -87,13 +99,11 @@ footer {
 footer > button {
   all: unset;
   cursor: pointer;
-  padding-bottom: 2px;
-  border-bottom: 1px solid transparent;
-  transition: border 250ms ease;
+  transition: color 250ms ease;
 }
 
 footer > button:hover {
-  border-bottom: 1px solid var(--color-primary);
+  color: var(--color-primary-100);
 }
 
 form {
@@ -107,9 +117,9 @@ button {
   padding: 8px;
   border-radius: 4px;
   cursor: pointer;
-  color: inherit;
+  color: var(--color-surface-200);
   height: 40px;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-300);
   min-width: 100px;
 }
 
@@ -125,6 +135,7 @@ button {
   width: 100%;
   max-width: 500px;
   padding-right: 2.5rem;
+  border: solid 1px var(--color-primary-300);
 }
 
 .search-bar i {
@@ -152,7 +163,7 @@ button {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-100);
 }
 
 h1 {
@@ -171,7 +182,7 @@ h4 {
 input {
   color: inherit;
   padding: 0.8rem;
-  background-color: var(--color-semi-dark);
+  background-color: var(--color-surface-200);
   border-radius: 4px;
   border: none;
 }
@@ -194,20 +205,36 @@ textarea {
   font-size: 1.5rem;
   color: inherit;
   padding: 0.8rem;
-  background-color: var(--color-semi-dark);
+  background-color: var(--color-surface-200);
   border-radius: 4px;
   border: none;
   font-family: inherit;
+}
+
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .recipe-list > div {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-height: calc(
+    100vh - var(--footer-height) - var(--footer-margin-top) - 200px
+  );
+  overflow-y: scroll;
 }
 
 .recipe-list > p {
-  text-align: right;
+  background-color: var(--color-primary-300);
+  padding: 0.25rem 0.5rem;
+  color: var(--color-surface-100);
+  border-radius: 4px;
+  width: fit-content;
+  align-self: flex-end;
+  margin: 0;
 }
 
 .recipe-list-item {
@@ -216,7 +243,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--color-semi-dark);
+  background-color: var(--color-surface-200);
   padding: 1rem;
   border-radius: 4px;
 }
@@ -241,6 +268,7 @@ textarea {
 .recipe-list-item-title {
   font-size: 20px;
   font-weight: bold;
+  color: var(--color-primary-300);
 }
 
 .recipe-list-item-description {
@@ -256,11 +284,11 @@ textarea {
 }
 
 form > :last-child {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-300);
   border: none;
   cursor: pointer;
   height: 40px;
-  color: inherit;
+  color: var(--color-surface-100);
   border-radius: 4px;
 }
 
@@ -287,7 +315,7 @@ form > :last-child {
 }
 
 .loading circle {
-  stroke: var(--color-primary);
+  stroke: var(--color-primary-100);
   stroke-linecap: round;
   transform-origin: 50% 50%;
   animation: 1.4s ease-in-out infinite both circle-animation;
