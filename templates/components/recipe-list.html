@@ -1,7 +1,10 @@
 {{ define "recipe-list" }}
 <div id="recipe-list" class="recipe-list">
   {{ if .Recipes }}
-  <p>{{ len .Recipes }} Rezepte</p>
+  <p>
+    {{ len .Recipes }} {{ if eq (len .Recipes) 1 }}Rezept{{ else }}Rezepte{{ end
+    }}
+  </p>
   <div>{{ range .Recipes }} {{ template "recipe-card" . }} {{ end }}</div>
   {{ else }}
   <p>Keine Rezepte</p>

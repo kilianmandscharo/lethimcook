@@ -4,8 +4,13 @@
     {{ template "heading" . }}
     <div>
       {{ if .IsAdmin }}
-      <button class="icon-button" hx-get="/recipe/edit/{{ .Recipe.ID }}" hx-trigger="click" hx-target="#content"
-        hx-push-url="true">
+      <button
+        class="icon-button"
+        hx-get="/recipe/edit/{{ .Recipe.ID }}"
+        hx-trigger="click"
+        hx-target="#content"
+        hx-push-url="true"
+      >
         <i class="fa-solid fa-pen-to-square fa-xl"></i>
       </button>
       {{ end }} {{ template "admin-button" . }} {{ template "home-button" . }}
@@ -13,18 +18,26 @@
   </div>
 </header>
 <main>
-  <section>
-    <h2>{{ .Recipe.Title }}</h2>
-    <p class="recipe-description">{{ .Recipe.Description }}</p>
-    <p>Zubereitungszeit: {{ .Recipe.Duration }} Minuten</p>
-  </section>
-  <section>
-    <h3>Zutaten</h3>
-    <div>{{ .Recipe.Ingredients }}</div>
-  </section>
-  <section>
-    <h3>Anweisungen</h3>
-    <div>{{ .Recipe.Instructions }}</div>
-  </section>
+  <div class="recipe">
+    <section class="recipe-heading">
+      <h2>{{ .Recipe.Title }}</h2>
+      <div class="caret-container">
+        <i class="fa-solid fa-caret-right"></i>
+        <p>{{ .Recipe.Description }}</p>
+      </div>
+      <div class="caret-container">
+        <i class="fa-solid fa-caret-right"></i>
+        <p>Zubereitungszeit: {{ .Recipe.Duration }} Minuten</p>
+      </div>
+    </section>
+    <section>
+      <h3>Zutaten</h3>
+      <div>{{ .Recipe.Ingredients }}</div>
+    </section>
+    <section>
+      <h3>Anweisungen</h3>
+      <div>{{ .Recipe.Instructions }}</div>
+    </section>
+  </div>
 </main>
 {{ end }}

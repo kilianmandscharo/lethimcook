@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"path"
+	"runtime"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
@@ -62,25 +63,25 @@ func newCustomTemplate(baseName string, templates *template.Template) customTemp
 	}
 }
 
-func getComponentPaths(components []string) []string {
+func getComponentPaths(components []string, dir string) []string {
 	var componentPaths []string
 
 	for _, component := range components {
 		componentPaths = append(
 			componentPaths,
-			path.Join("./templates/components", htmlName(component)),
+			path.Join(dir, "templates/components", htmlName(component)),
 		)
 	}
 
 	return componentPaths
 }
 
-func registerPageTemplate(tmap map[string]customTemplate, name string, components ...string) {
-	pageFilePath := path.Join("./templates/pages", htmlName(name))
-	componentFilePaths := getComponentPaths(components)
+func registerPageTemplate(tmap map[string]customTemplate, name string, dir string, components ...string) {
+	pageFilePath := path.Join(dir, "templates/pages", htmlName(name))
+	componentFilePaths := getComponentPaths(components, dir)
 
 	paths := append(
-		[]string{"./templates/page.html", pageFilePath},
+		[]string{path.Join(dir, "templates/page.html"), pageFilePath},
 		componentFilePaths...,
 	)
 
@@ -91,7 +92,7 @@ func registerPageTemplate(tmap map[string]customTemplate, name string, component
 	)
 
 	paths = append(
-		[]string{"./templates/fragment.html", pageFilePath},
+		[]string{path.Join(dir, "templates/fragment.html"), pageFilePath},
 		componentFilePaths...,
 	)
 
@@ -102,10 +103,10 @@ func registerPageTemplate(tmap map[string]customTemplate, name string, component
 	)
 }
 
-func registerComponentTemplate(tmap map[string]customTemplate, name string, components ...string) {
-	fragmentFilePath := path.Join("./templates/components", htmlName(FragmentName(name)))
-	componentFilePath := path.Join("./templates/components", htmlName(name))
-	componentPaths := getComponentPaths(components)
+func registerComponentTemplate(tmap map[string]customTemplate, name string, dir string, components ...string) {
+	fragmentFilePath := path.Join(dir, "templates/components", htmlName(FragmentName(name)))
+	componentFilePath := path.Join(dir, "templates/components", htmlName(name))
+	componentPaths := getComponentPaths(components, dir)
 
 	paths := append(
 		[]string{fragmentFilePath, componentFilePath},
@@ -126,26 +127,40 @@ func (t *templateRegistry) Render(w io.Writer, name string, data any, c echo.Con
 	return errors.New("Template not found -> " + name)
 }
 
-func AttachTemplates(e *echo.Echo) {
+func AttachTemplatesTest(e *echo.Echo) {
+	_, file, _, _ := runtime.Caller(0)
+	dir := path.Join(file, "../../")
 	templates := make(map[string]customTemplate)
 
-	attachPageTemplates(templates)
-	attachComponentTemplates(templates)
+	attachPageTemplates(templates, dir)
+	attachComponentTemplates(templates, dir)
 
 	e.Renderer = &templateRegistry{
 		templates: templates,
 	}
 }
 
-func attachComponentTemplates(tmap map[string]customTemplate) {
-	registerComponentTemplate(tmap, ComponentRecipeCard)
-	registerComponentTemplate(tmap, ComponentRecipeList, ComponentRecipeCard)
+func AttachTemplates(e *echo.Echo) {
+	templates := make(map[string]customTemplate)
+
+	attachPageTemplates(templates, ".")
+	attachComponentTemplates(templates, ".")
+
+	e.Renderer = &templateRegistry{
+		templates: templates,
+	}
 }
 
-func attachPageTemplates(tmap map[string]customTemplate) {
+func attachComponentTemplates(tmap map[string]customTemplate, dir string) {
+	registerComponentTemplate(tmap, ComponentRecipeCard, dir)
+	registerComponentTemplate(tmap, ComponentRecipeList, dir, ComponentRecipeCard)
+}
+
+func attachPageTemplates(tmap map[string]customTemplate, dir string) {
 	registerPageTemplate(
 		tmap,
 		PageImprint,
+		dir,
 		ComponentHomeButton,
 		ComponentAdminButton,
 		ComponentHeading,
@@ -153,6 +168,7 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(
 		tmap,
 		PagePrivacyNotice,
+		dir,
 		ComponentHomeButton,
 		ComponentAdminButton,
 		ComponentHeading,
@@ -160,6 +176,7 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(
 		tmap,
 		PageRecipeList,
+		dir,
 		ComponentRecipeList,
 		ComponentRecipeCard,
 		ComponentAdminButton,
@@ -170,6 +187,7 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(
 		tmap,
 		PageRecipe,
+		dir,
 		ComponentAdminButton,
 		ComponentHomeButton,
 		ComponentHeading,
@@ -177,6 +195,7 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(
 		tmap,
 		PageRecipeNew,
+		dir,
 		ComponentAdminButton,
 		ComponentHomeButton,
 		ComponentHeading,
@@ -184,12 +203,14 @@ func attachPageTemplates(tmap map[string]customTemplate) {
 	registerPageTemplate(
 		tmap,
 		PageRecipeEdit,
+		dir,
 		ComponentAdminButton,
 		ComponentHomeButton,
 		ComponentHeading,
 	)
 	registerPageTemplate(tmap,
 		PageAdmin,
+		dir,
 		ComponentHomeButton,
 		ComponentAdminButton,
 		ComponentHeading,

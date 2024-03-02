@@ -1,5 +1,6 @@
 :root {
   --color-danger: #ef4444;
+  --color-white: rgba(255, 255, 255, 0.9);
 
   --header-height: 60px;
   --footer-height: 48px;
@@ -21,7 +22,7 @@
 
 body {
   background-color: var(--color-surface-100);
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-white);
   font-family: "Noto Sans", sans-serif;
   margin: 0;
 }
@@ -55,6 +56,19 @@ header > div > div {
   align-items: center;
 }
 
+.heading {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.heading > h1 {
+  background-image: linear-gradient(var(--color-danger), white);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -74,17 +88,18 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
+  position: fixed;
   gap: 0.5rem;
   bottom: 0.5rem;
   right: 0.5rem;
   border-radius: 4px;
   height: 40px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   background-color: var(--color-danger);
   opacity: 0;
   max-width: 300px;
   pointer-events: none;
+  font-size: 12px;
 }
 
 footer {
@@ -167,8 +182,9 @@ a {
 }
 
 h1 {
-  font-size: 32px;
+  font-size: 24px;
   margin: 0;
+  font-family: "Fugaz One", sans-serif;
 }
 
 h2 {
@@ -202,7 +218,7 @@ input[type="number"] {
 
 textarea {
   height: 400px;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: inherit;
   padding: 0.8rem;
   background-color: var(--color-surface-200);
@@ -283,6 +299,50 @@ textarea {
   font-style: italic;
 }
 
+.recipe h2 {
+  color: var(--color-primary-300);
+}
+
+.recipe h3 {
+  background-color: var(--color-primary-300);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  width: fit-content;
+  color: var(--color-surface-100);
+}
+
+.recipe ol,
+.recipe ul {
+  line-height: 1.75rem;
+  margin-top: 0;
+}
+
+.recipe p {
+  margin: 0 0 0.5rem 0;
+}
+
+.recipe i {
+  color: var(--color-primary-300);
+}
+
+.recipe-heading {
+  margin-bottom: 2rem;
+}
+
+.recipe-heading p {
+  margin: 0;
+}
+
+.recipe-heading div {
+  margin-bottom: 1rem;
+}
+
+.caret-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 form > :last-child {
   background-color: var(--color-primary-300);
   border: none;
@@ -302,9 +362,9 @@ form > :last-child {
 }
 
 .loading {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0.5rem;
   width: 48px;
   height: 48px;
   pointer-events: none;

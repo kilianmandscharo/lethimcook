@@ -8,11 +8,34 @@
 <main>
   <h2>Neues Rezept</h2>
   <form hx-post="/recipe" hx-target="#content">
-    <input placeholder="Titel" type="text" name="title" />
-    <input placeholder="Beschreibung" type="text" name="description" />
-    <input placeholder="Kochdauer (Minuten)" type="number" name="duration" />
-    <textarea placeholder="Zutaten" name="ingredients"></textarea>
-    <textarea placeholder="Anleitung" name="instructions"></textarea>
+    <label for="title">Titel:</label>
+    <input id="title" placeholder="Titel" type="text" name="title" />
+    <label for="description">Beschreibung:</label>
+    <input
+      id="description"
+      placeholder="Beschreibung"
+      type="text"
+      name="description"
+    />
+    <label for="duration">Kochdauer (Minuten):</label>
+    <input
+      id="duration"
+      placeholder="Kochdauer (Minuten)"
+      type="number"
+      name="duration"
+    />
+    <label for="ingredient">Zutaten:</label>
+    <textarea
+      id="ingredients"
+      placeholder="Zutaten"
+      name="ingredients"
+    ></textarea>
+    <label for="instructions">Anleitung:</label>
+    <textarea
+      id="instructions"
+      placeholder="Anleitung"
+      name="instructions"
+    ></textarea>
     <input type="submit" value="Rezept erstellen" name="submit" />
   </form>
 </main>
