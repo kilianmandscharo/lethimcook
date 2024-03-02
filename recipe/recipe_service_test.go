@@ -35,6 +35,34 @@ func newTestContext(t *testing.T, formData string, pathId string) echo.Context {
 	return c
 }
 
+func TestGetFilteredRecipes(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+	assert.NoError(t, recipeService.createRecipe(&recipe{
+		Title: "Naan",
+	}))
+	assert.NoError(t, recipeService.createRecipe(&recipe{
+		Description: "Italienische Knoblauchnudeln",
+	}))
+
+	testCases := []struct {
+		query string
+		hits  int
+	}{
+		{"naan", 1},
+		{"Naan", 1},
+		{"xx", 0},
+		{"Italienische Knoblauchnudeln", 1},
+		{"a", 2},
+	}
+
+	for _, test := range testCases {
+		filteredRecipes, err := recipeService.getFilteredRecipes(test.query)
+		assert.NoError(t, err)
+		assert.Equal(t, test.hits, len(filteredRecipes))
+	}
+}
+
 func TestGetPathId(t *testing.T) {
 	// Given
 	recipeService := newTestRecipeService()

@@ -5,8 +5,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/templutil"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,11 +30,15 @@ type requestOptions struct {
 	authorized       bool
 	withPathParam    bool
 	pathParamId      string
+	withQueryParam   bool
+	queryParam       string
 }
 
 func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseRecorder, echo.Context) {
 	e := echo.New()
-	w := httptest.NewRecorder()
+	templutil.AttachTemplatesTest(e)
+
+	rr := httptest.NewRecorder()
 
 	var body io.Reader
 
@@ -42,6 +48,10 @@ func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseReco
 		body = nil
 	}
 
+	if options.withQueryParam {
+		options.route += options.queryParam
+	}
+
 	req, err := http.NewRequest(options.method, options.route, body)
 	assert.NoError(t, err)
 
@@ -49,7 +59,7 @@ func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseReco
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	}
 
-	c := e.NewContext(req, w)
+	c := e.NewContext(req, rr)
 	if options.authorized {
 		c.Set("authorized", true)
 	} else {
@@ -61,11 +71,11 @@ func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseReco
 		c.SetParamValues(options.pathParamId)
 	}
 
-	options.handlerFunc(c)
+	assert.NoError(t, options.handlerFunc(c))
 
-	assert.Equal(t, options.statusWant, w.Code)
+	assert.Equal(t, options.statusWant, rr.Code)
 
-	return w, c
+	return rr, c
 }
 
 func TestRenderRecipeListPage(t *testing.T) {
@@ -440,8 +450,8 @@ func TestHandleDeleteRecipe(t *testing.T) {
 	err := recipeController.recipeService.createRecipe(&recipe{})
 	assert.NoError(t, err)
 
-	t.Run("valid request", func(t *testing.T) {
-		assertRequest(
+	t.Run("valid request without force", func(t *testing.T) {
+		rr, _ := assertRequest(
 			t,
 			requestOptions{
 				RecipeController: &recipeController,
@@ -452,6 +462,68 @@ func TestHandleDeleteRecipe(t *testing.T) {
 				pathParamId:      "1",
 				statusWant:       http.StatusOK,
 				authorized:       true,
+			},
+		)
+		assert.True(t, strings.Contains(rr.Body.String(), "Löschen bestätigen"))
+	})
+
+	t.Run("valid request with cancel", func(t *testing.T) {
+		rr, _ := assertRequest(
+			t,
+			requestOptions{
+				RecipeController: &recipeController,
+				handlerFunc:      recipeController.HandleDeleteRecipe,
+				method:           http.MethodDelete,
+				route:            "/recipe",
+				withPathParam:    true,
+				pathParamId:      "1",
+				withQueryParam:   true,
+				queryParam:       "?cancel=true",
+				statusWant:       http.StatusOK,
+				authorized:       true,
+			},
+		)
+		resBody := rr.Body.String()
+		assert.False(t, strings.Contains(resBody, "Löschen bestätigen"))
+		assert.True(t, len(resBody) != 0)
+	})
+
+	t.Run("valid request with force", func(t *testing.T) {
+		rr, _ := assertRequest(
+			t,
+			requestOptions{
+				RecipeController: &recipeController,
+				handlerFunc:      recipeController.HandleDeleteRecipe,
+				method:           http.MethodDelete,
+				route:            "/recipe",
+				withPathParam:    true,
+				pathParamId:      "1",
+				withQueryParam:   true,
+				queryParam:       "?force=true",
+				statusWant:       http.StatusOK,
+				authorized:       true,
+			},
+		)
+		resBody := rr.Body.String()
+		assert.False(t, strings.Contains(resBody, "Löschen bestätigen"))
+		assert.Equal(t, 0, len(resBody))
+	})
+}
+
+func TestHandleSearchRecipe(t *testing.T) {
+	recipeController := newTestRecipeController()
+
+	t.Run("valid request", func(t *testing.T) {
+		assertRequest(
+			t,
+			requestOptions{
+				RecipeController: &recipeController,
+				handlerFunc:      recipeController.HandleSearchRecipe,
+				method:           http.MethodPost,
+				route:            "/search",
+				withFormData:     true,
+				formData:         "query=test",
+				statusWant:       http.StatusOK,
 			},
 		)
 	})

@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/labstack/echo/v4"
@@ -37,6 +38,29 @@ func (rs *recipeService) updateRecipe(recipe *recipe) errutil.RecipeError {
 	return rs.db.updateRecipe(recipe)
 }
 
+func (rs *recipeService) getFilteredRecipes(query string) (recipes, errutil.RecipeError) {
+	recipes, err := rs.readAllRecipes()
+	if err != nil {
+		return []recipe{}, err
+	}
+
+	query = strings.TrimSpace(strings.ToLower(query))
+
+	if len(query) == 0 {
+		return recipes, err
+	}
+
+	var filteredRecipes []recipe
+	for _, recipe := range recipes {
+		if strings.Contains(strings.ToLower(recipe.Title), query) ||
+			strings.Contains(strings.ToLower(recipe.Description), query) {
+			filteredRecipes = append(filteredRecipes, recipe)
+		}
+	}
+
+	return filteredRecipes, nil
+}
+
 func (rs *recipeService) getPathId(c echo.Context) (uint, errutil.RecipeError) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -64,10 +88,10 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (recipe, err
 		return recipe, errutil.RecipeErrorInvalidFormData
 	}
 
-	recipe.Title = c.Request().FormValue("title")
-	recipe.Description = c.Request().FormValue("description")
-	recipe.Ingredients = c.Request().FormValue("ingredients")
-	recipe.Instructions = c.Request().FormValue("instructions")
+	recipe.Title = strings.TrimSpace(c.Request().FormValue("title"))
+	recipe.Description = strings.TrimSpace(c.Request().FormValue("description"))
+	recipe.Ingredients = strings.TrimSpace(c.Request().FormValue("ingredients"))
+	recipe.Instructions = strings.TrimSpace(c.Request().FormValue("instructions"))
 
 	if len(recipe.Title) == 0 ||
 		len(recipe.Description) == 0 ||

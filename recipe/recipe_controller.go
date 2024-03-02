@@ -124,21 +124,13 @@ func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
 
 func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		servutil.RenderError(c, err)
+		return servutil.RenderError(c, err)
 	}
 	query := strings.ToLower(c.FormValue("query"))
 
-	recipes, err := rc.recipeService.readAllRecipes()
+	filteredRecipes, err := rc.recipeService.getFilteredRecipes(query)
 	if err != nil {
 		return servutil.RenderError(c, err)
-	}
-
-	var filteredRecipes []recipe
-	for _, recipe := range recipes {
-		if strings.Contains(strings.ToLower(recipe.Title), query) ||
-			strings.Contains(strings.ToLower(recipe.Description), query) {
-			filteredRecipes = append(filteredRecipes, recipe)
-		}
 	}
 
 	isAdmin := servutil.IsAuthorized(c)
@@ -211,15 +203,15 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return c.String(http.StatusOK, "")
 	}
 
-	recipe, err := rc.recipeService.readRecipe(id)
-	if err != nil {
-		return servutil.RenderError(c, err)
-	}
-
 	var deleting = true
 
 	if c.QueryParam("cancel") == "true" {
 		deleting = false
+	}
+
+	recipe, err := rc.recipeService.readRecipe(id)
+	if err != nil {
+		return servutil.RenderError(c, err)
 	}
 
 	return servutil.RenderTemplateComponent(
@@ -229,5 +221,6 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 			recipe:   recipe,
 			IsAdmin:  servutil.IsAuthorized(c),
 			Deleting: deleting,
-		})
+		},
+	)
 }
