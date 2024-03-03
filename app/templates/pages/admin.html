@@ -10,9 +10,8 @@
     <h2>Anmelden</h2>
     <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
       <label for="password">Passwort:</label>
-      <input id="password" placeholder="Passwort" type="password" name="password" {{ if . }}disabled{{ end }} />
-      <input {{ if . }}class="button-disabled" {{ end }} type="submit" value="Anmelden" name="submit" {{ if .
-        }}disabled{{ end }} />
+      <input id="password" placeholder="Passwort" type="password" name="password" {{ if . }}disabled="true"{{ end }} />
+      <input {{ if . }}class="button-disabled" disabled="true"{{ end }} type="submit" value="Anmelden" name="submit" />
     </form>
   </div>
   <div>
