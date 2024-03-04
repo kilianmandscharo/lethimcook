@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,15 +19,15 @@ func newRecipeService() recipeService {
 	}
 }
 
-func (rs *recipeService) createRecipe(recipe *recipe) errutil.RecipeError {
+func (rs *recipeService) createRecipe(recipe *types.Recipe) errutil.RecipeError {
 	return rs.db.createRecipe(recipe)
 }
 
-func (rs *recipeService) readRecipe(id uint) (recipe, errutil.RecipeError) {
+func (rs *recipeService) readRecipe(id uint) (types.Recipe, errutil.RecipeError) {
 	return rs.db.readRecipe(id)
 }
 
-func (rs *recipeService) readAllRecipes() ([]recipe, errutil.RecipeError) {
+func (rs *recipeService) readAllRecipes() ([]types.Recipe, errutil.RecipeError) {
 	return rs.db.readAllRecipes()
 }
 
@@ -34,14 +35,14 @@ func (rs *recipeService) deleteRecipe(id uint) errutil.RecipeError {
 	return rs.db.deleteRecipe(id)
 }
 
-func (rs *recipeService) updateRecipe(recipe *recipe) errutil.RecipeError {
+func (rs *recipeService) updateRecipe(recipe *types.Recipe) errutil.RecipeError {
 	return rs.db.updateRecipe(recipe)
 }
 
-func (rs *recipeService) getFilteredRecipes(query string) (recipes, errutil.RecipeError) {
+func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, errutil.RecipeError) {
 	recipes, err := rs.readAllRecipes()
 	if err != nil {
-		return []recipe{}, err
+		return []types.Recipe{}, err
 	}
 
 	query = strings.TrimSpace(strings.ToLower(query))
@@ -50,7 +51,7 @@ func (rs *recipeService) getFilteredRecipes(query string) (recipes, errutil.Reci
 		return recipes, err
 	}
 
-	var filteredRecipes []recipe
+	var filteredRecipes []types.Recipe
 	for _, recipe := range recipes {
 		if strings.Contains(strings.ToLower(recipe.Title), query) ||
 			strings.Contains(strings.ToLower(recipe.Description), query) {
@@ -70,8 +71,8 @@ func (rs *recipeService) getPathId(c echo.Context) (uint, errutil.RecipeError) {
 	return uint(id), nil
 }
 
-func (rs *recipeService) getRecipeById(c echo.Context) (recipe, errutil.RecipeError) {
-	var recipe recipe
+func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, errutil.RecipeError) {
+	var recipe types.Recipe
 
 	id, err := rs.getPathId(c)
 	if err != nil {
@@ -81,8 +82,8 @@ func (rs *recipeService) getRecipeById(c echo.Context) (recipe, errutil.RecipeEr
 	return rs.readRecipe(id)
 }
 
-func (rs *recipeService) parseFormData(c echo.Context, withID bool) (recipe, errutil.RecipeError) {
-	var recipe recipe
+func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, errutil.RecipeError) {
+	var recipe types.Recipe
 
 	if err := c.Request().ParseForm(); err != nil {
 		return recipe, errutil.RecipeErrorInvalidFormData

@@ -1,0 +1,37 @@
+package components
+
+templ AdminPage(isAdmin bool) {
+	@Header()
+	<main>
+		<div>
+			<h2>Anmelden</h2>
+			<form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
+				<label for="password">Passwort:</label>
+				<input id="password" placeholder="Passwort" type="password" name="password" if isAdmin {
+	disabled="true"
+}/>
+				<input type="submit" value="Anmelden" name="submit" if isAdmin {
+	class="button-disabled"
+	disabled="true"
+}/>
+			</form>
+		</div>
+		<div>
+			<h2>Passwort ändern</h2>
+			<form hx-put="/auth/password" hx-indicator="#loading">
+				<label for="old-password">Altes Passwort:</label>
+				<input id="old-password" placeholder="Altes Passwort" type="password" name="oldPassword"/>
+				<label for="new-password">Neues Passwort:</label>
+				<input id="new-password" placeholder="Neues Passwort" type="password" name="newPassword"/>
+				<input type="submit" value="Bestätigen" name="submit"/>
+			</form>
+		</div>
+		if isAdmin {
+			<div class="logout-section">
+				<button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
+					Abmelden
+				</button>
+			</div>
+		}
+	</main>
+}

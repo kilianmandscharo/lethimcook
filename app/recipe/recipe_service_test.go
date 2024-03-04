@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,10 +39,10 @@ func newTestContext(t *testing.T, formData string, pathId string) echo.Context {
 func TestGetFilteredRecipes(t *testing.T) {
 	// Given
 	recipeService := newTestRecipeService()
-	assert.NoError(t, recipeService.createRecipe(&recipe{
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
 		Title: "Naan",
 	}))
-	assert.NoError(t, recipeService.createRecipe(&recipe{
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
 		Description: "Italienische Knoblauchnudeln",
 	}))
 
@@ -149,7 +150,7 @@ func TestParseFormData(t *testing.T) {
 	// When
 	parsedRecipe, err := recipeService.parseFormData(c, true)
 	assert.NoError(t, err)
-	assertRecipesEqual(t, recipe{
+	assertRecipesEqual(t, types.Recipe{
 		ID:           uint(1),
 		Title:        "title",
 		Description:  "description",

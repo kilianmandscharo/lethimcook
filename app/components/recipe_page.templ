@@ -1,0 +1,53 @@
+package components
+
+import (
+	"github.com/kilianmandscharo/lethimcook/types"
+	"fmt"
+)
+
+templ RecipePage(isAdmin bool, recipe types.Recipe) {
+	if isAdmin {
+		@Header(editRecipeButton(recipe))
+	} else {
+		@Header()
+	}
+	<main>
+		<div class="recipe">
+			<section class="recipe-heading">
+				<h2>{ recipe.Title }</h2>
+				<div class="caret-container">
+					<i class="fa-solid fa-caret-right"></i>
+					<p>{ recipe.Description }</p>
+				</div>
+				<div class="caret-container">
+					<i class="fa-solid fa-caret-right"></i>
+					<p>Zubereitungszeit: { fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
+				</div>
+			</section>
+			<section>
+				<h3>Zutaten</h3>
+				<div>
+					@templ.Raw(recipe.Ingredients)
+				</div>
+			</section>
+			<section>
+				<h3>Anweisungen</h3>
+				<div>
+					@templ.Raw(recipe.Instructions)
+				</div>
+			</section>
+		</div>
+	</main>
+}
+
+templ editRecipeButton(recipe types.Recipe) {
+	<button
+		class="icon-button"
+		hx-get={ fmt.Sprintf("/recipe/edit/%d", recipe.ID) }
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+	>
+		<i class="fa-solid fa-pen-to-square fa-xl"></i>
+	</button>
+}

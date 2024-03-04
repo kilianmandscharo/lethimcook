@@ -1,0 +1,33 @@
+package components
+
+import (
+	"github.com/kilianmandscharo/lethimcook/types"
+	"fmt"
+)
+
+templ RecipeEditPage(recipe types.Recipe) {
+	@Header()
+	<main>
+		<h2>Rezept bearbeiten</h2>
+		<form hx-put={ fmt.Sprintf("/recipe/%d", recipe.ID) } hx-target="#content">
+			<label for="title">Titel:</label>
+			<input id="title" placeholder="Titel" value={ recipe.Title } type="text" name="title"/>
+			<label for="description">Beschreibung:</label>
+			<input id="description" placeholder="Beschreibung" value={ recipe.Description } type="text" name="description"/>
+			<label for="duration">Kochdauer (Minuten):</label>
+			<input
+				id="duration"
+				placeholder="Kochdauer (Minuten)"
+				type="number"
+				name="duration"
+				value={ fmt.Sprintf("%d",
+      recipe.Duration ) }
+			/>
+			<label for="ingredients">Zutaten:</label>
+			<textarea id="ingredients" placeholder="Zutaten" name="ingredients">{ recipe.Ingredients }</textarea>
+			<label for="instructions">Anleitung:</label>
+			<textarea id="instructions" placeholder="Anleitung" name="instructions">{ recipe.Instructions }</textarea>
+			<input type="submit" value="Rezept aktualisieren" name="submit"/>
+		</form>
+	</main>
+}

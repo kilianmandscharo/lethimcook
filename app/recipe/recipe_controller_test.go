@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kilianmandscharo/lethimcook/templutil"
+	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -36,7 +36,6 @@ type requestOptions struct {
 
 func assertRequest(t *testing.T, options requestOptions) (*httptest.ResponseRecorder, echo.Context) {
 	e := echo.New()
-	templutil.AttachTemplatesTest(e)
 
 	rr := httptest.NewRecorder()
 
@@ -160,7 +159,7 @@ func TestRenderRecipeEditPage(t *testing.T) {
 		)
 	})
 
-	err := recipeController.recipeService.createRecipe(&recipe{})
+	err := recipeController.recipeService.createRecipe(&types.Recipe{})
 	assert.NoError(t, err)
 
 	t.Run("authorized", func(t *testing.T) {
@@ -229,7 +228,7 @@ func TestRenderRecipePage(t *testing.T) {
 		)
 	})
 
-	err := recipeController.recipeService.createRecipe(&recipe{})
+	err := recipeController.recipeService.createRecipe(&types.Recipe{})
 	assert.NoError(t, err)
 
 	t.Run("valid request", func(t *testing.T) {
@@ -375,7 +374,7 @@ func TestHandleUpdateRecipe(t *testing.T) {
 		)
 	})
 
-	err := recipeController.recipeService.createRecipe(&recipe{})
+	err := recipeController.recipeService.createRecipe(&types.Recipe{})
 	assert.NoError(t, err)
 
 	t.Run("valid request", func(t *testing.T) {
@@ -447,7 +446,7 @@ func TestHandleDeleteRecipe(t *testing.T) {
 		)
 	})
 
-	err := recipeController.recipeService.createRecipe(&recipe{})
+	err := recipeController.recipeService.createRecipe(&types.Recipe{})
 	assert.NoError(t, err)
 
 	t.Run("valid request without force", func(t *testing.T) {

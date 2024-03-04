@@ -1,0 +1,46 @@
+package components
+
+templ Header(buttons ...templ.Component) {
+	<header>
+		<div>
+			<div class="heading">
+				<svg height="32" width="52">
+					<image href="/static/logo.svg" height="28"></image>
+				</svg>
+				<h1>Lethimcook</h1>
+			</div>
+			<div>
+				for _, button := range buttons {
+					@button
+				}
+				@AdminButton()
+				@HomeButton()
+			</div>
+		</div>
+	</header>
+}
+
+templ AdminButton() {
+	<button
+		id="admin-button"
+		class="icon-button"
+		hx-get="/admin"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+	>
+		<i class="fa-solid fa-user fa-xl"></i>
+	</button>
+}
+
+templ HomeButton() {
+	<button id="home-button" class="icon-button" hx-get="/" hx-trigger="click" hx-target="#content" hx-push-url="true">
+		<i class="fas fa-solid fa-house fa-xl"></i>
+	</button>
+}
+
+templ NewRecipeButton() {
+	<button class="icon-button" hx-get="/recipe/new" hx-target="#content" hx-trigger="click" hx-push-url="true">
+		<i class="fa-solid fa-plus fa-xl"></i>
+	</button>
+}

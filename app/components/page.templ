@@ -1,0 +1,80 @@
+package components
+
+templ Page(content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="de">
+		@head()
+		@body(content)
+	</html>
+}
+
+templ head() {
+	<head>
+		<title>Let Him Cook</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<script src="/static/js/htmx.min.js" defer></script>
+		<link rel="stylesheet" href="/static/css/styles.css"/>
+		<link rel="stylesheet" href="/static/css/fonts.css"/>
+		<link href="/static/fa/css/fontawesome.css" rel="stylesheet"/>
+		<link href="/static/fa/css/solid.css" rel="stylesheet"/>
+		<link rel="icon" type="image/x-icon" href="/static/favicon.ico"/>
+	</head>
+}
+
+templ body(content templ.Component) {
+	<body>
+		<div id="content">
+			@content
+		</div>
+		@loading()
+		@notification()
+		@footer()
+		@script()
+	</body>
+}
+
+templ loading() {
+	<div id="loading" class="htmx-indicator loading">
+		<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+			<circle cx="50" cy="50" r="32" stroke-width="10" fill="transparent" stroke-dasharray="201" stroke-dashoffset="55"></circle>
+		</svg>
+	</div>
+}
+
+templ notification() {
+	<div id="notification">
+		<i class="fa-solid fa-circle-exclamation"></i>
+		<p id="notification-text">Hinweis</p>
+	</div>
+}
+
+templ footer() {
+	<footer>
+		<button hx-get="/imprint" hx-trigger="click" hx-target="#content" hx-push-url="true">
+			Impressum
+		</button>
+		<button hx-get="/privacy-notice" hx-trigger="click" hx-target="#content" hx-push-url="true">
+			Datenschutz
+		</button>
+	</footer>
+}
+
+templ script() {
+	<script>
+  document.body.addEventListener("htmx:responseError", function (event) {
+    const response = event.detail.xhr.response;
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notification-text");
+
+    if (notification && notificationText) {
+      notificationText.innerText = response;
+      notification.style.opacity = 1;
+
+      setTimeout(() => {
+        notification.style.opacity = 0;
+      }, 3000);
+    }
+  });
+</script>
+}

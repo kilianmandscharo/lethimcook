@@ -6,23 +6,14 @@ import (
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func newTestRecipe() recipe {
-	return recipe{
-		Title:        "Test title",
-		Description:  "Test description",
-		Duration:     30,
-		Ingredients:  "Test ingredients",
-		Instructions: "Test instructions",
-	}
-}
-
-func assertRecipesEqual(t *testing.T, first, second recipe) {
+func assertRecipesEqual(t *testing.T, first, second types.Recipe) {
 	assert.True(
 		t,
 		first.ID == second.ID &&
@@ -43,9 +34,9 @@ func newTestRecipeDatabase() recipeDatabase {
 		os.Exit(1)
 	}
 
-	db.Migrator().DropTable(&recipe{})
+	db.Migrator().DropTable(&types.Recipe{})
 
-	db.AutoMigrate(&recipe{})
+	db.AutoMigrate(&types.Recipe{})
 
 	return recipeDatabase{handler: db}
 }
@@ -55,7 +46,7 @@ func TestCreateRecipe(t *testing.T) {
 	db := newTestRecipeDatabase()
 
 	// When
-	r := newTestRecipe()
+	r := types.NewTestRecipe()
 	err := db.createRecipe(&r)
 
 	// Then
@@ -63,7 +54,7 @@ func TestCreateRecipe(t *testing.T) {
 	assert.Equal(t, uint(1), r.ID)
 
 	// When
-	r = newTestRecipe()
+	r = types.NewTestRecipe()
 	err = db.createRecipe(&r)
 
 	// Then
@@ -82,7 +73,7 @@ func TestReadRecipe(t *testing.T) {
 	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
 
 	// Given
-	r := newTestRecipe()
+	r := types.NewTestRecipe()
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
@@ -105,7 +96,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.Equal(t, 0, len(recipes))
 
 	// Given
-	r := newTestRecipe()
+	r := types.NewTestRecipe()
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
@@ -120,7 +111,7 @@ func TestReadAllRecipes(t *testing.T) {
 func TestDeleteRecipe(t *testing.T) {
 	// Given
 	db := newTestRecipeDatabase()
-	r := newTestRecipe()
+	r := types.NewTestRecipe()
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
@@ -145,7 +136,7 @@ func TestDeleteRecipe(t *testing.T) {
 func TestUpdateRecipe(t *testing.T) {
 	// Given
 	db := newTestRecipeDatabase()
-	r := newTestRecipe()
+	r := types.NewTestRecipe()
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When

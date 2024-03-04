@@ -1,4 +1,4 @@
-package recipe
+package types
 
 import (
 	"testing"
@@ -14,12 +14,12 @@ const renderedInstructions = "<ol>\n<li>Instruction 1</li>\n<li>Instruction 2</l
 
 func TestRenderMarkdown(t *testing.T) {
 	// Given
-	recipe := newTestRecipe()
+	recipe := NewTestRecipe()
 	recipe.Ingredients = testMarkdownIngredients
 	recipe.Instructions = testMarkdownInstructions
 
 	// When
-	err := recipe.renderMarkdown()
+	err := recipe.RenderMarkdown()
 
 	// Then
 	assert.NoError(t, err)

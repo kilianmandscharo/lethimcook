@@ -1,4 +1,4 @@
-package recipe
+package types
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"github.com/yuin/goldmark"
 )
 
-type recipe struct {
+type Recipe struct {
 	ID           uint
 	Title        string
 	Description  string
@@ -16,9 +16,7 @@ type recipe struct {
 	Instructions string
 }
 
-type recipes = []recipe
-
-func (r *recipe) renderMarkdown() errutil.RecipeError {
+func (r *Recipe) RenderMarkdown() errutil.RecipeError {
 	var buf bytes.Buffer
 
 	if err := goldmark.Convert([]byte(r.Ingredients), &buf); err != nil {
@@ -34,4 +32,14 @@ func (r *recipe) renderMarkdown() errutil.RecipeError {
 	r.Instructions = buf.String()
 
 	return nil
+}
+
+func NewTestRecipe() Recipe {
+	return Recipe{
+		Title:        "Test title",
+		Description:  "Test description",
+		Duration:     30,
+		Ingredients:  "Test ingredients",
+		Instructions: "Test instructions",
+	}
 }
