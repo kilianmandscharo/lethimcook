@@ -11,6 +11,9 @@ on:
 jobs:
   build-test-ship:
     runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./app
     steps:
       - uses: actions/checkout@v4
 
@@ -45,5 +48,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: ${{ steps.bundle.outputs.BUNDLE_NAME }}
+          source: ./app/${{ steps.bundle.outputs.BUNDLE_NAME }}
           target: ${{ secrets.TARGET_DIR }}
