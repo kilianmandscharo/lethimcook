@@ -505,7 +505,7 @@ func TestHandleDeleteRecipe(t *testing.T) {
 		)
 		resBody := rr.Body.String()
 		assert.False(t, strings.Contains(resBody, "Löschen bestätigen"))
-		assert.Equal(t, 0, len(resBody))
+		assert.NotEqual(t, 0, len(resBody))
 	})
 }
 

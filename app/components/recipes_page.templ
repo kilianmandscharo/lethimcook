@@ -51,7 +51,7 @@ templ RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) {
 			<div class="recipe-list-item-delete-container">
 				<button
 					class="danger-button"
-					hx-target={ fmt.Sprintf("#recipe-%d", recipe.ID) }
+					hx-target="#recipe-list"
 					hx-swap="outerHTML"
 					hx-delete={ fmt.Sprintf("/recipe/%d?force=true", recipe.ID) }
 					hx-trigger="click"

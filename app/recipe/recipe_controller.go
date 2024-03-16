@@ -2,7 +2,6 @@ package recipe
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -153,7 +152,14 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 			return servutil.RenderError(c, err)
 		}
 
-		return c.String(http.StatusOK, "")
+		recipes, err := rc.recipeService.readAllRecipes()
+		if err != nil {
+			return servutil.RenderError(c, err)
+		}
+
+		return servutil.RenderComponent(
+			c, components.RecipeList(servutil.IsAuthorized(c), false, recipes),
+		)
 	}
 
 	var deleting = true
