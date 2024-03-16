@@ -15,6 +15,7 @@ templ RecipePage(isAdmin bool, recipe types.Recipe) {
 		<div class="recipe">
 			<section class="recipe-heading">
 				<h2>{ recipe.Title }</h2>
+				@RecipeTags(recipe.ParseTags())
 				<div class="caret-container">
 					<i class="fa-solid fa-caret-right"></i>
 					<p>{ recipe.Description }</p>
@@ -42,6 +43,7 @@ templ RecipePage(isAdmin bool, recipe types.Recipe) {
 
 templ editRecipeButton(recipe types.Recipe) {
 	<button
+		id="edit-recipe-button"
 		class="icon-button"
 		hx-get={ fmt.Sprintf("/recipe/edit/%d", recipe.ID) }
 		hx-trigger="click"

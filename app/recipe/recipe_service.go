@@ -45,7 +45,7 @@ func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, errut
 		return []types.Recipe{}, err
 	}
 
-	query = strings.TrimSpace(strings.ToLower(query))
+	query = strings.TrimSpace(query)
 
 	if len(query) == 0 {
 		return recipes, err
@@ -53,8 +53,7 @@ func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, errut
 
 	var filteredRecipes []types.Recipe
 	for _, recipe := range recipes {
-		if strings.Contains(strings.ToLower(recipe.Title), query) ||
-			strings.Contains(strings.ToLower(recipe.Description), query) {
+		if recipe.ContainsQuery(query) {
 			filteredRecipes = append(filteredRecipes, recipe)
 		}
 	}
@@ -91,6 +90,7 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recip
 
 	recipe.Title = strings.TrimSpace(c.Request().FormValue("title"))
 	recipe.Description = strings.TrimSpace(c.Request().FormValue("description"))
+	recipe.Tags = strings.TrimSpace(c.Request().FormValue("tags"))
 	recipe.Ingredients = strings.TrimSpace(c.Request().FormValue("ingredients"))
 	recipe.Instructions = strings.TrimSpace(c.Request().FormValue("instructions"))
 

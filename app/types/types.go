@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/yuin/goldmark"
@@ -14,6 +15,42 @@ type Recipe struct {
 	Duration     int
 	Ingredients  string
 	Instructions string
+	Tags         string
+}
+
+func (r *Recipe) ParseTags() []string {
+	if len(strings.TrimSpace(r.Tags)) == 0 {
+		return []string{}
+	}
+
+	tags := []string{}
+
+	for _, tag := range strings.Split(r.Tags, ",") {
+		trimmedTag := strings.TrimSpace(tag)
+		if len(trimmedTag) > 0 {
+			tags = append(tags, trimmedTag)
+		}
+	}
+
+	return tags
+}
+
+func (r *Recipe) ContainsQuery(query string) bool {
+	query = strings.ToLower(query)
+
+	return strings.Contains(strings.ToLower(r.Title), query) ||
+		strings.Contains(strings.ToLower(r.Description), query) ||
+		r.containsQueryInTags(query)
+}
+
+func (r *Recipe) containsQueryInTags(query string) bool {
+	for _, tag := range r.ParseTags() {
+		if strings.Contains(strings.ToLower(tag), query) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *Recipe) RenderMarkdown() errutil.RecipeError {

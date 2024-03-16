@@ -14,15 +14,17 @@ templ RecipeEditPage(recipe types.Recipe) {
 			<input id="title" placeholder="Titel" value={ recipe.Title } type="text" name="title"/>
 			<label for="description">Beschreibung:</label>
 			<input id="description" placeholder="Beschreibung" value={ recipe.Description } type="text" name="description"/>
-			<label for="duration">Kochdauer (Minuten):</label>
+			<label for="duration">Zubereitungszeit (Minuten):</label>
 			<input
 				id="duration"
-				placeholder="Kochdauer (Minuten)"
+				placeholder="Zubereitungszeit (Minuten)"
 				type="number"
 				name="duration"
 				value={ fmt.Sprintf("%d",
       recipe.Duration ) }
 			/>
+			<label for="tags">Tags:</label>
+			<input id="tags" placeholder="Tags" type="text" name="tags" value={ recipe.Tags }/>
 			<label for="ingredients">Zutaten:</label>
 			<textarea id="ingredients" placeholder="Zutaten" name="ingredients">{ recipe.Ingredients }</textarea>
 			<label for="instructions">Anleitung:</label>

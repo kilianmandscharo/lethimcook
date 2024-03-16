@@ -20,7 +20,7 @@ async function createRecipe(page: Page) {
   await page
     .getByPlaceholder("Beschreibung")
     .fill("Indisches Fladenbrot - zubereitet in der Pfanne");
-  await page.getByPlaceholder("Kochdauer (Minuten)").fill("180");
+  await page.getByPlaceholder("Zubereitungszeit (Minuten)").fill("180");
 
   await page.getByPlaceholder("Zutaten").fill(`**Rezept für 10 Stück**
 - 560 g Maida-Mehl

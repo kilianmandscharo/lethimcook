@@ -41,6 +41,7 @@ func TestGetFilteredRecipes(t *testing.T) {
 	recipeService := newTestRecipeService()
 	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
 		Title: "Naan",
+		Tags:  "indisch, Beilage",
 	}))
 	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
 		Description: "Italienische Knoblauchnudeln",
@@ -55,6 +56,8 @@ func TestGetFilteredRecipes(t *testing.T) {
 		{"xx", 0},
 		{"Italienische Knoblauchnudeln", 1},
 		{"a", 2},
+		{"indisch", 1},
+		{"Beilage", 1},
 	}
 
 	for _, test := range testCases {

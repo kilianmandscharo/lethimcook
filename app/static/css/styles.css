@@ -299,6 +299,21 @@ textarea {
   margin: 0;
 }
 
+.recipe-list-item-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.recipe-list-item-tags p {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  color: var(--color-surface-100);
+  background-color: var(--color-primary-300);
+  font-size: 14px;
+}
+
 .recipe-description {
   font-style: italic;
 }

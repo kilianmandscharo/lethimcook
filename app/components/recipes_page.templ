@@ -36,11 +36,13 @@ templ RecipeList(isAdmin bool, deleting bool, recipes []types.Recipe) {
 			default:
 				<p>{ fmt.Sprintf("%d", len(recipes)) } Rezepte</p>
 		}
-		<div>
-			for _, recipe := range recipes {
-				@RecipeCard(isAdmin, deleting, recipe)
-			}
-		</div>
+		if len(recipes) > 0 {
+			<div>
+				for _, recipe := range recipes {
+					@RecipeCard(isAdmin, deleting, recipe)
+				}
+			</div>
+		}
 	</div>
 }
 
@@ -96,6 +98,17 @@ templ RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) {
 				<p>{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
 			</div>
 			<p class="recipe-list-item-description">{ recipe.Description }</p>
+			@RecipeTags(recipe.ParseTags())
+		</div>
+	}
+}
+
+templ RecipeTags(tags []string) {
+	if len(tags) > 0 {
+		<div class="recipe-list-item-tags">
+			for _, tag := range tags {
+				<p>{ tag }</p>
+			}
 		</div>
 	}
 }
