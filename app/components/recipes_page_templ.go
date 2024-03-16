@@ -217,7 +217,7 @@ func RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			if isAdmin {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"icon-button\" hx-target=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"recipe-delete-button\" class=\"icon-button\" hx-target=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -245,7 +245,7 @@ func RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) templ.Componen
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(recipe.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 92, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 93, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -258,7 +258,7 @@ func RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) templ.Componen
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d Minuten", recipe.Duration))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 94, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 95, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -271,7 +271,7 @@ func RecipeCard(isAdmin bool, deleting bool, recipe types.Recipe) templ.Componen
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(recipe.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 96, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipes_page.templ`, Line: 97, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

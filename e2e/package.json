@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui"
+    "test": "CI=true npx playwright test --project chromium --project firefox",
+    "test:dev": "npx playwright test --project chromium --project firefox",
+    "test:ui": "npx playwright test --ui --project chromium --project firefox"
   },
   "keywords": [],
   "author": "",
