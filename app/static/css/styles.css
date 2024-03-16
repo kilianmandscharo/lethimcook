@@ -99,6 +99,10 @@ main {
   opacity: 0;
   max-width: 300px;
   pointer-events: none;
+  font-size: 20px;
+}
+
+#notification p {
   font-size: 12px;
 }
 
