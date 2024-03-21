@@ -11,7 +11,7 @@ var (
 	AuthErrorNoAdminFound         AuthError = errors.New("Kein Admin gefunden")
 	AuthErrorDatabaseFailure      AuthError = errors.New("Datenbankfehler")
 	AuthErrorInvalidBody          AuthError = errors.New("Ungültiger Body")
-	AuthErrorInvalidPassword      AuthError = errors.New("Falsche Passwort")
+	AuthErrorInvalidPassword      AuthError = errors.New("Falsches Passwort")
 	AuthErrorPasswordTooLong      AuthError = errors.New("Maximale Passwortlänge: 72")
 	AuthErrorPasswordTooShort     AuthError = errors.New("Minimale Passwortlänge: 5")
 	AuthErrorAdminAlreadyExists   AuthError = errors.New("Es kann nur einen Admin geben")
