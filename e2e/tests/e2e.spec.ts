@@ -82,7 +82,8 @@ async function changePassword(
   await page.getByPlaceholder("Altes Passwort").fill(oldPassword);
   await page.getByPlaceholder("Neues Passwort").fill(newPassword);
   await page.getByRole("button", { name: "Bestätigen" }).click();
-  await expect(page.getByText("Passwort erfolgreich geändert")).toBeVisible();
+  await expect(page.getByPlaceholder("Altes Passwort")).toBeEmpty();
+  await expect(page.getByPlaceholder("Neues Passwort")).toBeEmpty();
 }
 
 async function testInvalidPassword(page: Page, invalidPassword: string) {
@@ -174,17 +175,13 @@ test("e2e test", async ({ page }) => {
 
   await navigateToHomePage(page);
   await createRecipe(page);
-
   await checkRecipeList(page, recipe);
-
   await navigateToRecipePage(page);
   await checkRecipePage(page, recipe);
 
   await navigateToEditPage(page);
   await editRecipe(page);
-
   await checkRecipePage(page, editedRecipe);
-
   await navigateToHomePage(page);
   await checkRecipeList(page, editedRecipe);
 
