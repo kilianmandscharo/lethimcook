@@ -1,7 +1,7 @@
 package servutil
 
 import (
-	"net/http"
+	"encoding/json"
 
 	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -28,36 +28,56 @@ func AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func renderImprint(c echo.Context) error {
-	return RenderComponent(c, components.Imprint())
+	return RenderComponent(RenderComponentOptions{
+		Context:   c,
+		Component: components.Imprint(),
+	})
 }
 
 func renderPrivacyNotice(c echo.Context) error {
-	return RenderComponent(c, components.PrivacyNotice())
+	return RenderComponent(RenderComponentOptions{
+		Context:   c,
+		Component: components.PrivacyNotice(),
+	})
 }
-
-// func RenderTemplate(c echo.Context, templateName string, data any) error {
-// 	if isHxRequest(c) {
-// 		return c.Render(http.StatusOK, templutil.FragmentName(templateName), data)
-// 	}
-//
-// 	return c.Render(http.StatusOK, templutil.PageName(templateName), data)
-// }
-//
-// func RenderTemplateComponent(c echo.Context, templateName string, data any) error {
-// 	return c.Render(http.StatusOK, templutil.FragmentName(templateName), data)
-// }
 
 func RenderError(c echo.Context, err error) error {
 	return c.String(errutil.ErrorHttpCodes[err], err.Error())
 }
 
-func RenderComponent(c echo.Context, component templ.Component) error {
-	c.Response().Writer.WriteHeader(http.StatusOK)
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+type RenderComponentOptions struct {
+	Context   echo.Context
+	Component templ.Component
+	Message   string
+}
 
-	if isHxRequest(c) {
-		return component.Render(c.Request().Context(), c.Response().Writer)
+type triggerPayload struct {
+	Message string `json:"message"`
+}
+
+func RenderComponent(options RenderComponentOptions) error {
+	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+
+	if len(options.Message) > 0 {
+		payload, err := json.Marshal(triggerPayload{Message: options.Message})
+
+		if err == nil {
+			options.Context.Response().Header().Set(
+				"HX-Trigger",
+				string(payload),
+			)
+		}
 	}
 
-	return components.Page(component).Render(c.Request().Context(), c.Response().Writer)
+	if isHxRequest(options.Context) {
+		return options.Component.Render(
+			options.Context.Request().Context(),
+			options.Context.Response().Writer,
+		)
+	}
+
+	return components.Page(options.Component).Render(
+		options.Context.Request().Context(),
+		options.Context.Response().Writer,
+	)
 }

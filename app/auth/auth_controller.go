@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -31,7 +30,10 @@ func (ac *AuthController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (ac *AuthController) RenderAdminPage(c echo.Context) error {
-	return servutil.RenderComponent(c, components.AdminPage(servutil.IsAuthorized(c)))
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.AdminPage(servutil.IsAuthorized(c)),
+	})
 }
 
 func (ac *AuthController) HandleLogin(c echo.Context) error {
@@ -54,7 +56,11 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	c.Set("authorized", true)
 
-	return ac.RenderAdminPage(c)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.AdminPage(servutil.IsAuthorized(c)),
+		Message:   "Angemeldet",
+	})
 }
 
 func (ac *AuthController) HandleLogout(c echo.Context) error {
@@ -67,7 +73,11 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 
 	c.Set("authorized", false)
 
-	return ac.RenderAdminPage(c)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.AdminPage(servutil.IsAuthorized(c)),
+		Message:   "Abgemeldet",
+	})
 }
 
 func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
@@ -85,7 +95,11 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return c.String(http.StatusOK, "Passwort erfolgreich geändert")
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.AdminPage(servutil.IsAuthorized(c)),
+		Message:   "Passwort aktualisiert",
+	})
 }
 
 func (ac *AuthController) ValidateTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {

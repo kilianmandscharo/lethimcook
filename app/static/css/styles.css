@@ -1,5 +1,6 @@
 :root {
   --color-danger: #ef4444;
+  --color-success: #4caf50; 
   --color-white: rgba(255, 255, 255, 0.9);
 
   --header-height: 60px;
@@ -69,6 +70,16 @@ header > div > div {
   -webkit-text-fill-color: transparent;
 }
 
+.heading .title {
+  background-image: linear-gradient(var(--color-danger), white);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+  margin: 0;
+  font-family: "Fugaz One", sans-serif;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -95,11 +106,22 @@ main {
   border-radius: 4px;
   height: 40px;
   padding: 0.5rem;
-  background-color: var(--color-danger);
   opacity: 0;
   max-width: 300px;
   pointer-events: none;
   font-size: 20px;
+}
+
+#notification p {
+  font-weight: 700;
+}
+
+.notification-danger {
+  background-color: var(--color-danger);
+}
+
+.notification-success {
+  background-color: var(--color-success);
 }
 
 #notification p {
@@ -186,9 +208,7 @@ a {
 }
 
 h1 {
-  font-size: 24px;
-  margin: 0;
-  font-family: "Fugaz One", sans-serif;
+  margin-top: 0rem;
 }
 
 h2 {
@@ -318,6 +338,10 @@ textarea {
   font-style: italic;
 }
 
+.recipe section:last-child {
+  margin-top: 2rem;
+}
+
 .recipe h2 {
   color: var(--color-primary-300);
 }
@@ -369,6 +393,14 @@ form > :last-child {
   height: 40px;
   color: var(--color-surface-100);
   border-radius: 4px;
+}
+
+.contact {
+  margin-bottom: 1rem;
+}
+
+.contact > p {
+  margin: 0;
 }
 
 .danger {

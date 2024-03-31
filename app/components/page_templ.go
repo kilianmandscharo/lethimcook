@@ -99,7 +99,7 @@ func body(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = notification().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = errorNotification().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -146,7 +146,7 @@ func loading() templ.Component {
 	})
 }
 
-func notification() templ.Component {
+func errorNotification() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -159,7 +159,7 @@ func notification() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notification\"><i class=\"fa-solid fa-circle-exclamation\"></i><p id=\"notification-text\">Hinweis</p></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notification\"><i class=\"fa-solid fa-circle-info\"></i><p id=\"notification-text\">Hinweis</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -207,7 +207,7 @@ func script() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script>\n  document.body.addEventListener(\"htmx:responseError\", function (event) {\n    const response = event.detail.xhr.response;\n    const notification = document.getElementById(\"notification\");\n    const notificationText = document.getElementById(\"notification-text\");\n\n    if (notification && notificationText) {\n      notificationText.innerText = response;\n      notification.style.opacity = 1;\n\n      setTimeout(() => {\n        notification.style.opacity = 0;\n      }, 3000);\n    }\n  });\n</script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script>\n  document.body.addEventListener(\"htmx:responseError\", function (event) {\n    const message = event.detail.xhr.response;\n    notify(message, \"error\");\n  });\n\n  document.body.addEventListener(\"message\", function (event) {\n    const message = event.detail.value;\n    notify(message, \"success\");\n  });\n\n  function notify(message, type) {\n    const notification = document.getElementById(\"notification\");\n    const notificationText = document.getElementById(\"notification-text\");\n\n    if (notification && notificationText) {\n      notificationText.innerText = message;\n      notification.style.opacity = 1;\n      notification.className = type === \"success\" ?\n        \"notification-success\" :\n        \"notification-danger\";\n\n      setTimeout(() => {\n        notification.style.opacity = 0;\n      }, 3000);\n    }\n  }\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

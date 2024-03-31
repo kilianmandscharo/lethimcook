@@ -8,7 +8,7 @@ import (
 templ RecipeEditPage(recipe types.Recipe) {
 	@Header()
 	<main>
-		<h2>Rezept bearbeiten</h2>
+		<h1>Rezept bearbeiten</h1>
 		<form hx-put={ fmt.Sprintf("/recipe/%d", recipe.ID) } hx-target="#content">
 			<label for="title">Titel:</label>
 			<input id="title" placeholder="Titel" value={ recipe.Title } type="text" name="title"/>

@@ -28,7 +28,7 @@ templ body(content templ.Component) {
 			@content
 		</div>
 		@loading()
-		@notification()
+		@errorNotification()
 		@footer()
 		@script()
 	</body>
@@ -42,9 +42,9 @@ templ loading() {
 	</div>
 }
 
-templ notification() {
+templ errorNotification() {
 	<div id="notification">
-		<i class="fa-solid fa-circle-exclamation"></i>
+    <i class="fa-solid fa-circle-info"></i>
 		<p id="notification-text">Hinweis</p>
 	</div>
 }
@@ -63,18 +63,30 @@ templ footer() {
 templ script() {
 	<script>
   document.body.addEventListener("htmx:responseError", function (event) {
-    const response = event.detail.xhr.response;
+    const message = event.detail.xhr.response;
+    notify(message, "error");
+  });
+
+  document.body.addEventListener("message", function (event) {
+    const message = event.detail.value;
+    notify(message, "success");
+  });
+
+  function notify(message, type) {
     const notification = document.getElementById("notification");
     const notificationText = document.getElementById("notification-text");
 
     if (notification && notificationText) {
-      notificationText.innerText = response;
+      notificationText.innerText = message;
       notification.style.opacity = 1;
+      notification.className = type === "success" ?
+        "notification-success" :
+        "notification-danger";
 
       setTimeout(() => {
         notification.style.opacity = 0;
       }, 3000);
     }
-  });
+  }
 </script>
 }

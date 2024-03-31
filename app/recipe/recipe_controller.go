@@ -35,15 +35,20 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
+	return rc.renderRecipeListPageHelper(c, "")
+}
+
+func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message string) error {
 	recipes, err := rc.recipeService.readAllRecipes()
 	if err != nil {
 		return servutil.RenderError(c, err)
 	}
 
-	return servutil.RenderComponent(
-		c,
-		components.RecipesPage(servutil.IsAuthorized(c), false, recipes),
-	)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipesPage(servutil.IsAuthorized(c), false, recipes),
+		Message:   message,
+	})
 }
 
 func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
@@ -51,7 +56,10 @@ func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 		return servutil.RenderError(c, errutil.AuthErrorNotAuthorized)
 	}
 
-	return servutil.RenderComponent(c, components.RecipeNewPage())
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipeNewPage(),
+	})
 }
 
 func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
@@ -64,10 +72,17 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return servutil.RenderComponent(c, components.RecipeEditPage(recipe))
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipeEditPage(recipe),
+	})
 }
 
 func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
+	return rc.RenderRecipePageHelper(c, "")
+}
+
+func (rc *RecipeController) RenderRecipePageHelper(c echo.Context, message string) error {
 	recipe, err := rc.recipeService.getRecipeById(c)
 	if err != nil {
 		return servutil.RenderError(c, err)
@@ -79,10 +94,11 @@ func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
 
 	c.Response().Header().Set("HX-Push-Url", fmt.Sprintf("/recipe/%d", recipe.ID))
 
-	return servutil.RenderComponent(
-		c,
-		components.RecipePage(servutil.IsAuthorized(c), recipe),
-	)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipePage(servutil.IsAuthorized(c), recipe),
+		Message:   message,
+	})
 }
 
 func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
@@ -96,10 +112,10 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return servutil.RenderComponent(
-		c,
-		components.RecipeList(servutil.IsAuthorized(c), false, filteredRecipes),
-	)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipeList(servutil.IsAuthorized(c), false, filteredRecipes),
+	})
 }
 
 func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
@@ -116,7 +132,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return rc.RenderRecipeListPage(c)
+	return rc.renderRecipeListPageHelper(c, "Rezept erstellt")
 }
 
 func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
@@ -133,7 +149,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return rc.RenderRecipePage(c)
+	return rc.RenderRecipePageHelper(c, "Rezept aktualisiert")
 }
 
 func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
@@ -157,9 +173,11 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 			return servutil.RenderError(c, err)
 		}
 
-		return servutil.RenderComponent(
-			c, components.RecipeList(servutil.IsAuthorized(c), false, recipes),
-		)
+		return servutil.RenderComponent(servutil.RenderComponentOptions{
+			Context:   c,
+			Component: components.RecipeList(servutil.IsAuthorized(c), false, recipes),
+			Message:   "Rezept gelöscht",
+		})
 	}
 
 	var deleting = true
@@ -173,8 +191,8 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
-	return servutil.RenderComponent(
-		c,
-		components.RecipeCard(servutil.IsAuthorized(c), deleting, recipe),
-	)
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipeCard(servutil.IsAuthorized(c), deleting, recipe),
+	})
 }
