@@ -80,3 +80,20 @@ func NewTestRecipe() Recipe {
 		Instructions: "Test instructions",
 	}
 }
+
+type FormElementType int
+
+const (
+	FormElementInput    FormElementType = 1
+	FormElementTextArea FormElementType = 2
+)
+
+type FormElement struct {
+	Type      FormElementType
+	Name      string
+	Err       error
+	Value     string
+	InputType string
+	Label     string
+	Required  bool
+}

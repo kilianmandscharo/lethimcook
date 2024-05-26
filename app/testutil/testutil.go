@@ -70,3 +70,57 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 
 	return rr, c
 }
+
+type TestFormDataStringOptions struct {
+	TitleEmpty        bool
+	DescriptionEmpty  bool
+	DurationEmpty     bool
+	InvalidDuration   bool
+	TagsEmpty         bool
+	IngredientsEmpty  bool
+	InstructionsEmpty bool
+}
+
+func ConstructTestFormDataString(options TestFormDataStringOptions) string {
+	formData := ""
+
+	if !options.TitleEmpty {
+		formData += "title=title"
+	}
+	if !options.DescriptionEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		formData += "description=description"
+	}
+	if !options.DurationEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		if options.InvalidDuration {
+			formData += "duration=duration"
+		} else {
+			formData += "duration=10"
+		}
+	}
+	if !options.TagsEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		formData += "tags=tags"
+	}
+	if !options.IngredientsEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		formData += "ingredients=ingredients"
+	}
+	if !options.InstructionsEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		formData += "instructions=instructions"
+	}
+
+	return formData
+}

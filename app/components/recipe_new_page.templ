@@ -1,22 +1,13 @@
 package components
 
-templ RecipeNewPage() {
+import "github.com/kilianmandscharo/lethimcook/types"
+
+templ RecipeNewPage(recipeForm []types.FormElement) {
 	@Header()
 	<main>
 		<h1>Neues Rezept</h1>
 		<form hx-post="/recipe" hx-target="#content">
-			<label for="title">Titel:</label>
-			<input id="title" placeholder="Titel" type="text" name="title"/>
-			<label for="description">Beschreibung:</label>
-			<input id="description" placeholder="Beschreibung" type="text" name="description"/>
-			<label for="duration">Zubereitungszeit (Minuten):</label>
-			<input id="duration" placeholder="Zubereitungszeit (Minuten)" type="number" name="duration"/>
-			<label for="tags">Tags:</label>
-			<input id="tags" placeholder="Tags" type="text" name="tags"/>
-			<label for="ingredient">Zutaten:</label>
-			<textarea id="ingredients" placeholder="Zutaten" name="ingredients"></textarea>
-			<label for="instructions">Anleitung:</label>
-			<textarea id="instructions" placeholder="Anleitung" name="instructions"></textarea>
+			@RecipeForm(recipeForm)
 			<input type="submit" value="Rezept erstellen" name="submit"/>
 		</form>
 	</main>

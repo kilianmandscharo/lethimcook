@@ -219,7 +219,7 @@ func TestHandleCreateRecipe(t *testing.T) {
 				Method:       http.MethodPost,
 				Route:        "/recipe",
 				Authorized:   true,
-				StatusWant:   http.StatusBadRequest,
+				StatusWant:   http.StatusOK,
 				WithFormData: true,
 				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=xx",
 			},

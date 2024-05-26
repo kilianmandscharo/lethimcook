@@ -72,7 +72,7 @@ func (db *authDatabase) createAdmin(admin *admin) error {
 	return nil
 }
 
-func (db *authDatabase) doesAdminExist() (bool, error) {
+func (db *authDatabase) doesAdminExist() (bool, errutil.AuthError) {
 	if err := db.handler.First(&admin{}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil

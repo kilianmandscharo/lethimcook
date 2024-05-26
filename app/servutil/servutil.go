@@ -49,6 +49,12 @@ type RenderComponentOptions struct {
 	Context   echo.Context
 	Component templ.Component
 	Message   string
+	IsError   bool
+}
+
+type message struct {
+	Value   string `json:"value"`
+	IsError bool   `json:"isError"`
 }
 
 type triggerPayload struct {
@@ -59,14 +65,22 @@ func RenderComponent(options RenderComponentOptions) error {
 	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
 
 	if len(options.Message) > 0 {
-		payload, err := json.Marshal(triggerPayload{Message: options.Message})
+		message, err := json.Marshal(message{
+			Value:   options.Message,
+			IsError: options.IsError,
+		})
 
 		if err == nil {
-			options.Context.Response().Header().Set(
-				"HX-Trigger",
-				string(payload),
-			)
+			payload, err := json.Marshal(triggerPayload{Message: string(message)})
+
+			if err == nil {
+				options.Context.Response().Header().Set(
+					"HX-Trigger",
+					string(payload),
+				)
+			}
 		}
+
 	}
 
 	if isHxRequest(options.Context) {

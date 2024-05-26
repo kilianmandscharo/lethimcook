@@ -7,6 +7,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -56,9 +57,10 @@ func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 		return servutil.RenderError(c, errutil.AuthErrorNotAuthorized)
 	}
 
+	formElements := rc.recipeService.createRecipeForm(types.Recipe{}, make(map[string]error))
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeNewPage(),
+		Component: components.RecipeNewPage(formElements),
 	})
 }
 
@@ -72,9 +74,10 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 		return servutil.RenderError(c, err)
 	}
 
+	formElements := rc.recipeService.createRecipeForm(recipe, make(map[string]error))
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeEditPage(recipe),
+		Component: components.RecipeEditPage(recipe.ID, formElements),
 	})
 }
 
@@ -123,9 +126,19 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 		return servutil.RenderError(c, errutil.AuthErrorNotAuthorized)
 	}
 
-	newRecipe, err := rc.recipeService.parseFormData(c, false)
+	newRecipe, formErrors, err := rc.recipeService.parseFormData(c, false)
 	if err != nil {
 		return servutil.RenderError(c, err)
+	}
+
+	if len(formErrors) > 0 {
+		formElements := rc.recipeService.createRecipeForm(newRecipe, formErrors)
+		return servutil.RenderComponent(servutil.RenderComponentOptions{
+			Context:   c,
+			Component: components.RecipeNewPage(formElements),
+			Message:   "Fehlerhaftes Formular",
+			IsError:   true,
+		})
 	}
 
 	if err := rc.recipeService.createRecipe(&newRecipe); err != nil {
@@ -140,9 +153,19 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		return servutil.RenderError(c, errutil.AuthErrorNotAuthorized)
 	}
 
-	updatedRecipe, err := rc.recipeService.parseFormData(c, true)
+	updatedRecipe, formErrors, err := rc.recipeService.parseFormData(c, true)
 	if err != nil {
 		return servutil.RenderError(c, err)
+	}
+
+	if len(formErrors) > 0 {
+		formElements := rc.recipeService.createRecipeForm(updatedRecipe, formErrors)
+		return servutil.RenderComponent(servutil.RenderComponentOptions{
+			Context:   c,
+			Component: components.RecipeEditPage(updatedRecipe.ID, formElements),
+			Message:   "Fehlerhaftes Formular",
+			IsError:   true,
+		})
 	}
 
 	if err := rc.recipeService.updateRecipe(&updatedRecipe); err != nil {

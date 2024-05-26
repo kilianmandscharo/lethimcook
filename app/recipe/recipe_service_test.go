@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/testutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -97,53 +98,109 @@ func TestParseFormData(t *testing.T) {
 		formData      string
 		withPathParam bool
 		pathParamId   string
-		shouldBeValid bool
+		shouldError   bool
+		formErrors    []errutil.FormError
 	}{
 		{
-			formData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=10",
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{},
+			),
 			withPathParam: true,
 			pathParamId:   "1",
-			shouldBeValid: true,
+			shouldError:   false,
 		},
 		{
-			formData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=10",
-			shouldBeValid: true,
-		},
-		{
-			formData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=10",
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{},
+			),
 			withPathParam: true,
-			shouldBeValid: false,
+			shouldError:   true,
 		},
 		{
-			formData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=xx",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					TitleEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoTitle},
 		},
 		{
-			formData:      "description=description&ingredients=ingredients&instructions=instructions&duration=xx",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					DescriptionEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoDescription},
 		},
 		{
-			formData:      "title=title&ingredients=ingredients&instructions=instructions&duration=xx",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					DurationEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoDuration},
 		},
 		{
-			formData:      "title=title&description=description&instructions=instructions&duration=xx",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					InvalidDuration: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoDuration},
 		},
 		{
-			formData:      "title=title&description=description&ingredients=ingredients&duration=xx",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					IngredientsEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoIngredients},
 		},
 		{
-			formData:      "title=title&description=description&ingredients=ingredients&instructions=instructions",
-			shouldBeValid: false,
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					InstructionsEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{errutil.FormErrorNoInstructions},
+		},
+		{
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					TitleEmpty:        true,
+					DescriptionEmpty:  true,
+					DurationEmpty:     true,
+					IngredientsEmpty:  true,
+					InstructionsEmpty: true,
+				},
+			),
+			formErrors: []errutil.FormError{
+				errutil.FormErrorNoTitle,
+				errutil.FormErrorNoDescription,
+				errutil.FormErrorNoDuration,
+				errutil.FormErrorNoIngredients,
+				errutil.FormErrorNoInstructions,
+			},
 		},
 	}
 
 	for _, test := range testCases {
 		c := newTestContext(t, test.formData, test.pathParamId)
-		_, err := recipeService.parseFormData(c, test.withPathParam)
-		assert.Equal(t, test.shouldBeValid, err == nil)
+		_, formErrors, err := recipeService.parseFormData(c, test.withPathParam)
+
+		assert.Equal(t, test.shouldError, err != nil)
+		assert.Equal(t, len(test.formErrors), len(formErrors))
+
+		for _, err := range test.formErrors {
+			errExists := false
+			for _, e := range formErrors {
+				if err == e {
+					errExists = true
+					break
+				}
+			}
+			assert.True(t, errExists)
+		}
 	}
 
 	// Given
@@ -151,7 +208,7 @@ func TestParseFormData(t *testing.T) {
 	c := newTestContext(t, formData, "1")
 
 	// When
-	parsedRecipe, err := recipeService.parseFormData(c, true)
+	parsedRecipe, _, err := recipeService.parseFormData(c, true)
 	assert.NoError(t, err)
 	assertRecipesEqual(t, types.Recipe{
 		ID:           uint(1),
