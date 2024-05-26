@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-test
+  build-test:
     runs-on: ubuntu-20.04
     defaults:
       run:
