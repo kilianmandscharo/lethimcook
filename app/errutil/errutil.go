@@ -5,7 +5,17 @@ import (
 	"net/http"
 )
 
-type AuthError = error
+type FormError error
+
+var (
+	FormErrorNoTitle        FormError = errors.New("Bitte trage einen Rezepttitel ein")
+	FormErrorNoDescription  FormError = errors.New("Bitte trage eine Rezeptbeschreibung ein")
+	FormErrorNoDuration     FormError = errors.New("Bitte trage die Zubereitungszeit ein")
+	FormErrorNoIngredients  FormError = errors.New("Bitte trage die Rezeptzutaten ein")
+	FormErrorNoInstructions FormError = errors.New("Bitte trage die Rezeptanleitung ein")
+)
+
+type AuthError error
 
 var (
 	AuthErrorNoAdminFound         AuthError = errors.New("Kein Admin gefunden")
@@ -22,7 +32,7 @@ var (
 	AuthErrorNotAuthorized        AuthError = errors.New("Nicht authorisiert")
 )
 
-type RecipeError = error
+type RecipeError error
 
 var (
 	RecipeErrorInvalidParam    RecipeError = errors.New("Ungültiges Pfadparameter")

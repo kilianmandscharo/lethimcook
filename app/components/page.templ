@@ -68,8 +68,12 @@ templ script() {
   });
 
   document.body.addEventListener("message", function (event) {
-    const message = event.detail.value;
-    notify(message, "success");
+    const message = JSON.parse(event.detail.value);
+    if (message.isError) {
+      notify(message.value, "error");
+    } else {
+      notify(message.value, "success");
+    }
   });
 
   function notify(message, type) {

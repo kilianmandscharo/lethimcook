@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -81,11 +82,13 @@ func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, errutil.Re
 	return rs.readRecipe(id)
 }
 
-func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, errutil.RecipeError) {
+func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, map[string]error, errutil.RecipeError) {
 	var recipe types.Recipe
 
+	formErrors := make(map[string]error)
+
 	if err := c.Request().ParseForm(); err != nil {
-		return recipe, errutil.RecipeErrorInvalidFormData
+		return recipe, formErrors, errutil.RecipeErrorInvalidFormData
 	}
 
 	recipe.Title = strings.TrimSpace(c.Request().FormValue("title"))
@@ -94,26 +97,96 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recip
 	recipe.Ingredients = strings.TrimSpace(c.Request().FormValue("ingredients"))
 	recipe.Instructions = strings.TrimSpace(c.Request().FormValue("instructions"))
 
-	if len(recipe.Title) == 0 ||
-		len(recipe.Description) == 0 ||
-		len(recipe.Ingredients) == 0 ||
-		len(recipe.Instructions) == 0 {
-		return recipe, errutil.RecipeErrorInvalidFormData
+	if len(recipe.Title) == 0 {
+		formErrors["title"] = errutil.FormErrorNoTitle
+	}
+	if len(recipe.Description) == 0 {
+		formErrors["description"] = errutil.FormErrorNoDescription
+	}
+	if len(recipe.Ingredients) == 0 {
+		formErrors["ingredients"] = errutil.FormErrorNoIngredients
+	}
+	if len(recipe.Instructions) == 0 {
+		formErrors["instructions"] = errutil.FormErrorNoInstructions
 	}
 
 	duration, err := strconv.Atoi(c.Request().FormValue("duration"))
+
 	if err != nil {
-		return recipe, errutil.RecipeErrorInvalidFormData
+		formErrors["duration"] = errutil.FormErrorNoDuration
+		recipe.Duration = 0
+	} else {
+		recipe.Duration = duration
 	}
-	recipe.Duration = duration
 
 	if withID {
 		id, err := rs.getPathId(c)
 		if err != nil {
-			return recipe, err
+			return recipe, formErrors, err
 		}
 		recipe.ID = id
 	}
 
-	return recipe, nil
+	return recipe, formErrors, nil
+}
+
+func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[string]error) []types.FormElement {
+	duration := ""
+	if recipe.Duration != 0 {
+		duration = fmt.Sprintf("%d", recipe.Duration)
+	}
+
+	return []types.FormElement{
+		{
+			Type:      types.FormElementInput,
+			Name:      "title",
+			Err:       formErrors["title"],
+			Value:     recipe.Title,
+			InputType: "text",
+			Label:     "Titel",
+			Required:  true,
+		},
+		{
+			Type:      types.FormElementInput,
+			Name:      "description",
+			Err:       formErrors["description"],
+			Value:     recipe.Description,
+			InputType: "text",
+			Label:     "Beschreibung",
+			Required:  true,
+		},
+		{
+			Type:      types.FormElementInput,
+			Name:      "duration",
+			Err:       formErrors["duration"],
+			Value:     duration,
+			InputType: "number",
+			Label:     "Zubereitungszeit (Minuten)",
+			Required:  true,
+		},
+		{
+			Type:      types.FormElementInput,
+			Name:      "tags",
+			Err:       formErrors["tags"],
+			Value:     recipe.Tags,
+			InputType: "text",
+			Label:     "Tags",
+		},
+		{
+			Type:     types.FormElementTextArea,
+			Name:     "ingredients",
+			Err:      formErrors["ingredients"],
+			Value:    recipe.Ingredients,
+			Label:    "Zutaten",
+			Required: true,
+		},
+		{
+			Type:     types.FormElementTextArea,
+			Name:     "instructions",
+			Err:      formErrors["instructions"],
+			Value:    recipe.Instructions,
+			Label:    "Anleitung",
+			Required: true,
+		},
+	}
 }
