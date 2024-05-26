@@ -140,11 +140,11 @@ async function navigateToEditPage(page: Page) {
 }
 
 async function editRecipe(page: Page) {
-  await page.getByLabel("Titel:").fill(editedRecipe.title);
+  await page.getByLabel("Titel").fill(editedRecipe.title);
   await page
-    .getByLabel("Zubereitungszeit (Minuten):")
+    .getByLabel("Zubereitungszeit (Minuten)")
     .fill(editedRecipe.duration);
-  await page.getByLabel("Beschreibung:").fill(editedRecipe.description);
+  await page.getByLabel("Beschreibung").fill(editedRecipe.description);
   await page.getByRole("button", { name: "Rezept aktualisieren" }).click();
 }
 
