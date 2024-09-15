@@ -1,0 +1,41 @@
+name: build-test-ship
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22.0
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Build
+        run: make
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v ./...
+  e2e-test:
+    runs-on: ubuntu-20.04
+    needs: unit-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and run e2e tests
+        run: ./run-e2e.sh
