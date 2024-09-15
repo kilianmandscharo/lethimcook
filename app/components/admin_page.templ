@@ -1,29 +1,30 @@
 package components
 
-templ AdminPage(isAdmin bool) {
+import "github.com/kilianmandscharo/lethimcook/types"
+
+templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []types.FormElement) {
 	@Header()
 	<main>
 		<h1>Admin</h1>
 		<div>
 			<h2>Anmelden</h2>
 			<form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
-				<label for="password">Passwort:</label>
-				<input id="password" placeholder="Passwort" type="password" name="password" if isAdmin {
-	disabled="true"
-}/>
-				<input type="submit" value="Anmelden" name="submit" if isAdmin {
-	class="button-disabled"
-	disabled="true"
-}/>
+				@Form(loginForm)
+				<input
+					type="submit"
+					value="Anmelden"
+					name="submit"
+					if isAdmin {
+						class="button-disabled"
+						disabled="true"
+					}
+				/>
 			</form>
 		</div>
 		<div>
 			<h2>Passwort ändern</h2>
 			<form hx-put="/auth/password" hx-indicator="#loading" hx-target="#content">
-				<label for="old-password">Altes Passwort:</label>
-				<input id="old-password" placeholder="Altes Passwort" type="password" name="oldPassword"/>
-				<label for="new-password">Neues Passwort:</label>
-				<input id="new-password" placeholder="Neues Passwort" type="password" name="newPassword"/>
+				@Form(newPasswordForm)
 				<input type="submit" value="Bestätigen" name="submit"/>
 			</form>
 		</div>

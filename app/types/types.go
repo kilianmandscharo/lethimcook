@@ -84,8 +84,8 @@ func NewTestRecipe() Recipe {
 type FormElementType int
 
 const (
-	FormElementInput    FormElementType = 1
-	FormElementTextArea FormElementType = 2
+	FormElementInput FormElementType = iota + 1
+	FormElementTextArea
 )
 
 type FormElement struct {
@@ -96,4 +96,5 @@ type FormElement struct {
 	InputType string
 	Label     string
 	Required  bool
+	Disabled  bool
 }

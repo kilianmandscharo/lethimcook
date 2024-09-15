@@ -3,7 +3,6 @@ package auth
 import (
 	"time"
 
-	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
@@ -30,9 +29,9 @@ func (ac *AuthController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (ac *AuthController) RenderAdminPage(c echo.Context) error {
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context:   c,
-		Component: components.AdminPage(servutil.IsAuthorized(c)),
+	return ac.authService.createAdminPage(createAdminPageOptions{
+		c:            c,
+		isAuthorized: servutil.IsAuthorized(c),
 	})
 }
 
@@ -43,7 +42,13 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	err := ac.authService.validatePassword(c.Request().FormValue("password"))
 	if err != nil {
-		return servutil.RenderError(c, err)
+		return ac.authService.createAdminPage(createAdminPageOptions{
+			c:              c,
+			isAuthorized:   servutil.IsAuthorized(c),
+			loginFormError: err,
+			message:        "Falsches Passwort",
+			isError:        true,
+		})
 	}
 
 	token, err := ac.authService.createToken()
@@ -56,10 +61,10 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	c.Set("authorized", true)
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context:   c,
-		Component: components.AdminPage(servutil.IsAuthorized(c)),
-		Message:   "Angemeldet",
+	return ac.authService.createAdminPage(createAdminPageOptions{
+		c:            c,
+		isAuthorized: servutil.IsAuthorized(c),
+		message:      "Angemeldet",
 	})
 }
 
@@ -73,10 +78,10 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 
 	c.Set("authorized", false)
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context:   c,
-		Component: components.AdminPage(servutil.IsAuthorized(c)),
-		Message:   "Abgemeldet",
+	return ac.authService.createAdminPage(createAdminPageOptions{
+		c:            c,
+		isAuthorized: servutil.IsAuthorized(c),
+		message:      "Abgemeldet",
 	})
 }
 
@@ -85,20 +90,32 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		return servutil.RenderError(c, errutil.AuthErrorInvalidForm)
 	}
 
-	err := ac.authService.validatePassword(c.Request().FormValue("oldPassword"))
+	err := ac.authService.validatePassword(c.Request().FormValue("old-password"))
 	if err != nil {
-		return servutil.RenderError(c, err)
+		return ac.authService.createAdminPage(createAdminPageOptions{
+			c:                c,
+			isAuthorized:     servutil.IsAuthorized(c),
+			message:          "Falsches Passwort",
+			isError:          true,
+			oldPasswordError: err,
+		})
 	}
 
-	err = ac.authService.updateAdminPasswordHash(c.Request().FormValue("newPassword"))
+	err = ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
 	if err != nil {
-		return servutil.RenderError(c, err)
+		return ac.authService.createAdminPage(createAdminPageOptions{
+			c:                c,
+			isAuthorized:     servutil.IsAuthorized(c),
+			message:          "Invalides Passwort",
+			isError:          true,
+			newPasswordError: err,
+		})
 	}
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context:   c,
-		Component: components.AdminPage(servutil.IsAuthorized(c)),
-		Message:   "Passwort aktualisiert",
+	return ac.authService.createAdminPage(createAdminPageOptions{
+		c:            c,
+		isAuthorized: servutil.IsAuthorized(c),
+		message:      "Passwort aktualisiert",
 	})
 }
 

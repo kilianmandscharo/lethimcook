@@ -8,7 +8,9 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func AdminPage(isAdmin bool) templ.Component {
+import "github.com/kilianmandscharo/lethimcook/types"
+
+func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []types.FormElement) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -33,17 +35,15 @@ func AdminPage(isAdmin bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><h1>Admin</h1><div><h2>Anmelden</h2><form hx-post=\"/auth/login\" hx-indicator=\"#loading\" hx-target=\"#content\"><label for=\"password\">Passwort:</label> <input id=\"password\" placeholder=\"Passwort\" type=\"password\" name=\"password\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><h1>Admin</h1><div><h2>Anmelden</h2><form hx-post=\"/auth/login\" hx-indicator=\"#loading\" hx-target=\"#content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if isAdmin {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled=\"true\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = Form(loginForm).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("> <input type=\"submit\" value=\"Anmelden\" name=\"submit\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"Anmelden\" name=\"submit\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +53,15 @@ func AdminPage(isAdmin bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></form></div><div><h2>Passwort ändern</h2><form hx-put=\"/auth/password\" hx-indicator=\"#loading\" hx-target=\"#content\"><label for=\"old-password\">Altes Passwort:</label> <input id=\"old-password\" placeholder=\"Altes Passwort\" type=\"password\" name=\"oldPassword\"> <label for=\"new-password\">Neues Passwort:</label> <input id=\"new-password\" placeholder=\"Neues Passwort\" type=\"password\" name=\"newPassword\"> <input type=\"submit\" value=\"Bestätigen\" name=\"submit\"></form></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></form></div><div><h2>Passwort ändern</h2><form hx-put=\"/auth/password\" hx-indicator=\"#loading\" hx-target=\"#content\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = Form(newPasswordForm).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"Bestätigen\" name=\"submit\"></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

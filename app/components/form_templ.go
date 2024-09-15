@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-func RecipeForm(recipeForm []types.FormElement) templ.Component {
+func Form(form []types.FormElement) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -31,7 +31,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		for _, element := range recipeForm {
+		for _, element := range form {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><label for=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -39,7 +39,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(element.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 8, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 8, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -53,7 +53,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(element.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 10, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 10, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -67,7 +67,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(element.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 12, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 12, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -86,7 +86,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(element.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 17, Col: 27}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 17, Col: 27}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -99,7 +99,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(element.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 18, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 18, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -112,7 +112,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(element.InputType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 19, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 19, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(element.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 20, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 20, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -138,7 +138,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(element.Value)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 21, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 21, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -147,6 +147,12 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
+				}
+				if element.Disabled {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 				if element.Err != nil {
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"input-error\"")
@@ -167,7 +173,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(element.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 29, Col: 27}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 32, Col: 27}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -180,7 +186,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(element.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 30, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 33, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -193,7 +199,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(element.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 31, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 34, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -202,6 +208,12 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
+				}
+				if element.Disabled {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
 				if element.Err != nil {
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"input-error\"")
@@ -216,7 +228,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(element.Value)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 36, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 42, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -235,7 +247,7 @@ func RecipeForm(recipeForm []types.FormElement) templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(element.Err.Error())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_form.templ`, Line: 41, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/form.templ`, Line: 47, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {

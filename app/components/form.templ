@@ -2,8 +2,8 @@ package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-templ RecipeForm(recipeForm []types.FormElement) {
-  for _, element := range recipeForm {
+templ Form(form []types.FormElement) {
+  for _, element := range form {
     <div>
       <label for={ element.Name }>
         if element.Required {
@@ -19,6 +19,9 @@ templ RecipeForm(recipeForm []types.FormElement) {
           type={ element.InputType } 
           name={ element.Name } 
           value={ element.Value }
+          if element.Disabled {
+              disabled
+          }
           if element.Err != nil {
             class="input-error"
           }
@@ -29,6 +32,9 @@ templ RecipeForm(recipeForm []types.FormElement) {
           id={ element.Name } 
           placeholder={ element.Label } 
           name={ element.Name } 
+          if element.Disabled {
+              disabled
+          }
           if element.Err != nil {
             class="input-error"
           }

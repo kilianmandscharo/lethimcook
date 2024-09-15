@@ -7,7 +7,7 @@ templ RecipeNewPage(recipeForm []types.FormElement) {
 	<main>
 		<h1>Neues Rezept</h1>
 		<form hx-post="/recipe" hx-target="#content">
-			@RecipeForm(recipeForm)
+			@Form(recipeForm)
 			<input type="submit" value="Rezept erstellen" name="submit"/>
 		</form>
 	</main>

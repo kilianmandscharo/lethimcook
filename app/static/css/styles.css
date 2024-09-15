@@ -157,6 +157,7 @@ form {
 form > div {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 form label {
