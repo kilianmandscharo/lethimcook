@@ -45,10 +45,11 @@ templ editRecipeButton(recipe types.Recipe) {
 	<button
 		id="edit-recipe-button"
 		class="icon-button"
-		hx-get={ fmt.Sprintf("/recipe/edit/%d", recipe.ID) }
+		hx-get={ fmt.Sprintf("/recipe/%d/edit", recipe.ID) }
 		hx-trigger="click"
 		hx-target="#content"
 		hx-push-url="true"
+        title="Rezept bearbeiten"
 	>
 		<i class="fa-solid fa-pen-to-square fa-xl"></i>
 	</button>

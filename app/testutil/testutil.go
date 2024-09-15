@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,20 +13,21 @@ import (
 )
 
 type RequestOptions struct {
-	HandlerFunc    func(c echo.Context) error
-	Method         string
-	Route          string
-	StatusWant     int
-	Authorized     bool
-	WithFormData   bool
-	FormData       string
-	WithCookie     bool
-	Cookie         http.Cookie
-	WithPathParam  bool
-	PathParamName  string
-	PathParamValue string
-	WithQueryParam bool
-	QueryParam     string
+	HandlerFunc         func(c echo.Context) error
+	Method              string
+	Route               string
+	StatusWant          int
+	Authorized          bool
+	WithFormData        bool
+	FormData            string
+	WithCookie          bool
+	Cookie              http.Cookie
+	WithPathParam       bool
+	PathParamName       string
+	PathParamValue      string
+	WithQueryParam      bool
+	QueryParam          string
+	HeaderErrorCodeWant int
 }
 
 func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseRecorder, echo.Context) {
@@ -67,6 +69,12 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 	assert.NoError(t, options.HandlerFunc(c))
 
 	assert.Equal(t, options.StatusWant, rr.Code)
+
+	if options.HeaderErrorCodeWant != 0 {
+		errorCodes := rr.Header()["Errorcode"]
+		assert.Equal(t, 1, len(errorCodes))
+		assert.Equal(t, fmt.Sprintf("%d", options.HeaderErrorCodeWant), errorCodes[0])
+	}
 
 	return rr, c
 }

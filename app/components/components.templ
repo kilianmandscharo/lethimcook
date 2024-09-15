@@ -34,13 +34,22 @@ templ AdminButton() {
 		hx-trigger="click"
 		hx-target="#content"
 		hx-push-url="true"
+        title="Admin"
 	>
 		<i class="fa-solid fa-user fa-xl"></i>
 	</button>
 }
 
 templ HomeButton() {
-	<button id="home-button" class="icon-button" hx-get="/" hx-trigger="click" hx-target="#content" hx-push-url="true">
+	<button 
+        id="home-button" 
+        class="icon-button" 
+        hx-get="/" 
+        hx-trigger="click" 
+        hx-target="#content" 
+        hx-push-url="true"
+        title="Home"
+    >
 		<i class="fas fa-solid fa-house fa-xl"></i>
 	</button>
 }
@@ -53,7 +62,8 @@ templ NewRecipeButton() {
 		hx-target="#content"
 		hx-trigger="click"
 		hx-push-url="true"
+        title="Neues Rezept"
 	>
-		<i class="fa-solid fa-plus fa-xl"></i>
+        <i class="fa-regular fa-pen-nib fa-xl"></i>
 	</button>
 }

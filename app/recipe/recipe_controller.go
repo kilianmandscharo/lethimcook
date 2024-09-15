@@ -24,7 +24,7 @@ func NewRecipeController() RecipeController {
 func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	// Pages
 	e.GET("/", rc.RenderRecipeListPage)
-	e.GET("/recipe/edit/:id", rc.RenderRecipeEditPage)
+	e.GET("/recipe/:id/edit", rc.RenderRecipeEditPage)
 	e.GET("/recipe/new", rc.RenderRecipeNewPage)
 	e.GET("/recipe/:id", rc.RenderRecipePage)
 
@@ -136,8 +136,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 		return servutil.RenderComponent(servutil.RenderComponentOptions{
 			Context:   c,
 			Component: components.RecipeNewPage(formElements),
-			Message:   "Fehlerhaftes Formular",
-			IsError:   true,
+			Err:       errutil.RecipeErrorInvalidFormData,
 		})
 	}
 
@@ -163,8 +162,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		return servutil.RenderComponent(servutil.RenderComponentOptions{
 			Context:   c,
 			Component: components.RecipeEditPage(updatedRecipe.ID, formElements),
-			Message:   "Fehlerhaftes Formular",
-			IsError:   true,
+			Err:       errutil.RecipeErrorInvalidFormData,
 		})
 	}
 

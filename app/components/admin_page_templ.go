@@ -35,7 +35,17 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><h1>Admin</h1><div><h2>Anmelden</h2><form hx-post=\"/auth/login\" hx-indicator=\"#loading\" hx-target=\"#content\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"admin-page-top-section\"><div class=\"label-with-icon\"><h1>Admin</h1><i class=\"fa-solid fa-user fa-xl\"></i></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isAdmin {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"danger-button\" hx-post=\"/auth/logout\" hx-trigger=\"click\" hx-target=\"#content\">Abmelden <i class=\"fa-solid fa-right-from-bracket\"></i></button>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"admin-page-section\"><h2>Anmelden</h2><form hx-post=\"/auth/login\" hx-indicator=\"#loading\" hx-target=\"#content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -53,7 +63,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></form></div><div><h2>Passwort ändern</h2><form hx-put=\"/auth/password\" hx-indicator=\"#loading\" hx-target=\"#content\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("></form></div><div class=\"admin-page-section\"><h2>Passwort ändern</h2><form hx-put=\"/auth/password\" hx-indicator=\"#loading\" hx-target=\"#content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -61,17 +71,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"Bestätigen\" name=\"submit\"></form></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if isAdmin {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"logout-section\"><button class=\"danger-button\" hx-post=\"/auth/logout\" hx-trigger=\"click\" hx-target=\"#content\">Abmelden</button></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"Bestätigen\" name=\"submit\"></form></div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

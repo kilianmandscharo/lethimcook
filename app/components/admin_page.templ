@@ -5,8 +5,19 @@ import "github.com/kilianmandscharo/lethimcook/types"
 templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []types.FormElement) {
 	@Header()
 	<main>
-		<h1>Admin</h1>
-		<div>
+        <div class="admin-page-top-section">
+            <div class="label-with-icon">
+                <h1>Admin</h1>
+                <i class="fa-solid fa-user fa-xl"></i>
+            </div>
+            if isAdmin {
+                <button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
+                    Abmelden
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            }
+        </div>
+		<div class="admin-page-section">
 			<h2>Anmelden</h2>
 			<form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
 				@Form(loginForm)
@@ -21,19 +32,12 @@ templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []t
 				/>
 			</form>
 		</div>
-		<div>
+		<div class="admin-page-section">
 			<h2>Passwort ändern</h2>
 			<form hx-put="/auth/password" hx-indicator="#loading" hx-target="#content">
 				@Form(newPasswordForm)
 				<input type="submit" value="Bestätigen" name="submit"/>
 			</form>
 		</div>
-		if isAdmin {
-			<div class="logout-section">
-				<button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
-					Abmelden
-				</button>
-			</div>
-		}
 	</main>
 }

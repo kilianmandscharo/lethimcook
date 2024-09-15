@@ -36,7 +36,7 @@ type RecipeError error
 
 var (
 	RecipeErrorInvalidParam    RecipeError = errors.New("Ungültiges Pfadparameter")
-	RecipeErrorInvalidFormData RecipeError = errors.New("Ungültiges Formular")
+	RecipeErrorInvalidFormData RecipeError = errors.New("Fehlerhaftes Formular")
 	RecipeErrorNotFound        RecipeError = errors.New("Kein Rezept gefunden")
 	RecipeErrorDatabaseFailure RecipeError = errors.New("Datenbankfehler")
 	RecipeErrorMarkdownFailure RecipeError = errors.New("Fehler beim Markdownparsing")

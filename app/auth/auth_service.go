@@ -181,7 +181,7 @@ type createAdminPageOptions struct {
 	isAuthorized     bool
 	loginFormError   error
 	message          string
-	isError          bool
+	err              error
 	oldPasswordError error
 	newPasswordError error
 }
@@ -195,6 +195,6 @@ func (as *AuthService) createAdminPage(options createAdminPageOptions) error {
 			as.createNewPasswordForm(options.oldPasswordError, options.newPasswordError),
 		),
 		Message: options.message,
-		IsError: options.isError,
+		Err:     options.err,
 	})
 }

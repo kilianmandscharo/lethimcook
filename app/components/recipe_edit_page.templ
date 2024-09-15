@@ -8,7 +8,10 @@ import (
 templ RecipeEditPage(id uint, recipeForm []types.FormElement) {
 	@Header()
 	<main>
-		<h1>Rezept bearbeiten</h1>
+        <div class="label-with-icon">
+            <h1>Rezept bearbeiten</h1>
+            <i class="fa-solid fa-pen-to-square fa-xl"></i>
+        </div>
 		<form hx-put={ fmt.Sprintf("/recipe/%d", id) } hx-target="#content">
 			@Form(recipeForm)
 			<input type="submit" value="Rezept aktualisieren" name="submit"/>

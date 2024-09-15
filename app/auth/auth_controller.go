@@ -46,8 +46,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 			c:              c,
 			isAuthorized:   servutil.IsAuthorized(c),
 			loginFormError: err,
-			message:        "Falsches Passwort",
-			isError:        true,
+			err:            err,
 		})
 	}
 
@@ -95,8 +94,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
-			message:          "Falsches Passwort",
-			isError:          true,
+			err:              err,
 			oldPasswordError: err,
 		})
 	}
@@ -106,8 +104,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
-			message:          "Invalides Passwort",
-			isError:          true,
+			err:              err,
 			newPasswordError: err,
 		})
 	}
