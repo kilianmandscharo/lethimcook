@@ -7,8 +7,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/env"
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/types"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -135,4 +139,62 @@ func (as *AuthService) validCookieToken(cookie *http.Cookie) bool {
 	})
 
 	return err == nil && token.Valid
+}
+
+func (as *AuthService) createLoginForm(disabled bool, err errutil.AuthError) []types.FormElement {
+	return []types.FormElement{
+		{
+			Type:      types.FormElementInput,
+			Name:      "password",
+			Err:       err,
+			InputType: "text",
+			Label:     "Passwort",
+			Required:  true,
+			Disabled:  disabled,
+		},
+	}
+}
+
+func (as *AuthService) createNewPasswordForm(oldPasswordError errutil.AuthError, newPasswordError errutil.AuthError) []types.FormElement {
+	return []types.FormElement{
+		{
+			Type:      types.FormElementInput,
+			Name:      "old-password",
+			Err:       oldPasswordError,
+			InputType: "text",
+			Label:     "Altes Passwort",
+			Required:  true,
+		},
+		{
+			Type:      types.FormElementInput,
+			Name:      "new-password",
+			Err:       newPasswordError,
+			InputType: "text",
+			Label:     "Neues Passwort",
+			Required:  true,
+		},
+	}
+}
+
+type createAdminPageOptions struct {
+	c                echo.Context
+	isAuthorized     bool
+	loginFormError   error
+	message          string
+	err              error
+	oldPasswordError error
+	newPasswordError error
+}
+
+func (as *AuthService) createAdminPage(options createAdminPageOptions) error {
+	return servutil.RenderComponent(servutil.RenderComponentOptions{
+		Context: options.c,
+		Component: components.AdminPage(
+			options.isAuthorized,
+			as.createLoginForm(options.isAuthorized, options.loginFormError),
+			as.createNewPasswordForm(options.oldPasswordError, options.newPasswordError),
+		),
+		Message: options.message,
+		Err:     options.err,
+	})
 }

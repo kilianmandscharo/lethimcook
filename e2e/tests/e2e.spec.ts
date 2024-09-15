@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import exp from "constants";
 
 const recipe = {
   title: "Naan",
@@ -86,14 +87,32 @@ async function changePassword(
   await expect(page.getByPlaceholder("Neues Passwort")).toBeEmpty();
 }
 
+async function testInvalidPasswordChange(page: Page) {
+  await changePassword(page, "invalid", "nimda");
+  await expect(
+    page.locator("#content").getByText("Falsches Passwort"),
+  ).toBeVisible();
+}
+
+async function testPasswordChangeTooShort(page: Page) {
+  await changePassword(page, "admin", "aaa");
+  await expect(
+    page.locator("#content").getByText("Minimale Passwortlänge: 5"),
+  ).toBeVisible();
+}
+
 async function testInvalidPassword(page: Page, invalidPassword: string) {
   await page
     .getByPlaceholder("Passwort", { exact: true })
     .fill(invalidPassword);
-  const resPromise = page.waitForResponse("/auth/login");
   await page.getByRole("button", { name: "Anmelden" }).click();
-  const res = await resPromise;
-  expect(res.status()).not.toBe(200);
+  await page.waitForLoadState("networkidle");
+  await expect(
+    page.getByRole("button", { name: "Abmelden" }),
+  ).not.toBeVisible();
+  await expect(
+    page.locator("#content").getByText("Falsches Passwort"),
+  ).toBeVisible();
 }
 
 async function navigateToHomePage(page: Page) {
@@ -162,6 +181,10 @@ test("e2e test", async ({ page }) => {
   await expect(page).toHaveTitle(/Let Him Cook/);
 
   await navigateToAdminPage(page);
+
+  await testInvalidPasswordChange(page);
+  await testPasswordChangeTooShort(page);
+
   await testInvalidPassword(page, "invalid");
   await login(page, "admin");
   await logout(page);

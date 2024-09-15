@@ -2,6 +2,7 @@ package servutil
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -49,10 +50,10 @@ type RenderComponentOptions struct {
 	Context   echo.Context
 	Component templ.Component
 	Message   string
-	IsError   bool
+	Err       error
 }
 
-type message struct {
+type responseMessage struct {
 	Value   string `json:"value"`
 	IsError bool   `json:"isError"`
 }
@@ -64,10 +65,28 @@ type triggerPayload struct {
 func RenderComponent(options RenderComponentOptions) error {
 	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
 
-	if len(options.Message) > 0 {
-		message, err := json.Marshal(message{
-			Value:   options.Message,
-			IsError: options.IsError,
+	// Usually you would want to return the status code correctly, however,
+	// for this purpose to still render the component with htmx and still
+	// somehow mark the response as an error, the code for the error status is
+	// set in the header (there might be a better way...)
+	if options.Err != nil {
+		options.Context.Response().Header().Set(
+			"Errorcode",
+			fmt.Sprintf("%d", errutil.ErrorHttpCodes[options.Err]),
+		)
+	}
+
+	var message string
+	if options.Err != nil {
+		message = options.Err.Error()
+	} else {
+		message = options.Message
+	}
+
+	if len(message) > 0 {
+		message, err := json.Marshal(responseMessage{
+			Value:   message,
+			IsError: options.Err != nil,
 		})
 
 		if err == nil {

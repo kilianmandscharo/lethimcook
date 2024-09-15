@@ -76,7 +76,7 @@ func AdminButton() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"admin-button\" class=\"icon-button\" hx-get=\"/admin\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><i class=\"fa-solid fa-user fa-xl\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"admin-button\" class=\"icon-button\" hx-get=\"/admin\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Admin\"><i class=\"fa-solid fa-user fa-xl\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,7 +105,7 @@ func HomeButton() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"home-button\" class=\"icon-button\" hx-get=\"/\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><i class=\"fas fa-solid fa-house fa-xl\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"home-button\" class=\"icon-button\" hx-get=\"/\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Home\"><i class=\"fas fa-solid fa-house fa-xl\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -134,7 +134,7 @@ func NewRecipeButton() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-recipe-button\" class=\"icon-button\" hx-get=\"/recipe/new\" hx-target=\"#content\" hx-trigger=\"click\" hx-push-url=\"true\"><i class=\"fa-solid fa-plus fa-xl\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-recipe-button\" class=\"icon-button\" hx-get=\"/recipe/new\" hx-target=\"#content\" hx-trigger=\"click\" hx-push-url=\"true\" title=\"Neues Rezept\"><i class=\"fa-regular fa-pen-nib fa-xl\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

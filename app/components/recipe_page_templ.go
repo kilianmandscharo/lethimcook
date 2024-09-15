@@ -142,7 +142,7 @@ func editRecipeButton(recipe types.Recipe) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/recipe/edit/%d", recipe.ID))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/recipe/%d/edit", recipe.ID))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_page.templ`, Line: 48, Col: 52}
 		}
@@ -150,7 +150,7 @@ func editRecipeButton(recipe types.Recipe) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><i class=\"fa-solid fa-pen-to-square fa-xl\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Rezept bearbeiten\"><i class=\"fa-solid fa-pen-to-square fa-xl\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

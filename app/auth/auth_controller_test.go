@@ -58,12 +58,13 @@ func TestHandleLogin(t *testing.T) {
 		w, c := testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleLogin,
-				Method:       http.MethodPost,
-				Route:        "/auth/login",
-				StatusWant:   http.StatusNotFound,
-				WithFormData: true,
-				FormData:     "password=" + testPassword,
+				HandlerFunc:         authController.HandleLogin,
+				Method:              http.MethodPost,
+				Route:               "/auth/login",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusNotFound,
+				WithFormData:        true,
+				FormData:            "password=" + testPassword,
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
@@ -76,12 +77,13 @@ func TestHandleLogin(t *testing.T) {
 		w, c := testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleLogin,
-				Method:       http.MethodPost,
-				Route:        "/auth/login",
-				StatusWant:   http.StatusUnauthorized,
-				WithFormData: true,
-				FormData:     "invalidKey=" + testPassword,
+				HandlerFunc:         authController.HandleLogin,
+				Method:              http.MethodPost,
+				Route:               "/auth/login",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusUnauthorized,
+				WithFormData:        true,
+				FormData:            "invalidKey=" + testPassword,
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
@@ -92,12 +94,13 @@ func TestHandleLogin(t *testing.T) {
 		w, c := testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleLogin,
-				Method:       http.MethodPost,
-				Route:        "/auth/login",
-				StatusWant:   http.StatusUnauthorized,
-				WithFormData: true,
-				FormData:     "password=invalid_password",
+				HandlerFunc:         authController.HandleLogin,
+				Method:              http.MethodPost,
+				Route:               "/auth/login",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusUnauthorized,
+				WithFormData:        true,
+				FormData:            "password=invalid_password",
 			},
 		)
 		assert.Equal(t, 0, len(w.Result().Cookies()))
@@ -160,12 +163,13 @@ func TestHandleUpdatePassword(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleUpdatePassword,
-				Method:       http.MethodPut,
-				Route:        "/auth/password",
-				StatusWant:   http.StatusNotFound,
-				WithFormData: true,
-				FormData:     "oldPassword=test&newPassword=test",
+				HandlerFunc:         authController.HandleUpdatePassword,
+				Method:              http.MethodPut,
+				Route:               "/auth/password",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusNotFound,
+				WithFormData:        true,
+				FormData:            "old-password=test&new-password=test",
 			},
 		)
 	})
@@ -176,12 +180,13 @@ func TestHandleUpdatePassword(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleUpdatePassword,
-				Method:       http.MethodPut,
-				Route:        "/auth/password",
-				StatusWant:   http.StatusUnauthorized,
-				WithFormData: true,
-				FormData:     "oldPassword=invalid_password&newPassword=test",
+				HandlerFunc:         authController.HandleUpdatePassword,
+				Method:              http.MethodPut,
+				Route:               "/auth/password",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusUnauthorized,
+				WithFormData:        true,
+				FormData:            "old-password=invalid_password&new-password=test",
 			},
 		)
 	})
@@ -190,12 +195,13 @@ func TestHandleUpdatePassword(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleUpdatePassword,
-				Method:       http.MethodPut,
-				Route:        "/auth/password",
-				StatusWant:   http.StatusUnauthorized,
-				WithFormData: true,
-				FormData:     fmt.Sprintf("wrongKey=%s&newPassword=test", testPassword),
+				HandlerFunc:         authController.HandleUpdatePassword,
+				Method:              http.MethodPut,
+				Route:               "/auth/password",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusUnauthorized,
+				WithFormData:        true,
+				FormData:            fmt.Sprintf("wrongKey=%s&new-password=test", testPassword),
 			},
 		)
 	})
@@ -204,12 +210,13 @@ func TestHandleUpdatePassword(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleUpdatePassword,
-				Method:       http.MethodPut,
-				Route:        "/auth/password",
-				StatusWant:   http.StatusBadRequest,
-				WithFormData: true,
-				FormData:     fmt.Sprintf("oldPassword=%s&wrongKey=test", testPassword),
+				HandlerFunc:         authController.HandleUpdatePassword,
+				Method:              http.MethodPut,
+				Route:               "/auth/password",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusBadRequest,
+				WithFormData:        true,
+				FormData:            fmt.Sprintf("old-password=%s&wrongKey=test", testPassword),
 			},
 		)
 	})
@@ -218,12 +225,13 @@ func TestHandleUpdatePassword(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  authController.HandleUpdatePassword,
-				Method:       http.MethodPut,
-				Route:        "/auth/password",
-				StatusWant:   http.StatusBadRequest,
-				WithFormData: true,
-				FormData:     fmt.Sprintf("oldPassword=%s&newPassword=new", testPassword),
+				HandlerFunc:         authController.HandleUpdatePassword,
+				Method:              http.MethodPut,
+				Route:               "/auth/password",
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusBadRequest,
+				WithFormData:        true,
+				FormData:            fmt.Sprintf("old-password=%s&new-password=new", testPassword),
 			},
 		)
 	})
@@ -237,7 +245,7 @@ func TestHandleUpdatePassword(t *testing.T) {
 				Route:        "/auth/password",
 				StatusWant:   http.StatusOK,
 				WithFormData: true,
-				FormData:     fmt.Sprintf("oldPassword=%s&newPassword=updated", testPassword),
+				FormData:     fmt.Sprintf("old-password=%s&new-password=updated", testPassword),
 			},
 		)
 	})

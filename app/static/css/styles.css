@@ -1,506 +1,548 @@
 :root {
-    --color-danger: #ef4444;
-    --color-success: #4caf50;
-    --color-white: rgba(255, 255, 255, 0.9);
+  --color-danger: #ef4444;
+  --color-success: #4caf50;
+  --color-white: rgba(255, 255, 255, 0.9);
 
-    --header-height: 60px;
-    --footer-height: 48px;
-    --footer-margin-top: 1rem;
+  --header-height: 60px;
+  --footer-height: 48px;
+  --footer-margin-top: 1rem;
 
-    --color-primary-100: #4caf50;
-    --color-primary-200: #63b863;
-    --color-primary-300: #79c176;
-    --color-primary-400: #8dca89;
-    --color-primary-500: #a0d39c;
-    --color-primary-600: #b4dcb0;
+  --color-primary-100: #4caf50;
+  --color-primary-200: #63b863;
+  --color-primary-300: #79c176;
+  --color-primary-400: #8dca89;
+  --color-primary-500: #a0d39c;
+  --color-primary-600: #b4dcb0;
 
-    --color-surface-100: #121212;
-    --color-surface-200: #282828;
-    --color-surface-300: #3f3f3f;
-    --color-surface-400: #575757;
-    --color-surface-500: #717171;
+  --color-surface-100: #121212;
+  --color-surface-200: #282828;
+  --color-surface-300: #3f3f3f;
+  --color-surface-400: #575757;
+  --color-surface-500: #717171;
 }
 
 body {
-    background-color: var(--color-surface-100);
-    color: var(--color-white);
-    font-family: "Noto Sans", sans-serif;
-    margin: 0;
+  background-color: var(--color-surface-100);
+  color: var(--color-white);
+  font-family: "Noto Sans", sans-serif;
+  margin: 0;
 }
 
 header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--color-surface-200);
-    position: fixed;
-    height: var(--header-height);
-    width: 100%;
-    box-shadow: 2px 2px 12px black;
-    z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-surface-200);
+  position: fixed;
+  height: var(--header-height);
+  width: 100%;
+  box-shadow: 2px 2px 12px black;
+  z-index: 100;
 }
 
-header>div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    max-width: 672px;
-    min-width: 300px;
-    width: 100%;
-    padding: 0 0.5rem;
+header > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  max-width: 672px;
+  min-width: 300px;
+  width: 100%;
+  padding: 0 0.5rem;
 }
 
-header>div>div {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+header > div > div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
 .heading {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  cursor: pointer;
 }
 
-.heading>h1 {
-    background-image: linear-gradient(var(--color-danger), white);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.heading > h1 {
+  background-image: linear-gradient(var(--color-danger), white);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .heading .title {
-    background-image: linear-gradient(var(--color-danger), white);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 24px;
-    margin: 0;
-    font-family: "Fugaz One", sans-serif;
+  background-image: linear-gradient(var(--color-danger), white);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+  margin: 0;
+  font-family: "Fugaz One", sans-serif;
 }
 
 main {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 672px;
-    min-width: 320px;
-    margin: 0 auto;
-    padding: 0 0.5rem;
-    padding-top: calc(var(--header-height) + 1.5rem);
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 672px;
+  min-width: 320px;
+  margin: 0 auto;
+  padding: 0 0.5rem;
+  padding-top: calc(var(--header-height) + 1.5rem);
+  position: relative;
 }
 
 #content {
-    min-height: calc(100vh - var(--footer-margin-top) - var(--footer-height));
+  min-height: calc(100vh - var(--footer-margin-top) - var(--footer-height));
 }
 
 #notification-container {
-    position: fixed;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    pointer-events: none;
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
 }
 
 .notification {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 4px;
-    height: 40px;
-    padding: 0.5rem;
-    max-width: 300px;
-    pointer-events: none;
-    font-size: 20px;
-    margin-top: 0.5rem;
-    animation: appear 0.25s ease-in;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  height: 40px;
+  padding: 0.5rem;
+  max-width: 300px;
+  pointer-events: none;
+  font-size: 20px;
+  animation: appear 0.25s ease-in;
+  width: fit-content;
 }
 
 .notification p {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .notification-danger {
-    background-color: var(--color-danger);
+  background-color: var(--color-danger);
 }
 
 .notification-success {
-    background-color: var(--color-success);
+  background-color: var(--color-success);
 }
 
 .notification p {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 @keyframes appear {
-    0% {
-        opacity: 0;
-    }
+  0% {
+    opacity: 0;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 footer {
-    margin-top: var(--footer-margin-top);
-    height: var(--footer-height);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
+  margin: var(--footer-margin-top) auto 0 auto;
+  height: var(--footer-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  max-width: 672px;
 }
 
-footer>button {
-    all: unset;
-    cursor: pointer;
-    transition: color 250ms ease;
+footer > button {
+  all: unset;
+  cursor: pointer;
+  transition: color 250ms ease;
 }
 
-footer>button:hover {
-    color: var(--color-primary-100);
+footer > button:hover {
+  color: var(--color-primary-100);
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-form>div {
-    display: flex;
-    flex-direction: column;
+form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 form label {
-    margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+form input[type="submit"] {
+  background-color: var(--color-primary-300);
+  border: none;
+  cursor: pointer;
+  height: 40px;
+  color: var(--color-surface-100);
+  border-radius: 4px;
+  width: 160px;
 }
 
 .input-error {
-    border: solid 1px var(--color-danger);
+  border: solid 1px var(--color-danger);
 }
 
 .form-error-message {
-    height: 17px;
-    font-size: 12px;
-    color: var(--color-danger);
+  height: 17px;
+  font-size: 12px;
+  color: var(--color-danger);
 }
 
 button {
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    color: var(--color-surface-200);
-    height: 40px;
-    background-color: var(--color-primary-300);
-    min-width: 100px;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-surface-200);
+  height: 40px;
+  background-color: var(--color-primary-300);
+  min-width: 100px;
 }
 
 .search-bar-container {
-    position: absolute;
-    right: 0.5rem;
-    padding-left: 0.5rem;
+  position: absolute;
+  right: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .search-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    align-self: end;
-    position: relative;
-    height: 46px;
-    width: 216px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: end;
+  position: relative;
+  height: 46px;
+  width: 216px;
 }
 
 .search-bar input {
-    width: 100%;
-    max-width: 500px;
-    padding-right: 2.5rem;
-    border: solid 1px var(--color-primary-300);
+  width: 100%;
+  max-width: 500px;
+  padding-right: 2.5rem;
+  border: solid 1px var(--color-primary-300);
 }
 
 .search-bar i {
-    position: absolute;
-    right: 0.5rem;
+  position: absolute;
+  right: 0.5rem;
 }
 
 .icon-button {
-    all: unset;
-    cursor: pointer;
+  all: unset;
+  cursor: pointer;
 }
 
 .danger-button {
-    background-color: var(--color-danger);
-}
-
-.logout-section {
-    display: flex;
-    border-top: solid 1px rgba(255, 255, 255, 0.9);
-    padding-top: 1rem;
-}
-
-.logout-section button {
-    width: 100%;
+  background-color: var(--color-danger);
 }
 
 a {
-    color: var(--color-primary-100);
+  color: var(--color-primary-100);
 }
 
 h1 {
-    margin-top: 0rem;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
 }
 
 h2 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 h4 {
-    font-style: italic;
+  font-style: italic;
 }
 
 input {
-    color: inherit;
-    padding: 0.8rem;
-    background-color: var(--color-surface-200);
-    border-radius: 4px;
-    border: solid 1px transparent;
+  color: inherit;
+  padding: 0.8rem;
+  background-color: var(--color-surface-200);
+  border-radius: 4px;
+  border: solid 1px transparent;
 }
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Firefox */
 input[type="number"] {
-    appearance: textfield;
-    -moz-appearance: textfield;
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 textarea {
-    height: 400px;
-    font-size: 1.25rem;
-    color: inherit;
-    padding: 0.8rem;
-    background-color: var(--color-surface-200);
-    border-radius: 4px;
-    border: solid 1px transparent;
-    font-family: inherit;
+  height: 400px;
+  font-size: 1.25rem;
+  color: inherit;
+  padding: 0.8rem;
+  background-color: var(--color-surface-200);
+  border-radius: 4px;
+  border: solid 1px transparent;
+  font-family: inherit;
+}
+
+.label-with-icon {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  align-self: flex-start;
+}
+
+.label-with-icon i {
+  margin-top: 4px;
+}
+
+.admin-page-top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-page-top-section button i {
+  margin-left: 0.25rem;
+}
+
+.admin-page-section {
+  border-top: 1px solid var(--color-surface-200);
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.admin-page-section h2 {
+  margin-bottom: 2rem;
+}
+
+.admin-page-section h2::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--color-primary-300);
+  margin-right: 0.75rem;
 }
 
 .recipe-list {
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.recipe-list>div {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: calc(100vh - var(--footer-height) - var(--footer-margin-top) - 110px);
-    overflow-y: scroll;
+.recipe-list > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(
+    100vh - var(--footer-height) - var(--footer-margin-top) - 106px
+  );
+  overflow-y: scroll;
 }
 
-.recipe-list>p {
-    background-color: var(--color-primary-300);
-    padding: 0.25rem 0.5rem;
-    color: var(--color-surface-100);
-    border-radius: 4px;
-    width: fit-content;
-    align-self: flex-start;
-    margin: 0.5rem 0 1rem 0;
+.recipe-list > p {
+  background-color: var(--color-primary-300);
+  padding: 0.25rem 0.5rem;
+  color: var(--color-surface-100);
+  border-radius: 4px;
+  width: fit-content;
+  align-self: flex-start;
+  margin: 0.5rem 0 1rem 0;
 }
 
 .recipe-list-item {
-    all: unset;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background-color: var(--color-surface-200);
-    padding: 1rem;
-    border-radius: 4px;
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: var(--color-surface-200);
+  padding: 1rem;
+  border-radius: 4px;
 }
 
-.recipe-list-item>div:first-child {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.recipe-list-item > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.recipe-list-item>div:first-child>div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.recipe-list-item > div:first-child > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .recipe-list-item-delete-container {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem;
 }
 
 .recipe-list-item-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--color-primary-300);
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--color-primary-300);
 }
 
 .recipe-list-item-description {
-    font-style: italic;
+  font-style: italic;
 }
 
 .recipe-list-item p {
-    margin: 0;
+  margin: 0;
 }
 
 .recipe-list-item-tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .recipe-list-item-tags p {
-    margin: 0;
-    padding: 0.25rem 0.75rem;
-    border-radius: 16px;
-    color: var(--color-surface-100);
-    background-color: var(--color-primary-300);
-    font-size: 14px;
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  color: var(--color-surface-100);
+  background-color: var(--color-primary-300);
+  font-size: 14px;
 }
 
 .recipe-description {
-    font-style: italic;
+  font-style: italic;
 }
 
 .recipe section:last-child {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 .recipe h2 {
-    color: var(--color-primary-300);
+  color: var(--color-primary-300);
 }
 
 .recipe h3 {
-    background-color: var(--color-primary-300);
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-    width: fit-content;
-    color: var(--color-surface-100);
+  background-color: var(--color-primary-300);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  width: fit-content;
+  color: var(--color-surface-100);
 }
 
 .recipe ol,
 .recipe ul {
-    line-height: 1.75rem;
-    margin-top: 0;
+  line-height: 1.75rem;
+  margin-top: 0;
 }
 
 .recipe p {
-    margin: 0 0 0.5rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .recipe i {
-    color: var(--color-primary-300);
+  color: var(--color-primary-300);
 }
 
 .recipe-heading {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .recipe-heading p {
-    margin: 0;
+  margin: 0;
 }
 
 .recipe-heading div {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .caret-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-form> :last-child {
-    background-color: var(--color-primary-300);
-    border: none;
-    cursor: pointer;
-    height: 40px;
-    color: var(--color-surface-100);
-    border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .contact {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
-.contact>p {
-    margin: 0;
+.contact > p {
+  margin: 0;
 }
 
 .danger {
-    color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .button-disabled {
-    cursor: default !important;
-    opacity: 0.6;
+  cursor: default !important;
+  opacity: 0.6;
 }
 
 .loading {
-    position: fixed;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    width: 48px;
-    height: 48px;
-    pointer-events: none;
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
 }
 
 .loading svg {
-    animation: 2s linear infinite svg-animation;
+  animation: 2s linear infinite svg-animation;
 }
 
 .loading circle {
-    stroke: var(--color-primary-100);
-    stroke-linecap: round;
-    transform-origin: 50% 50%;
-    animation: 1.4s ease-in-out infinite both circle-animation;
+  stroke: var(--color-primary-100);
+  stroke-linecap: round;
+  transform-origin: 50% 50%;
+  animation: 1.4s ease-in-out infinite both circle-animation;
 }
 
 @keyframes circle-animation {
+  0%,
+  25% {
+    stroke-dashoffset: 200;
+    transform: rotate(0);
+  }
 
-    0%,
-    25% {
-        stroke-dashoffset: 200;
-        transform: rotate(0);
-    }
+  50%,
+  75% {
+    stroke-dashoffset: 55;
+    transform: rotate(45deg);
+  }
 
-    50%,
-    75% {
-        stroke-dashoffset: 55;
-        transform: rotate(45deg);
-    }
-
-    100% {
-        stroke-dashoffset: 200;
-        transform: rotate(360deg);
-    }
+  100% {
+    stroke-dashoffset: 200;
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes svg-animation {
-    0% {
-        transform: rotateZ(0deg);
-    }
+  0% {
+    transform: rotateZ(0deg);
+  }
 
-    100% {
-        transform: rotateZ(360deg);
-    }
+  100% {
+    transform: rotateZ(360deg);
+  }
 }

@@ -5,9 +5,12 @@ import "github.com/kilianmandscharo/lethimcook/types"
 templ RecipeNewPage(recipeForm []types.FormElement) {
 	@Header()
 	<main>
-		<h1>Neues Rezept</h1>
+        <div class="label-with-icon">
+            <h1>Neues Rezept</h1>
+            <i class="fa-regular fa-pen-nib fa-xl"></i>
+        </div>
 		<form hx-post="/recipe" hx-target="#content">
-			@RecipeForm(recipeForm)
+			@Form(recipeForm)
 			<input type="submit" value="Rezept erstellen" name="submit"/>
 		</form>
 	</main>
