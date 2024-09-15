@@ -1,19 +1,12 @@
-GO := go
-GOCMD := $(GO) build
-
 BUILD_DIR := build
 STATIC_DIR := static
 
-SOURCES := $(wildcard *.go)
-
-TARGET := $(BUILD_DIR)/lethimcook
-
 .PHONY: all clean
 
-all: $(TARGET) copy_static copy_env
+all: app copy_static copy_env
 
-$(TARGET): $(SOURCES)
-	$(GOCMD) -o $(TARGET)
+app: $(wildcard *.go)
+	go build -o $(BUILD_DIR)/lethimcook
 
 copy_static:
 	mkdir -p $(BUILD_DIR)/$(STATIC_DIR)

@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN apt update && apt install make
+RUN apt-get update && apt-get install make
 
 RUN make
 

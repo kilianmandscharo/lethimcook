@@ -159,7 +159,7 @@ async function deleteRecipe(page: Page) {
 
 test("e2e test", async ({ page }) => {
   await page.goto("");
-  await expect(page).toHaveTitle(/Let Him Cook/);
+  await expect(page).toHaveTitle(/Let Him Cooked/);
 
   await navigateToAdminPage(page);
   await testInvalidPassword(page, "invalid");

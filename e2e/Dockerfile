@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright:v1.42.0-jammy
 
-RUN apt update && apt install -y curl
+RUN apt-get update && apt-get install -y curl
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ENV NVM_DIR=/root/.nvm
@@ -18,4 +18,4 @@ COPY . .
 
 RUN npm install
 
-CMD ["npm", "test"]
+CMD ["npm", "run", "test"]
