@@ -29,7 +29,7 @@ func Header(buttons ...templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><div><div class=\"heading\"><svg height=\"32\" width=\"52\"><image href=\"/static/logo.svg\" height=\"28\"></image></svg><div class=\"title\">Lethimcook</div></div><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><div><div class=\"heading\" hx-get=\"/\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><svg height=\"32\" width=\"52\"><image href=\"/static/logo.svg\" height=\"28\"></image></svg><div class=\"title\">Lethimcook</div></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
