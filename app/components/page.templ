@@ -14,6 +14,7 @@ templ head() {
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<script src="/static/js/htmx.min.js" defer></script>
+		<script src="/static/js/main.js" defer></script>
 		<link rel="stylesheet" href="/static/css/styles.css"/>
 		<link rel="stylesheet" href="/static/css/fonts.css"/>
 		<link href="/static/fa/css/fontawesome.css" rel="stylesheet"/>
@@ -28,9 +29,8 @@ templ body(content templ.Component) {
 			@content
 		</div>
 		@loading()
-		@errorNotification()
+		@notificationContainer()
 		@footer()
-		@script()
 	</body>
 }
 
@@ -42,11 +42,8 @@ templ loading() {
 	</div>
 }
 
-templ errorNotification() {
-	<div id="notification">
-    <i class="fa-solid fa-circle-info"></i>
-		<p id="notification-text">Hinweis</p>
-	</div>
+templ notificationContainer() {
+	<div id="notification-container"></div>
 }
 
 templ footer() {
@@ -58,39 +55,4 @@ templ footer() {
 			Datenschutz
 		</button>
 	</footer>
-}
-
-templ script() {
-	<script>
-  document.body.addEventListener("htmx:responseError", function (event) {
-    const message = event.detail.xhr.response;
-    notify(message, "error");
-  });
-
-  document.body.addEventListener("message", function (event) {
-    const message = JSON.parse(event.detail.value);
-    if (message.isError) {
-      notify(message.value, "error");
-    } else {
-      notify(message.value, "success");
-    }
-  });
-
-  function notify(message, type) {
-    const notification = document.getElementById("notification");
-    const notificationText = document.getElementById("notification-text");
-
-    if (notification && notificationText) {
-      notificationText.innerText = message;
-      notification.style.opacity = 1;
-      notification.className = type === "success" ?
-        "notification-success" :
-        "notification-danger";
-
-      setTimeout(() => {
-        notification.style.opacity = 0;
-      }, 3000);
-    }
-  }
-</script>
 }
