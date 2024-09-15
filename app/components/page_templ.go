@@ -70,7 +70,7 @@ func head() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<head><title>Let Him Cook</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><script src=\"/static/js/htmx.min.js\" defer></script><link rel=\"stylesheet\" href=\"/static/css/styles.css\"><link rel=\"stylesheet\" href=\"/static/css/fonts.css\"><link href=\"/static/fa/css/fontawesome.css\" rel=\"stylesheet\"><link href=\"/static/fa/css/solid.css\" rel=\"stylesheet\"><link rel=\"icon\" type=\"image/x-icon\" href=\"/static/favicon.ico\"></head>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<head><title>Let Him Cook</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><script src=\"/static/js/htmx.min.js\" defer></script><script src=\"/static/js/main.js\" defer></script><link rel=\"stylesheet\" href=\"/static/css/styles.css\"><link rel=\"stylesheet\" href=\"/static/css/fonts.css\"><link href=\"/static/fa/css/fontawesome.css\" rel=\"stylesheet\"><link href=\"/static/fa/css/solid.css\" rel=\"stylesheet\"><link rel=\"icon\" type=\"image/x-icon\" href=\"/static/favicon.ico\"></head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,15 +115,11 @@ func body(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = errorNotification().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = notificationContainer().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = footer().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = script().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -164,7 +160,7 @@ func loading() templ.Component {
 	})
 }
 
-func errorNotification() templ.Component {
+func notificationContainer() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -185,7 +181,7 @@ func errorNotification() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notification\"><i class=\"fa-solid fa-circle-info\"></i><p id=\"notification-text\">Hinweis</p></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notification-container\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -215,35 +211,6 @@ func footer() templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer><button hx-get=\"/imprint\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\">Impressum</button> <button hx-get=\"/privacy-notice\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\">Datenschutz</button></footer>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return templ_7745c5c3_Err
-	})
-}
-
-func script() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script>\n  document.body.addEventListener(\"htmx:responseError\", function (event) {\n    const message = event.detail.xhr.response;\n    notify(message, \"error\");\n  });\n\n  document.body.addEventListener(\"message\", function (event) {\n    const message = JSON.parse(event.detail.value);\n    if (message.isError) {\n      notify(message.value, \"error\");\n    } else {\n      notify(message.value, \"success\");\n    }\n  });\n\n  function notify(message, type) {\n    const notification = document.getElementById(\"notification\");\n    const notificationText = document.getElementById(\"notification-text\");\n\n    if (notification && notificationText) {\n      notificationText.innerText = message;\n      notification.style.opacity = 1;\n      notification.className = type === \"success\" ?\n        \"notification-success\" :\n        \"notification-danger\";\n\n      setTimeout(() => {\n        notification.style.opacity = 0;\n      }, 3000);\n    }\n  }\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
