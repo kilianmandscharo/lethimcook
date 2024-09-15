@@ -389,7 +389,6 @@ func TestHandleDeleteRecipe(t *testing.T) {
 				PathParamName:  "id",
 				PathParamValue: "1",
 				StatusWant:     http.StatusOK,
-                HeaderErrorCodeWant:
 				Authorized:     true,
 			},
 		)
