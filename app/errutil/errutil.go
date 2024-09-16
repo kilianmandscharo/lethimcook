@@ -2,62 +2,53 @@ package errutil
 
 import (
 	"errors"
-	"net/http"
+	"fmt"
 )
 
-type FormError error
-
-var (
-	FormErrorNoTitle        FormError = errors.New("Bitte trage einen Rezepttitel ein")
-	FormErrorNoDescription  FormError = errors.New("Bitte trage eine Rezeptbeschreibung ein")
-	FormErrorNoDuration     FormError = errors.New("Bitte trage die Zubereitungszeit ein")
-	FormErrorNoIngredients  FormError = errors.New("Bitte trage die Rezeptzutaten ein")
-	FormErrorNoInstructions FormError = errors.New("Bitte trage die Rezeptanleitung ein")
-)
-
-type AuthError error
-
-var (
-	AuthErrorNoAdminFound         AuthError = errors.New("Kein Admin gefunden")
-	AuthErrorDatabaseFailure      AuthError = errors.New("Datenbankfehler")
-	AuthErrorInvalidBody          AuthError = errors.New("Ungültiger Body")
-	AuthErrorInvalidPassword      AuthError = errors.New("Falsches Passwort")
-	AuthErrorPasswordTooLong      AuthError = errors.New("Maximale Passwortlänge: 72")
-	AuthErrorPasswordTooShort     AuthError = errors.New("Minimale Passwortlänge: 5")
-	AuthErrorAdminAlreadyExists   AuthError = errors.New("Es kann nur einen Admin geben")
-	AuthErrorTokenCreationFailure AuthError = errors.New("Fehler bei der Tokengenerierung")
-	AuthErrorInvalidAuthHeader    AuthError = errors.New("Ungültiger Auth Header")
-	AuthErrorInvalidToken         AuthError = errors.New("Ungültiger Token")
-	AuthErrorInvalidForm          AuthError = errors.New("Ungültiges Formular")
-	AuthErrorNotAuthorized        AuthError = errors.New("Nicht authorisiert")
-)
-
-type RecipeError error
-
-var (
-	RecipeErrorInvalidParam    RecipeError = errors.New("Ungültiges Pfadparameter")
-	RecipeErrorInvalidFormData RecipeError = errors.New("Fehlerhaftes Formular")
-	RecipeErrorNotFound        RecipeError = errors.New("Kein Rezept gefunden")
-	RecipeErrorDatabaseFailure RecipeError = errors.New("Datenbankfehler")
-	RecipeErrorMarkdownFailure RecipeError = errors.New("Fehler beim Markdownparsing")
-)
-
-var ErrorHttpCodes = map[error]int{
-	AuthErrorNoAdminFound:         http.StatusNotFound,
-	AuthErrorDatabaseFailure:      http.StatusInternalServerError,
-	AuthErrorInvalidBody:          http.StatusBadRequest,
-	AuthErrorInvalidPassword:      http.StatusUnauthorized,
-	AuthErrorPasswordTooLong:      http.StatusBadRequest,
-	AuthErrorPasswordTooShort:     http.StatusBadRequest,
-	AuthErrorAdminAlreadyExists:   http.StatusConflict,
-	AuthErrorTokenCreationFailure: http.StatusInternalServerError,
-	AuthErrorInvalidAuthHeader:    http.StatusBadRequest,
-	AuthErrorInvalidToken:         http.StatusUnauthorized,
-	AuthErrorInvalidForm:          http.StatusBadRequest,
-	AuthErrorNotAuthorized:        http.StatusUnauthorized,
-
-	RecipeErrorInvalidParam:    http.StatusBadRequest,
-	RecipeErrorInvalidFormData: http.StatusBadRequest,
-	RecipeErrorNotFound:        http.StatusNotFound,
-	RecipeErrorDatabaseFailure: http.StatusInternalServerError,
+type AppError struct {
+	UserMessage string
+	Err         error
+	StatusCode  int
 }
+
+func (a *AppError) Error() string {
+	return a.Err.Error()
+}
+
+func (a *AppError) AddMessage(message string) {
+	a.Err = fmt.Errorf("%s: %w", message, a.Err)
+}
+
+func AddMessageToAppError(err error, message string) error {
+	if appError, ok := err.(*AppError); ok {
+		appError.AddMessage(message)
+		return appError
+	}
+	return fmt.Errorf("%s: %w", message, err)
+}
+
+func GetAppErrorUserMessage(err error) string {
+	if appError, ok := err.(*AppError); ok {
+		return appError.UserMessage
+	}
+	return err.Error()
+}
+
+func GetAppErrorStatusCode(err error) int {
+	if appError, ok := err.(*AppError); ok {
+		return appError.StatusCode
+	}
+	return 0
+}
+
+var (
+	FormErrorPasswortTooShort = errors.New("Minimale Passwortlänge: 5")
+	FormErrorPasswortTooLong  = errors.New("Maximale Passwortlänge: 72")
+
+	FormErrorNoTitle         = errors.New("Bitte trage einen Rezepttitel ein")
+	FormErrorNoDescription   = errors.New("Bitte trage eine Rezeptbeschreibung ein")
+	FormErrorNoDuration      = errors.New("Bitte trage die Zubereitungszeit ein")
+	FormErrorNoIngredients   = errors.New("Bitte trage die Rezeptzutaten ein")
+	FormErrorNoInstructions  = errors.New("Bitte trage die Rezeptanleitung ein")
+	FormErrorInvalidPassword = errors.New("Falsches Passwort")
+)

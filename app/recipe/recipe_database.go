@@ -3,6 +3,7 @@ package recipe
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
@@ -17,66 +18,105 @@ type recipeDatabase struct {
 
 func newRecipeDatabase() recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("./recipe.db"), &gorm.Config{})
-
 	if err != nil {
 		fmt.Println("failed to connect recipe database: ", err)
 		os.Exit(1)
 	}
-
 	db.AutoMigrate(&types.Recipe{})
-
 	return recipeDatabase{handler: db}
 }
 
-func (db *recipeDatabase) createRecipe(recipe *types.Recipe) errutil.RecipeError {
+func (db *recipeDatabase) createRecipe(recipe *types.Recipe) error {
 	if err := db.handler.Create(recipe).Error; err != nil {
-		return errutil.RecipeErrorDatabaseFailure
+		return &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at createRecipe() with recipe %v, database failure: %w",
+				*recipe,
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
 	}
-
 	return nil
 }
 
-func (db *recipeDatabase) readRecipe(id uint) (types.Recipe, errutil.RecipeError) {
+func (db *recipeDatabase) readRecipe(id uint) (types.Recipe, error) {
 	var recipe types.Recipe
-
 	if err := db.handler.First(&recipe, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return recipe, errutil.RecipeErrorNotFound
+			return recipe, &errutil.AppError{
+				UserMessage: "Rezept nicht gefunden",
+				Err: fmt.Errorf(
+					"failed at readRecipe(), recipe with id %d not found",
+					id,
+				),
+				StatusCode: http.StatusNotFound,
+			}
 		}
-		return recipe, errutil.RecipeErrorDatabaseFailure
+		return recipe, &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at readRecipe(), database failure: %w",
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
 	}
-
 	return recipe, nil
 }
 
-func (db *recipeDatabase) readAllRecipes() ([]types.Recipe, errutil.RecipeError) {
+func (db *recipeDatabase) readAllRecipes() ([]types.Recipe, error) {
 	var recipes []types.Recipe
-
 	if err := db.handler.Find(&recipes).Error; err != nil {
-		return recipes, errutil.RecipeErrorDatabaseFailure
+		return recipes, &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at readAllRecipes(), database failure: %w",
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
 	}
-
 	return recipes, nil
 }
 
-func (db *recipeDatabase) deleteRecipe(id uint) errutil.RecipeError {
+func (db *recipeDatabase) deleteRecipe(id uint) error {
 	result := db.handler.Delete(&types.Recipe{}, id)
-
-	if result.Error != nil {
-		return errutil.RecipeErrorDatabaseFailure
+	if err := result.Error; err != nil {
+		return &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at deleteRecipe() with id %d, database failure: %w",
+				id,
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
 	}
-
 	if result.RowsAffected == 0 {
-		return errutil.RecipeErrorNotFound
+		return &errutil.AppError{
+			UserMessage: "Rezept nicht gefunden",
+			Err: fmt.Errorf(
+				"failed at deleteRecipe(), recipe with id %d not found",
+				id,
+			),
+			StatusCode: http.StatusNotFound,
+		}
 	}
-
 	return nil
 }
 
-func (db *recipeDatabase) updateRecipe(recipe *types.Recipe) errutil.RecipeError {
+func (db *recipeDatabase) updateRecipe(recipe *types.Recipe) error {
 	if err := db.handler.Save(recipe).Error; err != nil {
-		return errutil.RecipeErrorDatabaseFailure
+		return &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at updateRecipe(), database failure: %w",
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
 	}
-
 	return nil
 }
