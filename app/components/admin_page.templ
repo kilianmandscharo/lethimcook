@@ -3,41 +3,34 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []types.FormElement) {
-	@Header()
-	<main>
+    @Header()
+    <main>
         <div class="admin-page-top-section">
             <div class="label-with-icon">
                 <h1>Admin</h1>
                 <i class="fa-solid fa-user fa-xl"></i>
             </div>
             if isAdmin {
-                <button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
-                    Abmelden
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
+            <button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
+                Abmelden
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
             }
         </div>
-		<div class="admin-page-section">
-			<h2>Anmelden</h2>
-			<form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
-				@Form(loginForm)
-				<input
-					type="submit"
-					value="Anmelden"
-					name="submit"
-					if isAdmin {
-						class="button-disabled"
-						disabled="true"
-					}
-				/>
-			</form>
-		</div>
-		<div class="admin-page-section">
-			<h2>Passwort ändern</h2>
-			<form hx-put="/auth/password" hx-indicator="#loading" hx-target="#content">
-				@Form(newPasswordForm)
-				<input type="submit" value="Bestätigen" name="submit"/>
-			</form>
-		</div>
-	</main>
+        <div class="admin-page-section">
+            <h2>Anmelden</h2>
+            <form hx-post="/auth/login" hx-indicator="#loading" hx-target="#content">
+                @Form(loginForm)
+                <input type="submit" value="Anmelden" name="submit" if isAdmin { class="button-disabled" disabled="true"
+                    } />
+            </form>
+        </div>
+        <div class="admin-page-section">
+            <h2>Passwort ändern</h2>
+            <form hx-put="/auth/password" hx-indicator="#loading" hx-target="#content">
+                @Form(newPasswordForm)
+                <input type="submit" value="Bestätigen" name="submit" />
+            </form>
+        </div>
+    </main>
 }

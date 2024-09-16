@@ -1,0 +1,16 @@
+package components
+
+templ body(content templ.Component) {
+	<body>
+		<div id="content">
+			@content
+		</div>
+        <div id="loading" class="htmx-indicator loading">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="32" stroke-width="10" fill="transparent" stroke-dasharray="201" stroke-dashoffset="55"></circle>
+            </svg>
+        </div>
+        <div id="notification-container"></div>
+		@footer()
+	</body>
+}

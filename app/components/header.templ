@@ -1,0 +1,27 @@
+package components
+
+templ Header(buttons ...templ.Component) {
+	<header>
+		<div>
+			<div 
+                class="heading" 
+                hx-get="/"
+                hx-trigger="click"
+                hx-target="#content"
+                hx-push-url="true"
+            >
+				<svg height="32" width="52">
+					<image href="/static/logo.svg" height="28"></image>
+				</svg>
+				<div class="title">Lethimcook</div>
+			</div>
+			<div>
+				for _, button := range buttons {
+					@button
+				}
+				@AdminButton()
+				@HomeButton()
+			</div>
+		</div>
+	</header>
+}
