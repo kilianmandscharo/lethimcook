@@ -46,32 +46,31 @@ func (as *AuthService) CreateAdminIfDoesNotExist(password string) {
 	}
 }
 
-func (as *AuthService) updateAdminPasswordHash(newPassword string) error {
+func (as *AuthService) updateAdminPasswordHash(newPassword string) (error, error) {
 	if len(newPassword) < 5 {
 		return &errutil.AppError{
 			UserMessage: "Invalides Passwort",
-			FormMessage: "Minimale Passwortlänge: 5",
 			Err: errors.New(
 				"failed at updateAdminPasswordHash(), newPassword too short",
 			),
 			StatusCode: http.StatusBadRequest,
-		}
+		}, errutil.FormErrorPasswortTooShort
 	}
 	newPasswordHash, err := as.hashPassword(newPassword)
 	if err != nil {
 		return errutil.AddMessageToAppError(
 			err,
 			"failed at updateAdminPasswordHash() with newPassword",
-		)
+		), errutil.FormErrorPasswortTooLong
 	}
 	err = as.db.updateAdminPasswordHash(newPasswordHash)
 	if err != nil {
 		return errutil.AddMessageToAppError(
 			err,
 			"failed at updateAdminPasswordHash() with newPasswordHash",
-		)
+		), nil
 	}
-	return nil
+	return nil, nil
 }
 
 func (as *AuthService) validatePassword(password string) error {
@@ -82,8 +81,7 @@ func (as *AuthService) validatePassword(password string) error {
 	if !as.matchPassword(password, hash) {
 		return &errutil.AppError{
 			UserMessage: "Falsches Passwort",
-			FormMessage: "Falsches Passwort",
-			Err:         errors.New("wrong password"),
+			Err:         errors.New("failed at validatePassword(), invalid password"),
 			StatusCode:  http.StatusUnauthorized,
 		}
 	}
@@ -132,7 +130,6 @@ func (as *AuthService) hashPassword(password string) (string, error) {
 	if err != nil {
 		return "", &errutil.AppError{
 			UserMessage: "Invalides Passwort",
-			FormMessage: "Maximale Passwortlänge: 72",
 			Err: fmt.Errorf(
 				"failed at hashPassword(), password too long: %w",
 				err,

@@ -59,7 +59,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:              c,
 			isAuthorized:   servutil.IsAuthorized(c),
-			loginFormError: appError,
+			loginFormError: errutil.FormErrorInvalidPassword,
 			err:            appError,
 		})
 	}
@@ -130,11 +130,11 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
 			err:              appError,
-			oldPasswordError: appError,
+			oldPasswordError: errutil.FormErrorInvalidPassword,
 		})
 	}
 
-	err = ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
+	err, formError := ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
 	if err != nil {
 		appError := errutil.AddMessageToAppError(
 			err,
@@ -144,7 +144,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
 			err:              appError,
-			newPasswordError: appError,
+			newPasswordError: formError,
 		})
 	}
 

@@ -7,7 +7,6 @@ import (
 
 type AppError struct {
 	UserMessage string
-	FormMessage string
 	Err         error
 	StatusCode  int
 }
@@ -35,13 +34,6 @@ func GetAppErrorUserMessage(err error) string {
 	return err.Error()
 }
 
-func GetAppErrorFormMessage(err error) string {
-	if appError, ok := err.(*AppError); ok {
-		return appError.FormMessage
-	}
-	return ""
-}
-
 func GetAppErrorStatusCode(err error) int {
 	if appError, ok := err.(*AppError); ok {
 		return appError.StatusCode
@@ -50,9 +42,13 @@ func GetAppErrorStatusCode(err error) int {
 }
 
 var (
-	FormErrorNoTitle        = errors.New("Bitte trage einen Rezepttitel ein")
-	FormErrorNoDescription  = errors.New("Bitte trage eine Rezeptbeschreibung ein")
-	FormErrorNoDuration     = errors.New("Bitte trage die Zubereitungszeit ein")
-	FormErrorNoIngredients  = errors.New("Bitte trage die Rezeptzutaten ein")
-	FormErrorNoInstructions = errors.New("Bitte trage die Rezeptanleitung ein")
+	FormErrorPasswortTooShort = errors.New("Minimale Passwortlänge: 5")
+	FormErrorPasswortTooLong  = errors.New("Maximale Passwortlänge: 72")
+
+	FormErrorNoTitle         = errors.New("Bitte trage einen Rezepttitel ein")
+	FormErrorNoDescription   = errors.New("Bitte trage eine Rezeptbeschreibung ein")
+	FormErrorNoDuration      = errors.New("Bitte trage die Zubereitungszeit ein")
+	FormErrorNoIngredients   = errors.New("Bitte trage die Rezeptzutaten ein")
+	FormErrorNoInstructions  = errors.New("Bitte trage die Rezeptanleitung ein")
+	FormErrorInvalidPassword = errors.New("Falsches Passwort")
 )

@@ -51,10 +51,11 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	authService := newTestAuthService()
 
 	// When
-	err := authService.updateAdminPasswordHash("test_password")
+	err, formError := authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.Error(t, err)
+	assert.NoError(t, formError)
 	appError, ok := err.(*errutil.AppError)
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
@@ -65,21 +66,22 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	assert.NoError(t, authService.db.createAdmin(&admin))
 
 	// When
-	err = authService.updateAdminPasswordHash("aaaa")
+	err, formError = authService.updateAdminPasswordHash("aaaa")
 
 	// Then
 	assert.Error(t, err)
+	assert.ErrorIs(t, errutil.FormErrorPasswortTooShort, formError)
 	appError, ok = err.(*errutil.AppError)
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
 	assert.Equal(t, "Invalides Passwort", appError.UserMessage)
-	assert.Equal(t, "Minimale Passwortlänge: 5", appError.FormMessage)
 
 	// When
-	err = authService.updateAdminPasswordHash("test_password")
+	err, formError = authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.NoError(t, err)
+	assert.NoError(t, formError)
 }
 
 func TestValidatePassword(t *testing.T) {
@@ -117,7 +119,6 @@ func TestValidatePassword(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusUnauthorized, appError.StatusCode)
 	assert.Equal(t, "Falsches Passwort", appError.UserMessage)
-	assert.Equal(t, "Falsches Passwort", appError.FormMessage)
 }
 
 func TestCreateToken(t *testing.T) {
@@ -152,7 +153,6 @@ func TestHashPassword(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
 	assert.Equal(t, "Invalides Passwort", appError.UserMessage)
-	assert.Equal(t, "Maximale Passwortlänge: 72", appError.FormMessage)
 }
 
 func TestMatchPassword(t *testing.T) {
