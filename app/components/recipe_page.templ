@@ -1,8 +1,8 @@
 package components
 
 import (
-	"github.com/kilianmandscharo/lethimcook/types"
 	"fmt"
+	"github.com/kilianmandscharo/lethimcook/types"
 )
 
 templ RecipePage(isAdmin bool, recipe types.Recipe) {
@@ -18,12 +18,24 @@ templ RecipePage(isAdmin bool, recipe types.Recipe) {
 				@RecipeTags(recipe.ParseTags())
 				<div class="caret-container">
 					<i class="fa-solid fa-caret-right"></i>
-					<p>{ recipe.Description }</p>
+					<p><em>{ recipe.Description }</em></p>
 				</div>
 				<div class="caret-container">
 					<i class="fa-solid fa-caret-right"></i>
-					<p>Zubereitungszeit: { fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
+					<p>Zubereitungszeit: <em>{ fmt.Sprintf("%d Minuten", recipe.Duration) }</em></p>
 				</div>
+                if len(recipe.Author) != 0 {
+                    <div class="caret-container">
+                        <i class="fa-solid fa-caret-right"></i>
+                        <p>Autor: <em>{ recipe.Author }</em></p>
+                    </div>
+                }
+                if len(recipe.Source) != 0 {
+                    <div class="caret-container">
+                        <i class="fa-solid fa-caret-right"></i>
+                        <p>Quelle: <em>{ recipe.Source }</em></p>
+                    </div>
+                }
 			</section>
 			<section>
 				<h3>Zutaten</h3>
@@ -49,7 +61,7 @@ templ editRecipeButton(recipe types.Recipe) {
 		hx-trigger="click"
 		hx-target="#content"
 		hx-push-url="true"
-        title="Rezept bearbeiten"
+		title="Rezept bearbeiten"
 	>
 		<i class="fa-solid fa-pen-to-square fa-xl"></i>
 	</button>

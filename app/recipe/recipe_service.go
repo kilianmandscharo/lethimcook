@@ -110,6 +110,8 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recip
 		}
 	}
 
+	recipe.Author = strings.TrimSpace(c.Request().FormValue("author"))
+	recipe.Source = strings.TrimSpace(c.Request().FormValue("source"))
 	recipe.Title = strings.TrimSpace(c.Request().FormValue("title"))
 	recipe.Description = strings.TrimSpace(c.Request().FormValue("description"))
 	recipe.Tags = strings.TrimSpace(c.Request().FormValue("tags"))
@@ -185,11 +187,27 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 		},
 		{
 			Type:      types.FormElementInput,
+			Name:      "author",
+			Err:       formErrors["author"],
+			Value:     recipe.Author,
+			InputType: "text",
+			Label:     "Autor",
+		},
+		{
+			Type:      types.FormElementInput,
+			Name:      "source",
+			Err:       formErrors["source"],
+			Value:     recipe.Source,
+			InputType: "text",
+			Label:     "Quelle",
+		},
+		{
+			Type:      types.FormElementInput,
 			Name:      "tags",
 			Err:       formErrors["tags"],
 			Value:     recipe.Tags,
 			InputType: "text",
-			Label:     "Tags",
+			Label:     "Tags (getrennt durch Kommas)",
 		},
 		{
 			Type:     types.FormElementTextArea,

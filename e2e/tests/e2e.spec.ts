@@ -1,10 +1,11 @@
 import { test, expect, Page } from "@playwright/test";
-import exp from "constants";
 
 const recipe = {
   title: "Naan",
   description: "Indisches Fladenbrot - zubereitet in der Pfanne",
   duration: "180",
+  author: "Phillip Jeffries",
+  source: "Indische Küche Dishoom",
   tags: "indisch, Beilage",
   ingredients: `**Rezept für 10 Stück**
 - 560 g Maida-Mehl
@@ -28,6 +29,8 @@ const editedRecipe = {
   title: "Naanbrot",
   description: "Leckeres indisches Fladenbrot - zubereitet in der Pfanne",
   duration: "210",
+  author: "Dale Cooper",
+  source: "Indische Küche Dishoom (Buch)",
   tags: "Indien",
   ingredients: `**Rezept für 20 Stück**
 - 1120 g Maida-Mehl
@@ -127,6 +130,8 @@ async function createRecipe(page: Page) {
   await page
     .getByPlaceholder("Zubereitungszeit (Minuten)")
     .fill(recipe.duration);
+  await page.getByPlaceholder("Autor").fill(recipe.author);
+  await page.getByPlaceholder("Quelle").fill(recipe.source);
   await page.getByPlaceholder("Tags").fill(recipe.tags);
   await page.getByPlaceholder("Zutaten").fill(recipe.ingredients);
   await page.getByPlaceholder("Anleitung").fill(recipe.instructions);
@@ -151,6 +156,8 @@ async function checkRecipePage(page: Page, testRecipe: Recipe) {
   await expect(
     page.getByText(`Zubereitungszeit: ${testRecipe.duration} Minuten`),
   ).toBeVisible();
+  await expect(page.getByText(`Autor: ${testRecipe.author}`)).toBeVisible();
+  await expect(page.getByText(`Quelle: ${testRecipe.source}`)).toBeVisible();
   await expect(page.getByText(testRecipe.description)).toBeVisible();
 }
 
@@ -164,6 +171,8 @@ async function editRecipe(page: Page) {
     .getByLabel("Zubereitungszeit (Minuten)")
     .fill(editedRecipe.duration);
   await page.getByLabel("Beschreibung").fill(editedRecipe.description);
+  await page.getByPlaceholder("Autor").fill(editedRecipe.author);
+  await page.getByPlaceholder("Quelle").fill(editedRecipe.source);
   await page.getByRole("button", { name: "Rezept aktualisieren" }).click();
 }
 

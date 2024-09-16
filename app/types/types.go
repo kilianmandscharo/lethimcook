@@ -12,6 +12,8 @@ import (
 
 type Recipe struct {
 	ID           uint
+	Author       string
+	Source       string
 	Title        string
 	Description  string
 	Duration     int
@@ -42,6 +44,7 @@ func (r *Recipe) ContainsQuery(query string) bool {
 
 	return strings.Contains(strings.ToLower(r.Title), query) ||
 		strings.Contains(strings.ToLower(r.Description), query) ||
+		strings.Contains(strings.ToLower(r.Author), query) ||
 		r.containsQueryInTags(query)
 }
 
