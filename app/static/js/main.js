@@ -25,7 +25,6 @@ function notify(message, type) {
     const notificationContainer = document.getElementById(
         "notification-container",
     );
-    console.log(notificationContainer);
     if (!notificationContainer) {
         return;
     }
