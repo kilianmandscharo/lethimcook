@@ -54,7 +54,11 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	err := authService.updateAdminPasswordHash("test_password")
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Kein Admin gefunden", appError.UserMessage)
 
 	// Given
 	admin := newTestAdmin()
@@ -64,7 +68,12 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	err = authService.updateAdminPasswordHash("aaaa")
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorPasswordTooShort)
+	assert.Error(t, err)
+	appError, ok = err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
+	assert.Equal(t, "Invalides Passwort", appError.UserMessage)
+	assert.Equal(t, "Minimale Passwortlänge: 5", appError.FormMessage)
 
 	// When
 	err = authService.updateAdminPasswordHash("test_password")
@@ -81,7 +90,11 @@ func TestValidatePassword(t *testing.T) {
 	err := authService.validatePassword("test_password")
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Kein Admin gefunden", appError.UserMessage)
 
 	// Given
 	testHash, err := authService.hashPassword("test_password")
@@ -99,7 +112,12 @@ func TestValidatePassword(t *testing.T) {
 	err = authService.validatePassword("invalid_password")
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorInvalidPassword)
+	assert.Error(t, err)
+	appError, ok = err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusUnauthorized, appError.StatusCode)
+	assert.Equal(t, "Falsches Passwort", appError.UserMessage)
+	assert.Equal(t, "Falsches Passwort", appError.FormMessage)
 }
 
 func TestCreateToken(t *testing.T) {
@@ -129,7 +147,12 @@ func TestHashPassword(t *testing.T) {
 	hash, err = authService.hashPassword("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorPasswordTooLong)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
+	assert.Equal(t, "Invalides Passwort", appError.UserMessage)
+	assert.Equal(t, "Maximale Passwortlänge: 72", appError.FormMessage)
 }
 
 func TestMatchPassword(t *testing.T) {

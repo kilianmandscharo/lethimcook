@@ -77,7 +77,11 @@ func TestGetPathId(t *testing.T) {
 	_, err := recipeService.getPathId(c)
 
 	// Then
-	assert.ErrorIs(t, err, errutil.RecipeErrorInvalidParam)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
+	assert.Equal(t, "Ungültiges Pfadparameter", appError.UserMessage)
 
 	// Given
 	c = newTestContext(t, "", "1")
@@ -99,7 +103,7 @@ func TestParseFormData(t *testing.T) {
 		withPathParam bool
 		pathParamId   string
 		shouldError   bool
-		formErrors    []errutil.FormError
+		formErrors    []error
 	}{
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -122,7 +126,7 @@ func TestParseFormData(t *testing.T) {
 					TitleEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoTitle},
+			formErrors: []error{errutil.FormErrorNoTitle},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -130,7 +134,7 @@ func TestParseFormData(t *testing.T) {
 					DescriptionEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoDescription},
+			formErrors: []error{errutil.FormErrorNoDescription},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -138,7 +142,7 @@ func TestParseFormData(t *testing.T) {
 					DurationEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoDuration},
+			formErrors: []error{errutil.FormErrorNoDuration},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -146,7 +150,7 @@ func TestParseFormData(t *testing.T) {
 					InvalidDuration: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoDuration},
+			formErrors: []error{errutil.FormErrorNoDuration},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -154,7 +158,7 @@ func TestParseFormData(t *testing.T) {
 					IngredientsEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoIngredients},
+			formErrors: []error{errutil.FormErrorNoIngredients},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -162,7 +166,7 @@ func TestParseFormData(t *testing.T) {
 					InstructionsEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{errutil.FormErrorNoInstructions},
+			formErrors: []error{errutil.FormErrorNoInstructions},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -174,7 +178,7 @@ func TestParseFormData(t *testing.T) {
 					InstructionsEmpty: true,
 				},
 			),
-			formErrors: []errutil.FormError{
+			formErrors: []error{
 				errutil.FormErrorNoTitle,
 				errutil.FormErrorNoDescription,
 				errutil.FormErrorNoDuration,

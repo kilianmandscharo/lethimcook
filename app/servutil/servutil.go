@@ -2,7 +2,8 @@ package servutil
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
+	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -43,7 +44,11 @@ func renderPrivacyNotice(c echo.Context) error {
 }
 
 func RenderError(c echo.Context, err error) error {
-	return c.String(errutil.ErrorHttpCodes[err], err.Error())
+	log.Println("error in RenderError():", err)
+	return c.String(
+		errutil.GetAppErrorStatusCode(err),
+		errutil.GetAppErrorUserMessage(err),
+	)
 }
 
 type RenderComponentOptions struct {
@@ -70,15 +75,16 @@ func RenderComponent(options RenderComponentOptions) error {
 	// somehow mark the response as an error, the code for the error status is
 	// set in the header (there might be a better way...)
 	if options.Err != nil {
+		log.Println("error in RenderComponent():", options.Err)
 		options.Context.Response().Header().Set(
 			"Errorcode",
-			fmt.Sprintf("%d", errutil.ErrorHttpCodes[options.Err]),
+			strconv.Itoa(errutil.GetAppErrorStatusCode(options.Err)),
 		)
 	}
 
 	var message string
 	if options.Err != nil {
-		message = options.Err.Error()
+		message = errutil.GetAppErrorUserMessage(options.Err)
 	} else {
 		message = options.Message
 	}

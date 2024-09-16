@@ -2,6 +2,8 @@ package types
 
 import (
 	"bytes"
+	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
@@ -53,18 +55,26 @@ func (r *Recipe) containsQueryInTags(query string) bool {
 	return false
 }
 
-func (r *Recipe) RenderMarkdown() errutil.RecipeError {
+func (r *Recipe) RenderMarkdown() error {
 	var buf bytes.Buffer
 
 	if err := goldmark.Convert([]byte(r.Ingredients), &buf); err != nil {
-		return errutil.RecipeErrorMarkdownFailure
+		return &errutil.AppError{
+			UserMessage: "Fehler beim Markdownparsing",
+			StatusCode:  http.StatusInternalServerError,
+			Err:         fmt.Errorf("failed at RenderMarkdown() with ingredients %s", r.Ingredients),
+		}
 	}
 	r.Ingredients = buf.String()
 
 	buf.Reset()
 
 	if err := goldmark.Convert([]byte(r.Instructions), &buf); err != nil {
-		return errutil.RecipeErrorMarkdownFailure
+		return &errutil.AppError{
+			UserMessage: "Fehler beim Markdownparsing",
+			StatusCode:  http.StatusInternalServerError,
+			Err:         fmt.Errorf("failed at RenderMarkdown() with instructions %s", r.Instructions),
+		}
 	}
 	r.Instructions = buf.String()
 

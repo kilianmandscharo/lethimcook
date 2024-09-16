@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -45,29 +46,47 @@ func (as *AuthService) CreateAdminIfDoesNotExist(password string) {
 	}
 }
 
-func (as *AuthService) updateAdminPasswordHash(newPassword string) errutil.AuthError {
+func (as *AuthService) updateAdminPasswordHash(newPassword string) error {
 	if len(newPassword) < 5 {
-		return errutil.AuthErrorPasswordTooShort
+		return &errutil.AppError{
+			UserMessage: "Invalides Passwort",
+			FormMessage: "Minimale Passwortlänge: 5",
+			Err: errors.New(
+				"failed at updateAdminPasswordHash(), newPassword too short",
+			),
+			StatusCode: http.StatusBadRequest,
+		}
 	}
-
 	newPasswordHash, err := as.hashPassword(newPassword)
 	if err != nil {
-		return err
+		return errutil.AddMessageToAppError(
+			err,
+			"failed at updateAdminPasswordHash() with newPassword",
+		)
 	}
-
-	return as.db.updateAdminPasswordHash(newPasswordHash)
+	err = as.db.updateAdminPasswordHash(newPasswordHash)
+	if err != nil {
+		return errutil.AddMessageToAppError(
+			err,
+			"failed at updateAdminPasswordHash() with newPasswordHash",
+		)
+	}
+	return nil
 }
 
-func (as *AuthService) validatePassword(password string) errutil.AuthError {
+func (as *AuthService) validatePassword(password string) error {
 	hash, err := as.db.readAdminPasswordHash()
 	if err != nil {
-		return err
+		return errutil.AddMessageToAppError(err, "failed at validatePassword()")
 	}
-
 	if !as.matchPassword(password, hash) {
-		return errutil.AuthErrorInvalidPassword
+		return &errutil.AppError{
+			UserMessage: "Falsches Passwort",
+			FormMessage: "Falsches Passwort",
+			Err:         errors.New("wrong password"),
+			StatusCode:  http.StatusUnauthorized,
+		}
 	}
-
 	return nil
 }
 
@@ -77,7 +96,6 @@ func (as *AuthService) doesAdminExist() bool {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	return doesAdminExist
 }
 
@@ -87,7 +105,6 @@ func (as *AuthService) createAdmin(password string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	err = as.db.createAdmin(&admin{PasswordHash: passwordHash})
 	if err != nil {
 		fmt.Println(err)
@@ -95,25 +112,34 @@ func (as *AuthService) createAdmin(password string) {
 	}
 }
 
-func (as *AuthService) createToken() (string, errutil.AuthError) {
+func (as *AuthService) createToken() (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(60 * time.Minute).UnixMilli(),
 	})
-
 	tokenString, err := token.SignedString([]byte(as.privateKey))
 	if err != nil {
-		return "", errutil.AuthErrorTokenCreationFailure
+		return "", &errutil.AppError{
+			UserMessage: "Serverfehler",
+			Err:         fmt.Errorf("failed at createToken(): %w", err),
+			StatusCode:  http.StatusInternalServerError,
+		}
 	}
-
 	return tokenString, nil
 }
 
-func (as *AuthService) hashPassword(password string) (string, errutil.AuthError) {
+func (as *AuthService) hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 13)
 	if err != nil {
-		return "", errutil.AuthErrorPasswordTooLong
+		return "", &errutil.AppError{
+			UserMessage: "Invalides Passwort",
+			FormMessage: "Maximale Passwortlänge: 72",
+			Err: fmt.Errorf(
+				"failed at hashPassword(), password too long: %w",
+				err,
+			),
+			StatusCode: http.StatusBadRequest,
+		}
 	}
-
 	return string(bytes), nil
 }
 
@@ -137,17 +163,16 @@ func (as *AuthService) validCookieToken(cookie *http.Cookie) bool {
 	token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
 		return []byte(as.privateKey), nil
 	})
-
 	return err == nil && token.Valid
 }
 
-func (as *AuthService) createLoginForm(disabled bool, err errutil.AuthError) []types.FormElement {
+func (as *AuthService) createLoginForm(disabled bool, err error) []types.FormElement {
 	return []types.FormElement{
 		{
 			Type:      types.FormElementInput,
 			Name:      "password",
 			Err:       err,
-			InputType: "text",
+			InputType: "password",
 			Label:     "Passwort",
 			Required:  true,
 			Disabled:  disabled,
@@ -155,13 +180,13 @@ func (as *AuthService) createLoginForm(disabled bool, err errutil.AuthError) []t
 	}
 }
 
-func (as *AuthService) createNewPasswordForm(oldPasswordError errutil.AuthError, newPasswordError errutil.AuthError) []types.FormElement {
+func (as *AuthService) createNewPasswordForm(oldPasswordError error, newPasswordError error) []types.FormElement {
 	return []types.FormElement{
 		{
 			Type:      types.FormElementInput,
 			Name:      "old-password",
 			Err:       oldPasswordError,
-			InputType: "text",
+			InputType: "password",
 			Label:     "Altes Passwort",
 			Required:  true,
 		},
@@ -169,7 +194,7 @@ func (as *AuthService) createNewPasswordForm(oldPasswordError errutil.AuthError,
 			Type:      types.FormElementInput,
 			Name:      "new-password",
 			Err:       newPasswordError,
-			InputType: "text",
+			InputType: "password",
 			Label:     "Neues Passwort",
 			Required:  true,
 		},

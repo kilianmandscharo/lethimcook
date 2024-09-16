@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"errors"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
@@ -37,22 +40,36 @@ func (ac *AuthController) RenderAdminPage(c echo.Context) error {
 
 func (ac *AuthController) HandleLogin(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		return servutil.RenderError(c, errutil.AuthErrorInvalidForm)
+		return servutil.RenderError(c, &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err: fmt.Errorf(
+				"failed at HandleLogin(), invalid form: %w",
+				err,
+			),
+			StatusCode: http.StatusBadRequest,
+		})
 	}
 
 	err := ac.authService.validatePassword(c.Request().FormValue("password"))
 	if err != nil {
+		appError := errutil.AddMessageToAppError(
+			err,
+			"failed at HandleLogin(), invalid password",
+		)
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:              c,
 			isAuthorized:   servutil.IsAuthorized(c),
-			loginFormError: err,
-			err:            err,
+			loginFormError: appError,
+			err:            appError,
 		})
 	}
 
 	token, err := ac.authService.createToken()
 	if err != nil {
-		return servutil.RenderError(c, err)
+		return servutil.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at HandleLogin()"),
+		)
 	}
 
 	cookie := ac.authService.newTokenCookie(token, time.Now().Add(60*time.Minute))
@@ -69,7 +86,14 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 func (ac *AuthController) HandleLogout(c echo.Context) error {
 	if !servutil.IsAuthorized(c) {
-		return servutil.RenderError(c, errutil.AuthErrorNotAuthorized)
+		return servutil.RenderError(
+			c,
+			&errutil.AppError{
+				UserMessage: "Nicht authorisiert",
+				Err:         errors.New("failed at HandleLogout(), not authorized"),
+				StatusCode:  http.StatusUnauthorized,
+			},
+		)
 	}
 
 	cookie := ac.authService.newTokenCookie("", time.Unix(0, 0))
@@ -86,26 +110,41 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 
 func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		return servutil.RenderError(c, errutil.AuthErrorInvalidForm)
+		return servutil.RenderError(c, &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err: fmt.Errorf(
+				"failed at HandleUpdatePassword(), invalid form: %w",
+				err,
+			),
+			StatusCode: http.StatusBadRequest,
+		})
 	}
 
 	err := ac.authService.validatePassword(c.Request().FormValue("old-password"))
 	if err != nil {
+		appError := errutil.AddMessageToAppError(
+			err,
+			"failed at HandleUpdatePassword()",
+		)
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
-			err:              err,
-			oldPasswordError: err,
+			err:              appError,
+			oldPasswordError: appError,
 		})
 	}
 
 	err = ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
 	if err != nil {
+		appError := errutil.AddMessageToAppError(
+			err,
+			"failed at HandleUpdatePassword()",
+		)
 		return ac.authService.createAdminPage(createAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
-			err:              err,
-			newPasswordError: err,
+			err:              appError,
+			newPasswordError: appError,
 		})
 	}
 

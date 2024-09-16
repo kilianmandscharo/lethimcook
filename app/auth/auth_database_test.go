@@ -1,11 +1,34 @@
 package auth
 
 import (
+	"fmt"
+	"net/http"
+	"os"
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+func newTestAuthDatabase() authDatabase {
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+
+	if err != nil {
+		fmt.Println("failed to connect test database: ", err)
+		os.Exit(1)
+	}
+
+	db.Migrator().DropTable(&admin{})
+
+	db.AutoMigrate(&admin{})
+
+	return authDatabase{handler: db}
+}
 
 func newTestAdmin() admin {
 	return admin{PasswordHash: "test hash"}
@@ -27,7 +50,11 @@ func TestCreateAdmin(t *testing.T) {
 	err = db.createAdmin(&admin)
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorAdminAlreadyExists)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusConflict, appError.StatusCode)
+	assert.Equal(t, "Ein Admin existiert bereits", appError.UserMessage)
 }
 
 func TestDoesAdminExist(t *testing.T) {
@@ -61,7 +88,11 @@ func TestReadAdmin(t *testing.T) {
 	_, err := db.readAdmin()
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Kein Admin gefunden", appError.UserMessage)
 
 	// Given
 	admin := newTestAdmin()
@@ -84,7 +115,11 @@ func TestReadAdminPasswordHash(t *testing.T) {
 	_, err := db.readAdmin()
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Kein Admin gefunden", appError.UserMessage)
 
 	// Given
 	admin := newTestAdmin()
@@ -107,7 +142,11 @@ func TestUpdateAdminPassortHash(t *testing.T) {
 	err := db.updateAdminPasswordHash(updatedHash)
 
 	// Then
-	assert.ErrorIs(t, err, errutil.AuthErrorNoAdminFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Kein Admin gefunden", appError.UserMessage)
 
 	// Given
 	admin := newTestAdmin()

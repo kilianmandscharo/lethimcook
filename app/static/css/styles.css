@@ -327,8 +327,9 @@ textarea {
 
 .admin-page-section {
   border-top: 1px solid var(--color-surface-200);
-  margin-bottom: 2rem;
-  padding-top: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-top: 0.5rem;
 }
 
 .admin-page-section h2 {

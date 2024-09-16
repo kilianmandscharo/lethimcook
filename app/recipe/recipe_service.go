@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -20,30 +21,33 @@ func newRecipeService() recipeService {
 	}
 }
 
-func (rs *recipeService) createRecipe(recipe *types.Recipe) errutil.RecipeError {
+func (rs *recipeService) createRecipe(recipe *types.Recipe) error {
 	return rs.db.createRecipe(recipe)
 }
 
-func (rs *recipeService) readRecipe(id uint) (types.Recipe, errutil.RecipeError) {
+func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
 }
 
-func (rs *recipeService) readAllRecipes() ([]types.Recipe, errutil.RecipeError) {
+func (rs *recipeService) readAllRecipes() ([]types.Recipe, error) {
 	return rs.db.readAllRecipes()
 }
 
-func (rs *recipeService) deleteRecipe(id uint) errutil.RecipeError {
+func (rs *recipeService) deleteRecipe(id uint) error {
 	return rs.db.deleteRecipe(id)
 }
 
-func (rs *recipeService) updateRecipe(recipe *types.Recipe) errutil.RecipeError {
+func (rs *recipeService) updateRecipe(recipe *types.Recipe) error {
 	return rs.db.updateRecipe(recipe)
 }
 
-func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, errutil.RecipeError) {
+func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, error) {
 	recipes, err := rs.readAllRecipes()
 	if err != nil {
-		return []types.Recipe{}, err
+		return []types.Recipe{}, errutil.AddMessageToAppError(
+			err,
+			fmt.Sprintf("failed at getFilteredRecipes() with query '%s'", query),
+		)
 	}
 
 	query = strings.TrimSpace(query)
@@ -62,33 +66,48 @@ func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, errut
 	return filteredRecipes, nil
 }
 
-func (rs *recipeService) getPathId(c echo.Context) (uint, errutil.RecipeError) {
+func (rs *recipeService) getPathId(c echo.Context) (uint, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return 0, errutil.RecipeErrorInvalidParam
+		return 0, &errutil.AppError{
+			UserMessage: "Ungültiges Pfadparameter",
+			Err: fmt.Errorf(
+				"failed at getPathId() width parameter %s: %w",
+				c.Param("id"),
+				err,
+			),
+			StatusCode: http.StatusBadRequest,
+		}
 	}
 
 	return uint(id), nil
 }
 
-func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, errutil.RecipeError) {
+func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {
 	var recipe types.Recipe
 
 	id, err := rs.getPathId(c)
 	if err != nil {
-		return recipe, errutil.RecipeErrorInvalidParam
+		return recipe, errutil.AddMessageToAppError(
+			err,
+			"failed at getRecipeById()",
+		)
 	}
 
 	return rs.readRecipe(id)
 }
 
-func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, map[string]error, errutil.RecipeError) {
+func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, map[string]error, error) {
 	var recipe types.Recipe
 
 	formErrors := make(map[string]error)
 
 	if err := c.Request().ParseForm(); err != nil {
-		return recipe, formErrors, errutil.RecipeErrorInvalidFormData
+		return recipe, formErrors, &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err:         fmt.Errorf("failed at parseFormData(): %w", err),
+			StatusCode:  http.StatusBadRequest,
+		}
 	}
 
 	recipe.Title = strings.TrimSpace(c.Request().FormValue("title"))

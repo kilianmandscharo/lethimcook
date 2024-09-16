@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 
@@ -70,7 +71,11 @@ func TestReadRecipe(t *testing.T) {
 	_, err := db.readRecipe(uint(1))
 
 	// Then
-	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Rezept nicht gefunden", appError.UserMessage)
 
 	// Given
 	r := types.NewTestRecipe()
@@ -124,13 +129,21 @@ func TestDeleteRecipe(t *testing.T) {
 	_, err = db.readRecipe(r.ID)
 
 	// Then
-	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Rezept nicht gefunden", appError.UserMessage)
 
 	// When
 	err = db.deleteRecipe(r.ID)
 
 	// Then
-	assert.ErrorIs(t, err, errutil.RecipeErrorNotFound)
+	assert.Error(t, err)
+	appError, ok = err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Rezept nicht gefunden", appError.UserMessage)
 }
 
 func TestUpdateRecipe(t *testing.T) {

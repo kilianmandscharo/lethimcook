@@ -2,10 +2,10 @@ package testutil
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -73,7 +73,7 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 	if options.HeaderErrorCodeWant != 0 {
 		errorCodes := rr.Header()["Errorcode"]
 		assert.Equal(t, 1, len(errorCodes))
-		assert.Equal(t, fmt.Sprintf("%d", options.HeaderErrorCodeWant), errorCodes[0])
+		assert.Equal(t, strconv.Itoa(options.HeaderErrorCodeWant), errorCodes[0])
 	}
 
 	return rr, c

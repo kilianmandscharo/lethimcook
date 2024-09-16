@@ -1,6 +1,7 @@
 package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
+import "github.com/kilianmandscharo/lethimcook/errutil"
 
 templ Form(form []types.FormElement) {
   for _, element := range form {
@@ -44,7 +45,7 @@ templ Form(form []types.FormElement) {
       }
       <div class="form-error-message">
         if element.Err != nil {
-          { element.Err.Error() }
+          { errutil.GetAppErrorFormMessage(element.Err) }
         }
       </div>
     </div>
