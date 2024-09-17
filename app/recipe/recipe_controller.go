@@ -266,7 +266,7 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return servutil.RenderComponent(servutil.RenderComponentOptions{
 			Context:   c,
 			Component: components.RecipeList(servutil.IsAuthorized(c), false, recipes),
-			Message:   "Rezept gelöscht",
+			Message:   "Rezept entfernt",
 		})
 	}
 

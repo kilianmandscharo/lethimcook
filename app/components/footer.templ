@@ -1,0 +1,12 @@
+package components
+
+templ footer() {
+	<footer>
+		<button hx-get="/imprint" hx-trigger="click" hx-target="#content" hx-push-url="true">
+			Impressum
+		</button>
+		<button hx-get="/privacy-notice" hx-trigger="click" hx-target="#content" hx-push-url="true">
+			Datenschutz
+		</button>
+	</footer>
+}

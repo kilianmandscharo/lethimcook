@@ -1,0 +1,16 @@
+package components
+
+templ AdminButton() {
+	<button
+		id="admin-button"
+		class="icon-button"
+		hx-get="/admin"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+        title="Admin"
+	>
+		<i class="fa-solid fa-user fa-xl"></i>
+	</button>
+}
+

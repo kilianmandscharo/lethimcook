@@ -68,7 +68,7 @@ type triggerPayload struct {
 }
 
 func RenderComponent(options RenderComponentOptions) error {
-	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
 
 	// Usually you would want to return the status code correctly, however,
 	// for this purpose to still render the component with htmx and still
