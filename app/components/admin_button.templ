@@ -1,6 +1,6 @@
 package components
 
-templ AdminButton() {
+templ AdminButton(isAdmin bool) {
 	<button
 		id="admin-button"
 		class="icon-button"
@@ -8,9 +8,12 @@ templ AdminButton() {
 		hx-trigger="click"
 		hx-target="#content"
 		hx-push-url="true"
-        title="Admin"
+		title="Admin"
 	>
-		<i class="fa-solid fa-user fa-xl"></i>
+        if isAdmin {
+            <i class="fa-solid fa-user fa-xl success"></i>
+        } else {
+            <i class="fa-solid fa-user fa-xl"></i>
+        }
 	</button>
 }
-

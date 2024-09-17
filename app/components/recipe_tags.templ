@@ -1,0 +1,11 @@
+package components
+
+templ RecipeTags(tags []string) {
+	if len(tags) > 0 {
+		<div class="recipe-tags">
+			for _, tag := range tags {
+				<p>{ tag }</p>
+			}
+		</div>
+	}
+}

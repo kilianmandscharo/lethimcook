@@ -32,14 +32,14 @@ func AttachHandlerFunctions(e *echo.Echo) {
 func renderImprint(c echo.Context) error {
 	return RenderComponent(RenderComponentOptions{
 		Context:   c,
-		Component: components.Imprint(),
+		Component: components.Imprint(IsAuthorized(c)),
 	})
 }
 
 func renderPrivacyNotice(c echo.Context) error {
 	return RenderComponent(RenderComponentOptions{
 		Context:   c,
-		Component: components.PrivacyNotice(),
+		Component: components.PrivacyNotice(IsAuthorized(c)),
 	})
 }
 

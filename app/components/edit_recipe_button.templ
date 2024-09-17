@@ -1,0 +1,17 @@
+package components
+
+import "fmt"
+
+templ editRecipeButton(recipeId uint) {
+	<button
+		id="edit-recipe-button"
+		class="icon-button"
+		hx-get={ fmt.Sprintf("/recipe/%d/edit", recipeId) }
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept bearbeiten"
+	>
+		<i class="fa-solid fa-pen-to-square fa-xl"></i>
+	</button>
+}

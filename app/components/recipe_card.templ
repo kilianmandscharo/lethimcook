@@ -1,0 +1,27 @@
+package components
+
+import (
+	"fmt"
+	"github.com/kilianmandscharo/lethimcook/types"
+)
+
+templ RecipeCard(isAdmin bool, recipe types.Recipe) {
+    <div
+        if recipe.Pending {
+        class="recipe-list-item pending"
+        } else {
+        class="recipe-list-item"
+        }
+        id={ fmt.Sprintf("recipe-%d", recipe.ID) }
+        hx-target="#content"
+        hx-trigger="click"
+        hx-get={ fmt.Sprintf("/recipe/%d", recipe.ID) }
+    >
+        <div>
+            <p class="recipe-list-item-title">{ recipe.Title }</p>
+            <p>{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
+        </div>
+        <p class="recipe-list-item-description">{ recipe.Description }</p>
+        @RecipeTags(recipe.ParseTags())
+    </div>
+}

@@ -68,6 +68,21 @@ func (db *recipeDatabase) readRecipe(id uint) (types.Recipe, error) {
 
 func (db *recipeDatabase) readAllRecipes() ([]types.Recipe, error) {
 	var recipes []types.Recipe
+	if err := db.handler.Where("pending IS NULL OR pending = 0").Find(&recipes).Error; err != nil {
+		return recipes, &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at readAllRecipes(), database failure: %w",
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return recipes, nil
+}
+
+func (db *recipeDatabase) readAllRecipesWithPending() ([]types.Recipe, error) {
+	var recipes []types.Recipe
 	if err := db.handler.Find(&recipes).Error; err != nil {
 		return recipes, &errutil.AppError{
 			UserMessage: "Datenbankfehler",
@@ -117,6 +132,25 @@ func (db *recipeDatabase) updateRecipe(recipe *types.Recipe) error {
 			),
 			StatusCode: http.StatusInternalServerError,
 		}
+	}
+	return nil
+}
+
+func (db *recipeDatabase) updatePending(id uint, pending bool) error {
+	createError := func(err error) error {
+		return errutil.AddMessageToAppError(
+			err,
+			fmt.Sprintf("failed at acceptRecipe() with id %d", id),
+		)
+	}
+	recipe, err := db.readRecipe(id)
+	if err != nil {
+		return createError(err)
+	}
+	recipe.Pending = pending
+	err = db.updateRecipe(&recipe)
+	if err != nil {
+		return createError(err)
 	}
 	return nil
 }

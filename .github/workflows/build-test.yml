@@ -1,4 +1,4 @@
-name: build-test-ship
+name: build-test
 
 on:
   pull_request:

@@ -20,6 +20,7 @@ type Recipe struct {
 	Ingredients  string
 	Instructions string
 	Tags         string
+	Pending      bool
 }
 
 func (r *Recipe) ParseTags() []string {

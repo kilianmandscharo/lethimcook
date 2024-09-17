@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -29,8 +30,24 @@ func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
 }
 
-func (rs *recipeService) readAllRecipes() ([]types.Recipe, error) {
-	return rs.db.readAllRecipes()
+func (rs *recipeService) readAllRecipes(isAdmin bool) ([]types.Recipe, error) {
+	var recipes []types.Recipe
+	var err error
+
+	if isAdmin {
+		recipes, err = rs.db.readAllRecipesWithPending()
+	} else {
+		recipes, err = rs.db.readAllRecipes()
+	}
+
+	if err != nil {
+		errutil.AddMessageToAppError(
+			err,
+			fmt.Sprintf("failed at readAllRecipes() with isAdmin = %t", isAdmin),
+		)
+	}
+
+	return recipes, nil
 }
 
 func (rs *recipeService) deleteRecipe(id uint) error {
@@ -41,8 +58,12 @@ func (rs *recipeService) updateRecipe(recipe *types.Recipe) error {
 	return rs.db.updateRecipe(recipe)
 }
 
-func (rs *recipeService) getFilteredRecipes(query string) ([]types.Recipe, error) {
-	recipes, err := rs.readAllRecipes()
+func (rs *recipeService) updatePending(id uint, pending bool) error {
+	return rs.db.updatePending(id, pending)
+}
+
+func (rs *recipeService) getFilteredRecipes(query string, isAdmin bool) ([]types.Recipe, error) {
+	recipes, err := rs.readAllRecipes(isAdmin)
 	if err != nil {
 		return []types.Recipe{}, errutil.AddMessageToAppError(
 			err,
@@ -72,7 +93,7 @@ func (rs *recipeService) getPathId(c echo.Context) (uint, error) {
 		return 0, &errutil.AppError{
 			UserMessage: "Ungültiges Pfadparameter",
 			Err: fmt.Errorf(
-				"failed at getPathId() width parameter %s: %w",
+				"failed at getPathId() with parameter %s: %w",
 				c.Param("id"),
 				err,
 			),
@@ -81,6 +102,28 @@ func (rs *recipeService) getPathId(c echo.Context) (uint, error) {
 	}
 
 	return uint(id), nil
+}
+
+func (rs *recipeService) getPathPending(c echo.Context) (bool, error) {
+	pending := c.Param("pending")
+	if len(pending) == 0 {
+		return false, &errutil.AppError{
+			UserMessage: "Fehlendes Pfadparameter",
+			Err:         errors.New("failed at getPathPending()"),
+			StatusCode:  http.StatusBadRequest,
+		}
+	}
+	if pending == "true" {
+		return true, nil
+	}
+	if pending == "false" {
+		return false, nil
+	}
+	return false, &errutil.AppError{
+		UserMessage: "Ungültiges Pfadparameter",
+		Err:         fmt.Errorf("failed at getPathPending() with param %s", pending),
+		StatusCode:  http.StatusBadRequest,
+	}
 }
 
 func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {

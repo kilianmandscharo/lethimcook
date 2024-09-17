@@ -1,0 +1,26 @@
+package components
+
+import (
+	"fmt"
+	"github.com/kilianmandscharo/lethimcook/types"
+)
+
+templ RecipeList(isAdmin bool, recipes []types.Recipe) {
+	<div id="recipe-list" class="recipe-list">
+		switch len(recipes) {
+			case 0:
+				<p>Keine Rezepte</p>
+			case 1:
+				<p>1 Rezept</p>
+			default:
+				<p>{ fmt.Sprintf("%d", len(recipes)) } Rezepte</p>
+		}
+		if len(recipes) > 0 {
+			<div>
+				for _, recipe := range recipes {
+					@RecipeCard(isAdmin, recipe)
+				}
+			</div>
+		}
+	</div>
+}

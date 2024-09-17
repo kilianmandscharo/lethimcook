@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-func RecipeNewPage(recipeForm []types.FormElement) templ.Component {
+func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -31,11 +31,26 @@ func RecipeNewPage(recipeForm []types.FormElement) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Header().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"label-with-icon\"><h1>Neues Rezept</h1><i class=\"fa-regular fa-pen-nib fa-xl\"></i></div><form hx-post=\"/recipe\" hx-target=\"#content\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"label-with-icon\"><h1>Neues Rezept</h1><i class=\"fa-regular fa-pen-nib fa-xl\"></i></div><form")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isAdmin {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" hx-post=\"/recipe\" hx-target=\"#content\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" hx-post=\"/recipe?pending=true\" hx-target=\"main\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -43,7 +58,22 @@ func RecipeNewPage(recipeForm []types.FormElement) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"Rezept erstellen\" name=\"submit\"></form></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isAdmin {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" value=\"Rezept erstellen\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" value=\"Rezept einreichen\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"submit\"></form></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

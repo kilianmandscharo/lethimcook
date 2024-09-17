@@ -34,6 +34,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.POST("/search", rc.HandleSearchRecipe)
 	e.POST("/recipe", rc.HandleCreateRecipe)
 	e.PUT("/recipe/:id", rc.HandleUpdateRecipe)
+	e.PUT("/recipe/:id/pending/:pending", rc.HandleUpdatePending)
 	e.DELETE("/recipe/:id", rc.HandleDeleteRecipe)
 }
 
@@ -42,7 +43,9 @@ func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
 }
 
 func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message string) error {
-	recipes, err := rc.recipeService.readAllRecipes()
+	isAdmin := servutil.IsAuthorized(c)
+
+	recipes, err := rc.recipeService.readAllRecipes(isAdmin)
 	if err != nil {
 		return servutil.RenderError(
 			c,
@@ -52,29 +55,22 @@ func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message s
 
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipesPage(servutil.IsAuthorized(c), false, recipes),
+		Component: components.RecipesPage(isAdmin, recipes),
 		Message:   message,
 	})
 }
 
 func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
-	if !servutil.IsAuthorized(c) {
-		return servutil.RenderError(c, &errutil.AppError{
-			UserMessage: "Nicht authorisiert",
-			Err:         errors.New("failed at RenderRecipeNewPage(), not authorized"),
-			StatusCode:  http.StatusUnauthorized,
-		})
-	}
-
 	formElements := rc.recipeService.createRecipeForm(types.Recipe{}, make(map[string]error))
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeNewPage(formElements),
+		Component: components.RecipeNewPage(formElements, servutil.IsAuthorized(c)),
 	})
 }
 
 func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
-	if !servutil.IsAuthorized(c) {
+	isAdmin := servutil.IsAuthorized(c)
+	if !isAdmin {
 		return servutil.RenderError(c, &errutil.AppError{
 			UserMessage: "Nicht authorisiert",
 			Err:         errors.New("failed at RenderRecipeEditPage(), not authorized"),
@@ -93,7 +89,7 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 	formElements := rc.recipeService.createRecipeForm(recipe, make(map[string]error))
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeEditPage(recipe.ID, formElements),
+		Component: components.RecipeEditPage(isAdmin, recipe.ID, formElements),
 	})
 }
 
@@ -121,12 +117,14 @@ func (rc *RecipeController) RenderRecipePageHelper(c echo.Context, message strin
 
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipePage(servutil.IsAuthorized(c), recipe),
+		Component: components.RecipePage(servutil.IsAuthorized(c), recipe, recipe.ParseTags()),
 		Message:   message,
 	})
 }
 
 func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
+	isAdmin := servutil.IsAuthorized(c)
+
 	if err := c.Request().ParseForm(); err != nil {
 		return servutil.RenderError(
 			c,
@@ -135,7 +133,7 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 	}
 	query := strings.ToLower(c.FormValue("query"))
 
-	filteredRecipes, err := rc.recipeService.getFilteredRecipes(query)
+	filteredRecipes, err := rc.recipeService.getFilteredRecipes(query, isAdmin)
 	if err != nil {
 		return servutil.RenderError(
 			c,
@@ -145,12 +143,15 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeList(servutil.IsAuthorized(c), false, filteredRecipes),
+		Component: components.RecipeList(isAdmin, filteredRecipes),
 	})
 }
 
 func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
-	if !servutil.IsAuthorized(c) {
+	pending := c.QueryParam("pending") == "true"
+	isAdmin := servutil.IsAuthorized(c)
+
+	if !isAdmin && !pending {
 		return servutil.RenderError(c, &errutil.AppError{
 			UserMessage: "Nicht authorisiert",
 			Err:         errors.New("failed at HandleCreateRecipe(), not authorized"),
@@ -165,12 +166,13 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 			errutil.AddMessageToAppError(err, "failed at HandleCreateRecipe()"),
 		)
 	}
+	newRecipe.Pending = pending
 
 	if len(formErrors) > 0 {
 		formElements := rc.recipeService.createRecipeForm(newRecipe, formErrors)
 		return servutil.RenderComponent(servutil.RenderComponentOptions{
 			Context:   c,
-			Component: components.RecipeNewPage(formElements),
+			Component: components.RecipeNewPage(formElements, servutil.IsAuthorized(c)),
 			Err: &errutil.AppError{
 				UserMessage: "Fehlerhaftes Formular",
 				StatusCode:  http.StatusBadRequest,
@@ -186,11 +188,58 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 		)
 	}
 
+	if pending {
+		return servutil.RenderComponent(servutil.RenderComponentOptions{
+			Context:   c,
+			Component: components.RecipeCreationSuccess(),
+			Message:   "Rezept eingereicht",
+		})
+	}
 	return rc.renderRecipeListPageHelper(c, "Rezept erstellt")
 }
 
+func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
+	isAdmin := servutil.IsAuthorized(c)
+	if !isAdmin {
+		return servutil.RenderError(c, &errutil.AppError{
+			UserMessage: "Nicht authorisiert",
+			Err:         errors.New("failed at HandleToggleRecipe(), not authorized"),
+			StatusCode:  http.StatusUnauthorized,
+		})
+	}
+
+	createError := func(err error) error {
+		return servutil.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at HandleToggleRecipe()"),
+		)
+	}
+
+	pending, err := rc.recipeService.getPathPending(c)
+	if err != nil {
+		return createError(err)
+	}
+
+	id, err := rc.recipeService.getPathId(c)
+	if err != nil {
+		return createError(err)
+	}
+
+	err = rc.recipeService.updatePending(id, pending)
+	if err != nil {
+		return createError(err)
+	}
+
+	if pending {
+		return rc.renderRecipeListPageHelper(c, "Rezept auf 'ausstehend' gesetzt")
+	} else {
+		return rc.renderRecipeListPageHelper(c, "Rezept angenommen")
+	}
+}
+
 func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
-	if !servutil.IsAuthorized(c) {
+	isAdmin := servutil.IsAuthorized(c)
+	if !isAdmin {
 		return servutil.RenderError(c, &errutil.AppError{
 			UserMessage: "Nicht authorisiert",
 			Err:         errors.New("failed at HandleUpdateRecipe(), not authorized"),
@@ -210,7 +259,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		formElements := rc.recipeService.createRecipeForm(updatedRecipe, formErrors)
 		return servutil.RenderComponent(servutil.RenderComponentOptions{
 			Context:   c,
-			Component: components.RecipeEditPage(updatedRecipe.ID, formElements),
+			Component: components.RecipeEditPage(isAdmin, updatedRecipe.ID, formElements),
 			Err: &errutil.AppError{
 				UserMessage: "Fehlerhaftes Formular",
 				StatusCode:  http.StatusBadRequest,
@@ -230,7 +279,8 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 }
 
 func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
-	if !servutil.IsAuthorized(c) {
+	isAdmin := servutil.IsAuthorized(c)
+	if !isAdmin {
 		return servutil.RenderError(c, &errutil.AppError{
 			UserMessage: "Nicht authorisiert",
 			Err:         errors.New("failed at HandleDeleteRecipe(), not authorized"),
@@ -238,54 +288,31 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		})
 	}
 
+	createError := func(err error) error {
+		return servutil.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
+		)
+	}
+
 	id, err := rc.recipeService.getPathId(c)
 	if err != nil {
-		return servutil.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
-		)
+		return createError(err)
 	}
 
-	if c.QueryParam("force") == "true" {
-		err = rc.recipeService.deleteRecipe(id)
-		if err != nil {
-			return servutil.RenderError(
-				c,
-				errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
-			)
-		}
-
-		recipes, err := rc.recipeService.readAllRecipes()
-		if err != nil {
-			return servutil.RenderError(
-				c,
-				errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
-			)
-		}
-
-		return servutil.RenderComponent(servutil.RenderComponentOptions{
-			Context:   c,
-			Component: components.RecipeList(servutil.IsAuthorized(c), false, recipes),
-			Message:   "Rezept entfernt",
-		})
-	}
-
-	var deleting = true
-
-	if c.QueryParam("cancel") == "true" {
-		deleting = false
-	}
-
-	recipe, err := rc.recipeService.readRecipe(id)
+	err = rc.recipeService.deleteRecipe(id)
 	if err != nil {
-		return servutil.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
-		)
+		return createError(err)
+	}
+
+	recipes, err := rc.recipeService.readAllRecipes(isAdmin)
+	if err != nil {
+		return createError(err)
 	}
 
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipeCard(servutil.IsAuthorized(c), deleting, recipe),
+		Component: components.RecipesPage(isAdmin, recipes),
+		Message:   "Rezept entfernt",
 	})
 }

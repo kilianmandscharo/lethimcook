@@ -2,16 +2,32 @@ package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-templ RecipeNewPage(recipeForm []types.FormElement) {
-	@Header()
+templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
+	@Header(isAdmin)
 	<main>
         <div class="label-with-icon">
             <h1>Neues Rezept</h1>
             <i class="fa-regular fa-pen-nib fa-xl"></i>
         </div>
-		<form hx-post="/recipe" hx-target="#content">
+		<form 
+            if isAdmin {
+            hx-post="/recipe" 
+            hx-target="#content"
+            } else {
+            hx-post="/recipe?pending=true" 
+            hx-target="main"
+            }
+        >
 			@Form(recipeForm)
-			<input type="submit" value="Rezept erstellen" name="submit"/>
+			<input 
+                type="submit" 
+                if isAdmin {
+                value="Rezept erstellen" 
+                } else {
+                value="Rezept einreichen" 
+                }
+                name="submit"
+            />
 		</form>
 	</main>
 }
