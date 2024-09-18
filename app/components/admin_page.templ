@@ -11,9 +11,14 @@ templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []t
                 <i class="fa-solid fa-user fa-xl"></i>
             </div>
             if isAdmin {
-            <button class="danger-button" hx-post="/auth/logout" hx-trigger="click" hx-target="#content">
+            <button
+                class="icon-button with-label" 
+                hx-post="/auth/logout" 
+                hx-trigger="click" 
+                hx-target="#content"
+            >
                 Abmelden
-                <i class="fa-solid fa-right-from-bracket"></i>
+                <i class="fa-solid fa-right-from-bracket danger"></i>
             </button>
             }
         </div>

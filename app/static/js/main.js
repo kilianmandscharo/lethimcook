@@ -3,6 +3,60 @@ function main() {
     addMessageListener();
 }
 
+const INPUTS = ["title", "description", "duration", "author", "source", "tags", "ingredients", "instructions"];
+const RECIPE_NEW_KEY = "recipe_new";
+
+function attachNewFormSubmitEventListener() {
+    const submit = document.getElementById("recipe-new-submit");
+    if (!submit) {
+        return;
+    }
+    submit.addEventListener("click", () => {
+        deleteFormFromLocalStorage();
+    });
+}
+
+function attachFormEventListeners() {
+    INPUTS.forEach((inputName) => {
+        const input = document.getElementById(inputName);
+        if (input) {
+            input.addEventListener("blur", () => {
+                saveFormToLocalStorage();
+            })
+        }
+    });
+}
+
+function saveFormToLocalStorage() {
+    const recipe = INPUTS.reduce((acc, inputName) => {
+        const input = document.getElementById(inputName);
+        acc[inputName] = input?.value ?? "";
+        return acc;
+    }, {});
+    localStorage.setItem(RECIPE_NEW_KEY, JSON.stringify(recipe));
+};
+
+function loadFormFromLocalStorage() {
+    const recipeString = localStorage.getItem(RECIPE_NEW_KEY);
+    if (!recipeString) {
+        return;
+    }
+    const recipe = JSON.parse(recipeString);
+    if (!recipe) {
+        return;
+    }
+    INPUTS.forEach((inputName) => {
+        const input = document.getElementById(inputName);
+        if (input) {
+            input.value = recipe[inputName] ?? "";
+        }
+    });
+}
+
+function deleteFormFromLocalStorage() {
+    localStorage.setItem(RECIPE_NEW_KEY, "");
+}
+
 function addErrorResponseListener() {
     document.body.addEventListener("htmx:responseError", function(event) {
         const message = event.detail.xhr.response;

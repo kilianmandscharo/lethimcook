@@ -7,14 +7,6 @@ import (
 
 templ RecipeList(isAdmin bool, recipes []types.Recipe) {
 	<div id="recipe-list" class="recipe-list">
-		switch len(recipes) {
-			case 0:
-				<p>Keine Rezepte</p>
-			case 1:
-				<p>1 Rezept</p>
-			default:
-				<p>{ fmt.Sprintf("%d", len(recipes)) } Rezepte</p>
-		}
 		if len(recipes) > 0 {
 			<div>
 				for _, recipe := range recipes {
@@ -23,4 +15,43 @@ templ RecipeList(isAdmin bool, recipes []types.Recipe) {
 			</div>
 		}
 	</div>
+}
+
+templ RecipeCount(recipes []types.Recipe, swapOob bool) {
+    <p 
+        id="recipe-count"
+        if swapOob {
+        hx-swap-oob="true"
+        }
+    >
+    switch len(recipes) {
+        case 0:
+            Keine Rezepte
+        case 1:
+            1 Rezept
+        default:
+            { fmt.Sprintf("%d", len(recipes)) } Rezepte
+    }
+    </p>
+}
+
+templ RecipeListTopSection(recipes []types.Recipe) {
+    <div class="recipe-list-top-section">
+        <div>
+            @RecipeCount(recipes, false)
+            <button
+                id="new-recipe-button"
+                class="icon-button with-label"
+                hx-get="/recipe/new"
+                hx-target="#content"
+                hx-trigger="click"
+                hx-push-url="true"
+                title="Neues Rezept"
+            >
+                Neu
+                <i class="fa-regular fa-pen-nib fa-xl"></i>
+            </button>
+        </div>
+        @SearchBar()
+    </div>
 }

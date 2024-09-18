@@ -3,9 +3,9 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 templ RecipesPage(isAdmin bool, recipes []types.Recipe) {
-	@Header(isAdmin, NewRecipeButton())
+	@Header(isAdmin)
 	<main>
-		@SearchBar()
+        @RecipeListTopSection(recipes)
 		@RecipeList(isAdmin, recipes)
 	</main>
 }

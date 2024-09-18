@@ -1,18 +1,16 @@
 package components
 
 templ SearchBar() {
-	<div class="search-bar-container">
-		<div class="search-bar">
-			<i class="fa-solid fa-magnifying-glass fa-xl"></i>
-			<input
-				placeholder="Rezept suchen..."
-				type="text"
-				name="query"
-				hx-trigger="keyup delay:500ms"
-				hx-post="/search"
-				hx-target="#recipe-list"
-				hx-swap="outerHTML"
-			/>
-		</div>
-	</div>
+    <div class="search-bar">
+        <i class="fa-solid fa-magnifying-glass fa-xl"></i>
+        <input
+            placeholder="Rezept suchen..."
+            type="text"
+            name="query"
+            hx-trigger="keyup delay:500ms"
+            hx-post="/search"
+            hx-target="#recipe-list"
+            hx-swap="outerHTML"
+        />
+    </div>
 }

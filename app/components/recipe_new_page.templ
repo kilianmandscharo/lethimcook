@@ -20,6 +20,7 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
         >
 			@Form(recipeForm)
 			<input 
+                id="recipe-new-submit"
                 type="submit" 
                 if isAdmin {
                 value="Rezept erstellen" 
@@ -29,5 +30,10 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
                 name="submit"
             />
 		</form>
+        <script>
+            loadFormFromLocalStorage();
+            attachFormEventListeners();
+            attachNewFormSubmitEventListener();
+        </script>
 	</main>
 }
