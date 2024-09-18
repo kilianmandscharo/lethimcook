@@ -2,7 +2,6 @@ package recipe
 
 import (
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/testutil"
@@ -34,18 +33,6 @@ func TestRenderRecipeListPage(t *testing.T) {
 
 func TestRenderRecipeNewPage(t *testing.T) {
 	recipeController := newTestRecipeController()
-
-	t.Run("not authorized", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc: recipeController.RenderRecipeNewPage,
-				Method:      http.MethodGet,
-				Route:       "/recipe/new",
-				StatusWant:  http.StatusUnauthorized,
-			},
-		)
-	})
 
 	t.Run("authorized", func(t *testing.T) {
 		testutil.AssertRequest(
@@ -186,14 +173,34 @@ func TestRenderRecipePage(t *testing.T) {
 func TestHandleCreateRecipe(t *testing.T) {
 	recipeController := newTestRecipeController()
 
-	t.Run("not authorized", func(t *testing.T) {
+	t.Run("not authorized and not pending", func(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc: recipeController.HandleCreateRecipe,
-				Method:      http.MethodPost,
-				Route:       "/recipe",
-				StatusWant:  http.StatusUnauthorized,
+				HandlerFunc:    recipeController.HandleCreateRecipe,
+				Method:         http.MethodPost,
+				Route:          "/recipe",
+				StatusWant:     http.StatusUnauthorized,
+				WithQueryParam: true,
+				QueryParam:     "?pending=false",
+			},
+		)
+	})
+
+	t.Run("not authorized but pending", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleCreateRecipe,
+				Method:         http.MethodPost,
+				Route:          "/recipe",
+				StatusWant:     http.StatusOK,
+				WithQueryParam: true,
+				QueryParam:     "?pending=true",
+				WithFormData:   true,
+				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				AssertMessage:  true,
+				MessageWant:    "Rezept eingereicht",
 			},
 		)
 	})
@@ -230,13 +237,116 @@ func TestHandleCreateRecipe(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:  recipeController.HandleCreateRecipe,
-				Method:       http.MethodPost,
-				Route:        "/recipe",
-				Authorized:   true,
-				StatusWant:   http.StatusOK,
-				WithFormData: true,
-				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				HandlerFunc:   recipeController.HandleCreateRecipe,
+				Method:        http.MethodPost,
+				Route:         "/recipe",
+				Authorized:    true,
+				StatusWant:    http.StatusOK,
+				WithFormData:  true,
+				FormData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				AssertMessage: true,
+				MessageWant:   "Rezept erstellt",
+			},
+		)
+	})
+}
+
+func TestHandleUpdatePending(t *testing.T) {
+	recipeController := newTestRecipeController()
+
+	t.Run("not authorized", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc: recipeController.HandleUpdatePending,
+				Method:      http.MethodPut,
+				Route:       "/recipe/:id/pending/:pending",
+				StatusWant:  http.StatusUnauthorized,
+			},
+		)
+	})
+
+	t.Run("no pending path param", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc: recipeController.HandleUpdatePending,
+				Method:      http.MethodPut,
+				Route:       "/recipe/:id/pending/:pending",
+				StatusWant:  http.StatusBadRequest,
+				Authorized:  true,
+			},
+		)
+	})
+
+	t.Run("no id path param", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleUpdatePending,
+				Method:         http.MethodPut,
+				Route:          "/recipe/:id/pending/:pending",
+				StatusWant:     http.StatusBadRequest,
+				Authorized:     true,
+				WithPathParam:  true,
+				PathParamName:  "pending",
+				PathParamValue: "true",
+			},
+		)
+	})
+
+	t.Run("no recipe found", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:     recipeController.HandleUpdatePending,
+				Method:          http.MethodPut,
+				Route:           "/recipe/:id/pending/:pending",
+				StatusWant:      http.StatusNotFound,
+				Authorized:      true,
+				WithPathParam:   true,
+				PathParamNames:  []string{"pending", "id"},
+				PathParamValues: []string{"false", "5"},
+			},
+		)
+	})
+
+	t.Run("valid with pending false", func(t *testing.T) {
+		assert.NoError(
+			t,
+			recipeController.recipeService.createRecipe(&types.Recipe{ID: 1}),
+		)
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:     recipeController.HandleUpdatePending,
+				Method:          http.MethodPut,
+				Route:           "/recipe/:id/pending/:pending",
+				StatusWant:      http.StatusOK,
+				Authorized:      true,
+				WithPathParam:   true,
+				PathParamNames:  []string{"pending", "id"},
+				PathParamValues: []string{"false", "1"},
+				AssertMessage:   true,
+				MessageWant:     "Rezept angenommen",
+			},
+		)
+	})
+
+	t.Run("valid with pending true", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:     recipeController.HandleUpdatePending,
+				Method:          http.MethodPut,
+				Route:           "/recipe/:id/pending/:pending",
+				StatusWant:      http.StatusOK,
+				Authorized:      true,
+				WithPathParam:   true,
+				PathParamNames:  []string{"pending", "id"},
+				PathParamValues: []string{"true", "1"},
+				AssertMessage:   true,
+				MessageWant:     "Rezept auf 'ausstehend' gesetzt",
 			},
 		)
 	})
@@ -257,34 +367,6 @@ func TestHandleUpdateRecipe(t *testing.T) {
 		)
 	})
 
-	t.Run("no form data", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc: recipeController.HandleUpdateRecipe,
-				Method:      http.MethodPut,
-				Route:       "/recipe",
-				Authorized:  true,
-				StatusWant:  http.StatusBadRequest,
-			},
-		)
-	})
-
-	t.Run("invalid form data", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc:  recipeController.HandleUpdateRecipe,
-				Method:       http.MethodPut,
-				Route:        "/recipe",
-				Authorized:   true,
-				StatusWant:   http.StatusBadRequest,
-				WithFormData: true,
-				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=xx",
-			},
-		)
-	})
-
 	t.Run("invalid id", func(t *testing.T) {
 		testutil.AssertRequest(
 			t,
@@ -297,8 +379,70 @@ func TestHandleUpdateRecipe(t *testing.T) {
 				PathParamValue: "xx",
 				Authorized:     true,
 				StatusWant:     http.StatusBadRequest,
-				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				AssertMessage:  true,
+				MessageWant:    "Ungültiges Pfadparameter",
+			},
+		)
+	})
+
+	t.Run("recipe not found", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleUpdateRecipe,
+				Method:         http.MethodPut,
+				Route:          "/recipe",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				Authorized:     true,
+				StatusWant:     http.StatusNotFound,
+				AssertMessage:  true,
+				MessageWant:    "Rezept nicht gefunden",
+			},
+		)
+	})
+
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{}),
+	)
+
+	t.Run("no form data", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleUpdateRecipe,
+				Method:         http.MethodPut,
+				Route:          "/recipe",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				Authorized:     true,
+				StatusWant:     http.StatusBadRequest,
+				AssertMessage:  true,
+				MessageWant:    "Fehlerhaftes Formular",
+			},
+		)
+	})
+
+	t.Run("invalid form data", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:         recipeController.HandleUpdateRecipe,
+				Method:              http.MethodPut,
+				Route:               "/recipe",
+				WithPathParam:       true,
+				PathParamName:       "id",
+				PathParamValue:      "1",
+				Authorized:          true,
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusBadRequest,
+				WithFormData:        true,
+				FormData:            "title=title&description=description&ingredients=ingredients&&duration=xx",
+				AssertMessage:       true,
+				MessageWant:         "Fehlerhaftes Formular",
 			},
 		)
 	})
@@ -310,16 +454,16 @@ func TestHandleUpdateRecipe(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:    recipeController.HandleUpdateRecipe,
-				Method:         http.MethodPut,
-				Route:          "/recipe",
-				WithPathParam:  true,
-				PathParamName:  "id",
-				PathParamValue: "1",
-				Authorized:     true,
-				StatusWant:     http.StatusOK,
-				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				HandlerFunc:     recipeController.HandleUpdateRecipe,
+				Method:          http.MethodPut,
+				Route:           "/recipe",
+				WithPathParam:   true,
+				PathParamNames:  []string{"id", "pending"},
+				PathParamValues: []string{"1", "false"},
+				Authorized:      true,
+				StatusWant:      http.StatusOK,
+				WithFormData:    true,
+				FormData:        "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
 			},
 		)
 	})
@@ -375,11 +519,13 @@ func TestHandleDeleteRecipe(t *testing.T) {
 		)
 	})
 
-	err := recipeController.recipeService.createRecipe(&types.Recipe{})
-	assert.NoError(t, err)
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{}),
+	)
 
 	t.Run("valid request without force", func(t *testing.T) {
-		rr, _ := testutil.AssertRequest(
+		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
 				HandlerFunc:    recipeController.HandleDeleteRecipe,
@@ -390,51 +536,10 @@ func TestHandleDeleteRecipe(t *testing.T) {
 				PathParamValue: "1",
 				StatusWant:     http.StatusOK,
 				Authorized:     true,
+				AssertMessage:  true,
+				MessageWant:    "Rezept entfernt",
 			},
 		)
-		assert.True(t, strings.Contains(rr.Body.String(), "Löschen bestätigen"))
-	})
-
-	t.Run("valid request with cancel", func(t *testing.T) {
-		rr, _ := testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc:    recipeController.HandleDeleteRecipe,
-				Method:         http.MethodDelete,
-				Route:          "/recipe",
-				WithPathParam:  true,
-				PathParamName:  "id",
-				PathParamValue: "1",
-				WithQueryParam: true,
-				QueryParam:     "?cancel=true",
-				StatusWant:     http.StatusOK,
-				Authorized:     true,
-			},
-		)
-		resBody := rr.Body.String()
-		assert.False(t, strings.Contains(resBody, "Löschen bestätigen"))
-		assert.True(t, len(resBody) != 0)
-	})
-
-	t.Run("valid request with force", func(t *testing.T) {
-		rr, _ := testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc:    recipeController.HandleDeleteRecipe,
-				Method:         http.MethodDelete,
-				Route:          "/recipe",
-				WithPathParam:  true,
-				PathParamName:  "id",
-				PathParamValue: "1",
-				WithQueryParam: true,
-				QueryParam:     "?force=true",
-				StatusWant:     http.StatusOK,
-				Authorized:     true,
-			},
-		)
-		resBody := rr.Body.String()
-		assert.False(t, strings.Contains(resBody, "Löschen bestätigen"))
-		assert.NotEqual(t, 0, len(resBody))
 	})
 }
 

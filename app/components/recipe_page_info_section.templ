@@ -1,0 +1,36 @@
+package components
+
+import (
+	"fmt"
+	"github.com/kilianmandscharo/lethimcook/types"
+)
+
+templ RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) {
+    <section class="recipe-heading">
+        <div class="recipe-heading-title">
+            <h2>{ recipe.Title }</h2>
+            @RecipePageInfoSectionInfoItem("Autor", recipe.Author)
+        </div>
+        if isAdmin {
+        @divider()
+        }
+        @RecipePageControls(isAdmin, recipe.Pending, recipe.ID)
+        @divider()
+        <div 
+            if len(tags) == 0 {
+            class="recipe-info-container justify-right"
+            } else {
+            class="recipe-info-container"
+            }
+        >
+            @RecipeTags(tags)
+            <div class="recipe-info-right-section">
+                @RecipePageInfoSectionInfoItem("Beschreibung", recipe.Description)
+                @RecipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration))
+                @RecipePageInfoSectionInfoItem("Quelle", recipe.Source)
+            </div>
+        </div>
+        @divider()
+    </section>
+}
+

@@ -20,19 +20,25 @@ func newTestRecipeService() recipeService {
 	}
 }
 
-func newTestContext(t *testing.T, formData string, pathId string) echo.Context {
+type newTestContextOptions struct {
+	formData    string
+	pathId      string
+	pathPending string
+}
+
+func newTestContext(t *testing.T, options newTestContextOptions) echo.Context {
 	e := echo.New()
 	w := httptest.NewRecorder()
 
 	var body io.Reader
-	body = bytes.NewBufferString(formData)
+	body = bytes.NewBufferString(options.formData)
 	req, err := http.NewRequest(http.MethodPost, "", body)
 	assert.NoError(t, err)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 
 	c := e.NewContext(req, w)
-	c.SetParamNames("id")
-	c.SetParamValues(pathId)
+	c.SetParamNames("id", "pending")
+	c.SetParamValues(options.pathId, options.pathPending)
 
 	return c
 }
@@ -62,7 +68,7 @@ func TestGetFilteredRecipes(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		filteredRecipes, err := recipeService.getFilteredRecipes(test.query)
+		filteredRecipes, err := recipeService.getFilteredRecipes(test.query, false)
 		assert.NoError(t, err)
 		assert.Equal(t, test.hits, len(filteredRecipes))
 	}
@@ -71,7 +77,9 @@ func TestGetFilteredRecipes(t *testing.T) {
 func TestGetPathId(t *testing.T) {
 	// Given
 	recipeService := newTestRecipeService()
-	c := newTestContext(t, "", "xx")
+	c := newTestContext(t, newTestContextOptions{
+		pathId: "xx",
+	})
 
 	// When
 	_, err := recipeService.getPathId(c)
@@ -84,7 +92,9 @@ func TestGetPathId(t *testing.T) {
 	assert.Equal(t, "Ungültiges Pfadparameter", appError.UserMessage)
 
 	// Given
-	c = newTestContext(t, "", "1")
+	c = newTestContext(t, newTestContextOptions{
+		pathId: "1",
+	})
 
 	// When
 	id, err := recipeService.getPathId(c)
@@ -94,32 +104,69 @@ func TestGetPathId(t *testing.T) {
 	assert.Equal(t, uint(1), id)
 }
 
+func TestGetPathPending(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+	c := newTestContext(t, newTestContextOptions{})
+
+	// When
+	_, err := recipeService.getPathPending(c)
+
+	// Then
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
+	assert.Equal(t, "Fehlendes Pfadparameter", appError.UserMessage)
+
+	// Given
+	c = newTestContext(t, newTestContextOptions{
+		pathPending: "xx",
+	})
+
+	// When
+	_, err = recipeService.getPathPending(c)
+
+	// Then
+	assert.Error(t, err)
+	appError, ok = err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
+	assert.Equal(t, "Ungültiges Pfadparameter", appError.UserMessage)
+
+	// Given
+	c = newTestContext(t, newTestContextOptions{
+		pathPending: "true",
+	})
+
+	// When
+	pending, err := recipeService.getPathPending(c)
+
+	// Then
+	assert.NoError(t, err)
+	assert.True(t, pending)
+
+	// Given
+	c = newTestContext(t, newTestContextOptions{
+		pathPending: "false",
+	})
+
+	// When
+	pending, err = recipeService.getPathPending(c)
+
+	// Then
+	assert.NoError(t, err)
+	assert.False(t, pending)
+}
+
 func TestParseFormData(t *testing.T) {
 	// Given
 	recipeService := newTestRecipeService()
 
 	testCases := []struct {
-		formData      string
-		withPathParam bool
-		pathParamId   string
-		shouldError   bool
-		formErrors    []error
+		formData   string
+		formErrors []error
 	}{
-		{
-			formData: testutil.ConstructTestFormDataString(
-				testutil.TestFormDataStringOptions{},
-			),
-			withPathParam: true,
-			pathParamId:   "1",
-			shouldError:   false,
-		},
-		{
-			formData: testutil.ConstructTestFormDataString(
-				testutil.TestFormDataStringOptions{},
-			),
-			withPathParam: true,
-			shouldError:   true,
-		},
 		{
 			formData: testutil.ConstructTestFormDataString(
 				testutil.TestFormDataStringOptions{
@@ -189,10 +236,12 @@ func TestParseFormData(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		c := newTestContext(t, test.formData, test.pathParamId)
-		_, formErrors, err := recipeService.parseFormData(c, test.withPathParam)
+		c := newTestContext(t, newTestContextOptions{
+			formData: test.formData,
+		})
+		_, formErrors, err := recipeService.parseFormData(c, false, 0, false)
 
-		assert.Equal(t, test.shouldError, err != nil)
+		assert.NoError(t, err)
 		assert.Equal(t, len(test.formErrors), len(formErrors))
 
 		for _, err := range test.formErrors {
@@ -209,10 +258,15 @@ func TestParseFormData(t *testing.T) {
 
 	// Given
 	formData := "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=20"
-	c := newTestContext(t, formData, "1")
+	c := newTestContext(t, newTestContextOptions{
+		formData: formData,
+		pathId:   "1",
+	})
 
 	// When
-	parsedRecipe, _, err := recipeService.parseFormData(c, true)
+	parsedRecipe, _, err := recipeService.parseFormData(c, true, 1, true)
+
+	// Then
 	assert.NoError(t, err)
 	assertRecipesEqual(t, types.Recipe{
 		ID:           uint(1),
@@ -221,5 +275,32 @@ func TestParseFormData(t *testing.T) {
 		Instructions: "instructions",
 		Ingredients:  "ingredients",
 		Duration:     20,
+		Pending:      true,
 	}, parsedRecipe)
+}
+
+func TestReadAllRecipesService(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+	assert.NoError(t, recipeService.db.createRecipe(&types.Recipe{
+		Pending: true,
+	}))
+	assert.NoError(t, recipeService.db.createRecipe(&types.Recipe{
+		Pending: false,
+	}))
+
+	// When
+	recipes, err := recipeService.readAllRecipes(false)
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(recipes))
+	assert.False(t, recipes[0].Pending)
+
+	// When
+	recipes, err = recipeService.readAllRecipes(true)
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(recipes))
 }

@@ -5,8 +5,8 @@ import (
 	"github.com/kilianmandscharo/lethimcook/types"
 )
 
-templ RecipeEditPage(id uint, recipeForm []types.FormElement) {
-	@Header()
+templ RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) {
+	@Header(isAdmin)
 	<main>
         <div class="label-with-icon">
             <h1>Rezept bearbeiten</h1>

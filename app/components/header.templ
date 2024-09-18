@@ -1,6 +1,6 @@
 package components
 
-templ Header(buttons ...templ.Component) {
+templ Header(isAdmin bool, buttons ...templ.Component) {
 	<header>
 		<div>
 			<div 
@@ -19,7 +19,7 @@ templ Header(buttons ...templ.Component) {
 				for _, button := range buttons {
 					@button
 				}
-				@AdminButton()
+				@AdminButton(isAdmin)
 				@HomeButton()
 			</div>
 		</div>
