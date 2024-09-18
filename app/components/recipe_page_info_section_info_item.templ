@@ -1,0 +1,13 @@
+package components
+
+templ RecipePageInfoSectionInfoItem(label, value string) {
+    if len(value) > 0 {
+        <div class="recipe-info-item">
+            <div class="recipe-info-item-label">
+                <i class="fa-solid fa-caret-right success"></i>
+                <p>{ label }:</p>
+            </div>
+            <p>{ value }</p>
+        </div>
+    }
+}

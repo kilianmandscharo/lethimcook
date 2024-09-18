@@ -2,12 +2,14 @@ package testutil
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,9 +27,13 @@ type RequestOptions struct {
 	WithPathParam       bool
 	PathParamName       string
 	PathParamValue      string
+	PathParamNames      []string
+	PathParamValues     []string
 	WithQueryParam      bool
 	QueryParam          string
 	HeaderErrorCodeWant int
+	AssertMessage       bool
+	MessageWant         string
 }
 
 func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseRecorder, echo.Context) {
@@ -64,6 +70,10 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 	if options.WithPathParam {
 		c.SetParamNames(options.PathParamName)
 		c.SetParamValues(options.PathParamValue)
+		if len(options.PathParamNames) > 0 && len(options.PathParamValues) > 0 {
+			c.SetParamNames(options.PathParamNames...)
+			c.SetParamValues(options.PathParamValues...)
+		}
 	}
 
 	assert.NoError(t, options.HandlerFunc(c))
@@ -74,6 +84,16 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 		errorCodes := rr.Header()["Errorcode"]
 		assert.Equal(t, 1, len(errorCodes))
 		assert.Equal(t, strconv.Itoa(options.HeaderErrorCodeWant), errorCodes[0])
+	}
+
+	if options.AssertMessage {
+		headerValue := rr.Header().Get("HX-Trigger")
+		var payload servutil.TriggerPayload
+		err := json.Unmarshal([]byte(headerValue), &payload)
+		var message servutil.ResponseMessage
+		err = json.Unmarshal([]byte(payload.Message), &message)
+		assert.NoError(t, err)
+		assert.Equal(t, options.MessageWant, message.Value)
 	}
 
 	return rr, c

@@ -58,12 +58,12 @@ type RenderComponentOptions struct {
 	Err       error
 }
 
-type responseMessage struct {
+type ResponseMessage struct {
 	Value   string `json:"value"`
 	IsError bool   `json:"isError"`
 }
 
-type triggerPayload struct {
+type TriggerPayload struct {
 	Message string `json:"message"`
 }
 
@@ -90,13 +90,13 @@ func RenderComponent(options RenderComponentOptions) error {
 	}
 
 	if len(message) > 0 {
-		message, err := json.Marshal(responseMessage{
+		message, err := json.Marshal(ResponseMessage{
 			Value:   message,
 			IsError: options.Err != nil,
 		})
 
 		if err == nil {
-			payload, err := json.Marshal(triggerPayload{Message: string(message)})
+			payload, err := json.Marshal(TriggerPayload{Message: string(message)})
 
 			if err == nil {
 				options.Context.Response().Header().Set(

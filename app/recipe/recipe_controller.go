@@ -3,6 +3,7 @@ package recipe
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -214,6 +215,9 @@ func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
 			errutil.AddMessageToAppError(err, "failed at HandleToggleRecipe()"),
 		)
 	}
+
+    log.Println(c.ParamNames())
+    log.Println(c.ParamValues())
 
 	pending, err := rc.recipeService.getPathPending(c)
 	if err != nil {

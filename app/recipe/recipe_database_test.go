@@ -111,6 +111,55 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(recipes))
 	assertRecipesEqual(t, r, recipes[0])
+
+	// Given
+	r = types.NewTestRecipe()
+	r.Pending = true
+	assert.NoError(t, db.createRecipe(&r))
+
+	// When
+	recipes, err = db.readAllRecipes()
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(recipes))
+	assert.False(t, recipes[0].Pending)
+}
+
+func TestReadAllRecipesWithPending(t *testing.T) {
+	// Given
+	db := newTestRecipeDatabase()
+
+	// When
+	recipes, err := db.readAllRecipesWithPending()
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(recipes))
+
+	// Given
+	r := types.NewTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
+
+	// When
+	recipes, err = db.readAllRecipesWithPending()
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(recipes))
+	assertRecipesEqual(t, r, recipes[0])
+
+	// Given
+	r = types.NewTestRecipe()
+	r.Pending = true
+	assert.NoError(t, db.createRecipe(&r))
+
+	// When
+	recipes, err = db.readAllRecipesWithPending()
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(recipes))
 }
 
 func TestDeleteRecipe(t *testing.T) {
@@ -160,4 +209,29 @@ func TestUpdateRecipe(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assertRecipesEqual(t, r, retrievedRecipe)
+}
+
+func TestUpdatePending(t *testing.T) {
+	// Given
+	db := newTestRecipeDatabase()
+
+	// When
+	err := db.updatePending(1, true)
+
+	// Then
+	assert.Error(t, err)
+	appError, ok := err.(*errutil.AppError)
+	assert.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
+	assert.Equal(t, "Rezept nicht gefunden", appError.UserMessage)
+
+	// Given
+	r := types.NewTestRecipe()
+	assert.NoError(t, db.createRecipe(&r))
+
+	// When
+	err = db.updatePending(1, true)
+
+	// Then
+	assert.NoError(t, err)
 }
