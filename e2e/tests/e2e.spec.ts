@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { describe } from "node:test";
 
 const recipe = {
   title: "Naan",
@@ -289,4 +290,15 @@ test("create pending recipe", async ({ page }) => {
   navigateToHomePage(page);
   await expect(page.getByText("Keine Rezepte")).toBeVisible();
   await expect(page.locator(".recipe-list-item")).toHaveCount(0);
+});
+
+test("clean up", async ({ page }) => {
+  await page.goto("");
+  await navigateToAdminPage(page);
+  await login(page, "admin");
+  await navigateToHomePage(page);
+  await navigateToRecipePage(page);
+  await clickIconButton(page, "Rezept ablehnen");
+  page.on("dialog", (dialog) => dialog.accept());
+  await clickIconButton(page, "Rezept ablehnen");
 });
