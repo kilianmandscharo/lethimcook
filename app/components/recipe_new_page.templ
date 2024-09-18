@@ -12,11 +12,11 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
 		<form 
             if isAdmin {
             hx-post="/recipe" 
-            hx-target="#content"
             } else {
             hx-post="/recipe?pending=true" 
-            hx-target="main"
+            hx-confirm="Rezept einreichen? Nach der Freischaltung durch den Admin wird das Rezept auf der Hauptseite erscheinen."
             }
+            hx-target="#content"
         >
 			@Form(recipeForm)
 			<input 

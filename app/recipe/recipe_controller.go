@@ -189,11 +189,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 	}
 
 	if pending {
-		return servutil.RenderComponent(servutil.RenderComponentOptions{
-			Context:   c,
-			Component: components.RecipeCreationSuccess(),
-			Message:   "Rezept eingereicht",
-		})
+		return rc.renderRecipeListPageHelper(c, "Rezept eingereicht")
 	}
 	return rc.renderRecipeListPageHelper(c, "Rezept erstellt")
 }
