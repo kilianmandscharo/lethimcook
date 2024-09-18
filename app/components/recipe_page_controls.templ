@@ -3,19 +3,19 @@ package components
 import "fmt"
 
 templ RecipePageControls(isAdmin bool, isPending bool, recipeId uint) {
-	<div class="recipe-page-controls">
-		if isAdmin {
-			if isPending {
+    if isAdmin {
+        <div class="recipe-page-controls">
+            if isPending {
                 @editRecipeButton(recipeId)
-				@PendingRecipeAcceptButton(recipeId)
-				@PendingRecipeDenyButton(recipeId)
-			} else {
+                @PendingRecipeAcceptButton(recipeId)
+                @PendingRecipeDenyButton(recipeId)
+            } else {
                 @editRecipeButton(recipeId)
-				@RecipeResetPendingButton(recipeId)
-				@RecipeDeleteButton(recipeId)
-			}
-		}
-	</div>
+                @RecipeResetPendingButton(recipeId)
+                @RecipeDeleteButton(recipeId)
+            }
+        </div>
+    }
 }
 
 templ PendingRecipeAcceptButton(recipeId uint) {
