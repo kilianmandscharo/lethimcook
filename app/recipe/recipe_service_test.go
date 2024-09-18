@@ -164,27 +164,9 @@ func TestParseFormData(t *testing.T) {
 	recipeService := newTestRecipeService()
 
 	testCases := []struct {
-		formData      string
-		withPathParam bool
-		pathParamId   string
-		shouldError   bool
-		formErrors    []error
+		formData   string
+		formErrors []error
 	}{
-		{
-			formData: testutil.ConstructTestFormDataString(
-				testutil.TestFormDataStringOptions{},
-			),
-			withPathParam: true,
-			pathParamId:   "1",
-			shouldError:   false,
-		},
-		{
-			formData: testutil.ConstructTestFormDataString(
-				testutil.TestFormDataStringOptions{},
-			),
-			withPathParam: true,
-			shouldError:   true,
-		},
 		{
 			formData: testutil.ConstructTestFormDataString(
 				testutil.TestFormDataStringOptions{
@@ -256,11 +238,10 @@ func TestParseFormData(t *testing.T) {
 	for _, test := range testCases {
 		c := newTestContext(t, newTestContextOptions{
 			formData: test.formData,
-			pathId:   test.pathParamId,
 		})
-		_, formErrors, err := recipeService.parseFormData(c, test.withPathParam)
+		_, formErrors, err := recipeService.parseFormData(c, false, 0, false)
 
-		assert.Equal(t, test.shouldError, err != nil)
+		assert.NoError(t, err)
 		assert.Equal(t, len(test.formErrors), len(formErrors))
 
 		for _, err := range test.formErrors {
@@ -283,7 +264,9 @@ func TestParseFormData(t *testing.T) {
 	})
 
 	// When
-	parsedRecipe, _, err := recipeService.parseFormData(c, true)
+	parsedRecipe, _, err := recipeService.parseFormData(c, true, 1, true)
+
+	// Then
 	assert.NoError(t, err)
 	assertRecipesEqual(t, types.Recipe{
 		ID:           uint(1),
@@ -292,6 +275,7 @@ func TestParseFormData(t *testing.T) {
 		Instructions: "instructions",
 		Ingredients:  "ingredients",
 		Duration:     20,
+		Pending:      true,
 	}, parsedRecipe)
 }
 
@@ -305,18 +289,18 @@ func TestReadAllRecipesService(t *testing.T) {
 		Pending: false,
 	}))
 
-    // When
-    recipes, err := recipeService.readAllRecipes(false)
+	// When
+	recipes, err := recipeService.readAllRecipes(false)
 
-    // Then
-    assert.NoError(t, err)
-    assert.Equal(t, 1, len(recipes))
-    assert.False(t, recipes[0].Pending)
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(recipes))
+	assert.False(t, recipes[0].Pending)
 
-    // When
-    recipes, err = recipeService.readAllRecipes(true)
+	// When
+	recipes, err = recipeService.readAllRecipes(true)
 
-    // Then
-    assert.NoError(t, err)
-    assert.Equal(t, 2, len(recipes))
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(recipes))
 }

@@ -367,34 +367,6 @@ func TestHandleUpdateRecipe(t *testing.T) {
 		)
 	})
 
-	t.Run("no form data", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc: recipeController.HandleUpdateRecipe,
-				Method:      http.MethodPut,
-				Route:       "/recipe",
-				Authorized:  true,
-				StatusWant:  http.StatusBadRequest,
-			},
-		)
-	})
-
-	t.Run("invalid form data", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc:  recipeController.HandleUpdateRecipe,
-				Method:       http.MethodPut,
-				Route:        "/recipe",
-				Authorized:   true,
-				StatusWant:   http.StatusBadRequest,
-				WithFormData: true,
-				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=xx",
-			},
-		)
-	})
-
 	t.Run("invalid id", func(t *testing.T) {
 		testutil.AssertRequest(
 			t,
@@ -407,8 +379,70 @@ func TestHandleUpdateRecipe(t *testing.T) {
 				PathParamValue: "xx",
 				Authorized:     true,
 				StatusWant:     http.StatusBadRequest,
-				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				AssertMessage:  true,
+				MessageWant:    "Ungültiges Pfadparameter",
+			},
+		)
+	})
+
+	t.Run("recipe not found", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleUpdateRecipe,
+				Method:         http.MethodPut,
+				Route:          "/recipe",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				Authorized:     true,
+				StatusWant:     http.StatusNotFound,
+				AssertMessage:  true,
+				MessageWant:    "Rezept nicht gefunden",
+			},
+		)
+	})
+
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{}),
+	)
+
+	t.Run("no form data", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleUpdateRecipe,
+				Method:         http.MethodPut,
+				Route:          "/recipe",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				Authorized:     true,
+				StatusWant:     http.StatusBadRequest,
+				AssertMessage:  true,
+				MessageWant:    "Fehlerhaftes Formular",
+			},
+		)
+	})
+
+	t.Run("invalid form data", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:         recipeController.HandleUpdateRecipe,
+				Method:              http.MethodPut,
+				Route:               "/recipe",
+				WithPathParam:       true,
+				PathParamName:       "id",
+				PathParamValue:      "1",
+				Authorized:          true,
+				StatusWant:          http.StatusOK,
+				HeaderErrorCodeWant: http.StatusBadRequest,
+				WithFormData:        true,
+				FormData:            "title=title&description=description&ingredients=ingredients&&duration=xx",
+				AssertMessage:       true,
+				MessageWant:         "Fehlerhaftes Formular",
 			},
 		)
 	})
@@ -420,16 +454,16 @@ func TestHandleUpdateRecipe(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
-				HandlerFunc:    recipeController.HandleUpdateRecipe,
-				Method:         http.MethodPut,
-				Route:          "/recipe",
-				WithPathParam:  true,
-				PathParamName:  "id",
-				PathParamValue: "1",
-				Authorized:     true,
-				StatusWant:     http.StatusOK,
-				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				HandlerFunc:     recipeController.HandleUpdateRecipe,
+				Method:          http.MethodPut,
+				Route:           "/recipe",
+				WithPathParam:   true,
+				PathParamNames:  []string{"id", "pending"},
+				PathParamValues: []string{"1", "false"},
+				Authorized:      true,
+				StatusWant:      http.StatusOK,
+				WithFormData:    true,
+				FormData:        "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
 			},
 		)
 	})

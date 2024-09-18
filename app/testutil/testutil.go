@@ -88,12 +88,16 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 
 	if options.AssertMessage {
 		headerValue := rr.Header().Get("HX-Trigger")
-		var payload servutil.TriggerPayload
-		err := json.Unmarshal([]byte(headerValue), &payload)
-		var message servutil.ResponseMessage
-		err = json.Unmarshal([]byte(payload.Message), &message)
-		assert.NoError(t, err)
-		assert.Equal(t, options.MessageWant, message.Value)
+		if len(headerValue) > 0 {
+			var payload servutil.TriggerPayload
+			err := json.Unmarshal([]byte(headerValue), &payload)
+			var message servutil.ResponseMessage
+			err = json.Unmarshal([]byte(payload.Message), &message)
+			assert.NoError(t, err)
+			assert.Equal(t, options.MessageWant, message.Value)
+		} else {
+			assert.Equal(t, rr.Body.String(), options.MessageWant)
+		}
 	}
 
 	return rr, c

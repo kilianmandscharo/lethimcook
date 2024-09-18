@@ -140,7 +140,7 @@ func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {
 	return rs.readRecipe(id)
 }
 
-func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recipe, map[string]error, error) {
+func (rs *recipeService) parseFormData(c echo.Context, withId bool, id uint, pending bool) (types.Recipe, map[string]error, error) {
 	var recipe types.Recipe
 
 	formErrors := make(map[string]error)
@@ -175,7 +175,6 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recip
 	}
 
 	duration, err := strconv.Atoi(c.Request().FormValue("duration"))
-
 	if err != nil {
 		formErrors["duration"] = errutil.FormErrorNoDuration
 		recipe.Duration = 0
@@ -183,13 +182,11 @@ func (rs *recipeService) parseFormData(c echo.Context, withID bool) (types.Recip
 		recipe.Duration = duration
 	}
 
-	if withID {
-		id, err := rs.getPathId(c)
-		if err != nil {
-			return recipe, formErrors, err
-		}
+	if withId {
 		recipe.ID = id
 	}
+
+    recipe.Pending = pending
 
 	return recipe, formErrors, nil
 }

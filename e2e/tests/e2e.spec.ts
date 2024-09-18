@@ -54,7 +54,7 @@ type Recipe = typeof recipe;
 
 async function navigateToAdminPage(page: Page) {
   await page.goto("");
-  await page.locator("#admin-button").click();
+  await clickIconButton(page, "Admin");
 }
 
 async function login(page: Page, password: string) {
@@ -119,11 +119,11 @@ async function testInvalidPassword(page: Page, invalidPassword: string) {
 }
 
 async function navigateToHomePage(page: Page) {
-  await page.locator("#home-button").click();
+  await clickIconButton(page, "Home");
 }
 
-async function createRecipe(page: Page) {
-  await page.locator("#new-recipe-button").click();
+async function createRecipe(page: Page, pending?: boolean) {
+  await clickIconButton(page, "Neues Rezept");
 
   await page.getByPlaceholder("Titel").fill(recipe.title);
   await page.getByPlaceholder("Beschreibung").fill(recipe.description);
@@ -136,7 +136,11 @@ async function createRecipe(page: Page) {
   await page.getByPlaceholder("Zutaten").fill(recipe.ingredients);
   await page.getByPlaceholder("Anleitung").fill(recipe.instructions);
 
-  await page.getByRole("button", { name: "Rezept erstellen" }).click();
+  await page
+    .getByRole("button", {
+      name: pending ? "Rezept einreichen" : "Rezept erstellen",
+    })
+    .click();
 }
 
 async function checkRecipeList(page: Page, testRecipe: Recipe) {
@@ -153,16 +157,14 @@ async function navigateToRecipePage(page: Page) {
 
 async function checkRecipePage(page: Page, testRecipe: Recipe) {
   await expect(page.getByText(testRecipe.title)).toBeVisible();
-  await expect(
-    page.getByText(`Zubereitungszeit: ${testRecipe.duration} Minuten`),
-  ).toBeVisible();
-  await expect(page.getByText(`Autor: ${testRecipe.author}`)).toBeVisible();
-  await expect(page.getByText(`Quelle: ${testRecipe.source}`)).toBeVisible();
+  await expect(page.getByText(`${testRecipe.duration} Minuten`)).toBeVisible();
+  await expect(page.getByText(`${testRecipe.author}`)).toBeVisible();
+  await expect(page.getByText(`${testRecipe.source}`)).toBeVisible();
   await expect(page.getByText(testRecipe.description)).toBeVisible();
 }
 
 async function navigateToEditPage(page: Page) {
-  await page.locator("#edit-recipe-button").click();
+  await clickIconButton(page, "Rezept bearbeiten");
 }
 
 async function editRecipe(page: Page) {
@@ -178,17 +180,28 @@ async function editRecipe(page: Page) {
 
 async function deleteRecipe(page: Page) {
   await page.goto("");
-  await page.locator("#recipe-delete-button").click();
-  await page.getByRole("button", { name: "Löschen bestätigen" }).click();
+  await navigateToRecipePage(page);
+  await clickIconButton(page, "Rezept löschen");
+  page.on("dialog", (dialog) => dialog.accept());
+  await clickIconButton(page, "Rezept löschen");
   await page.goto("");
   await expect(page.getByText("Keine Rezepte")).toBeVisible();
   await expect(page.locator(".recipe-list-item")).toHaveCount(0);
 }
 
-test("e2e test", async ({ page }) => {
+async function clickIconButton(page: Page, title: string) {
+  const button = page.getByTitle(title);
+  await expect(button).toBeVisible();
+  await button.click();
+}
+
+test("check title", async ({ page }) => {
   await page.goto("");
   await expect(page).toHaveTitle(/Let Him Cook/);
+});
 
+test("admin tests", async ({ page }) => {
+  await page.goto("");
   await navigateToAdminPage(page);
 
   await testInvalidPasswordChange(page);
@@ -204,18 +217,76 @@ test("e2e test", async ({ page }) => {
   await changePassword(page, "nimda", "admin");
   await testInvalidPassword(page, "nimda");
   await login(page, "admin");
+});
 
+test("create recipe", async ({ page }) => {
+  await page.goto("");
+  await navigateToAdminPage(page);
+  await login(page, "admin");
   await navigateToHomePage(page);
   await createRecipe(page);
   await checkRecipeList(page, recipe);
   await navigateToRecipePage(page);
   await checkRecipePage(page, recipe);
+});
 
+test("edit recipe", async ({ page }) => {
+  await page.goto("");
+  await navigateToAdminPage(page);
+  await login(page, "admin");
+  await navigateToHomePage(page);
+  await navigateToRecipePage(page);
   await navigateToEditPage(page);
   await editRecipe(page);
   await checkRecipePage(page, editedRecipe);
   await navigateToHomePage(page);
   await checkRecipeList(page, editedRecipe);
+});
 
+test("delete recipe", async ({ page }) => {
+  await page.goto("");
+  await navigateToAdminPage(page);
+  await login(page, "admin");
   await deleteRecipe(page);
+});
+
+test("create pending recipe", async ({ page }) => {
+  page.on("dialog", (dialog) => dialog.accept());
+
+  await page.goto("");
+  await createRecipe(page, true);
+
+  navigateToHomePage(page);
+  await expect(page.getByText("Keine Rezepte")).toBeVisible();
+  await expect(page.locator(".recipe-list-item")).toHaveCount(0);
+
+  await navigateToAdminPage(page);
+  await login(page, "admin");
+
+  navigateToHomePage(page);
+  await checkRecipeList(page, recipe);
+
+  await navigateToRecipePage(page);
+  await clickIconButton(page, "Rezept akzeptieren");
+
+  await navigateToAdminPage(page);
+  await logout(page);
+
+  navigateToHomePage(page);
+  await checkRecipeList(page, recipe);
+
+  await navigateToAdminPage(page);
+  await login(page, "admin");
+  navigateToHomePage(page);
+  await navigateToRecipePage(page);
+  const button = page.getByTitle("Rezept auf 'ausstehend' setzen");
+  await expect(button).toBeVisible();
+  await button.click();
+
+  await navigateToAdminPage(page);
+  await logout(page);
+
+  navigateToHomePage(page);
+  await expect(page.getByText("Keine Rezepte")).toBeVisible();
+  await expect(page.locator(".recipe-list-item")).toHaveCount(0);
 });

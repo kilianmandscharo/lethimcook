@@ -160,14 +160,13 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 		})
 	}
 
-	newRecipe, formErrors, err := rc.recipeService.parseFormData(c, false)
+	newRecipe, formErrors, err := rc.recipeService.parseFormData(c, false, 0, pending)
 	if err != nil {
 		return servutil.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleCreateRecipe()"),
 		)
 	}
-	newRecipe.Pending = pending
 
 	if len(formErrors) > 0 {
 		formElements := rc.recipeService.createRecipeForm(newRecipe, formErrors)
@@ -216,8 +215,8 @@ func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
 		)
 	}
 
-    log.Println(c.ParamNames())
-    log.Println(c.ParamValues())
+	log.Println(c.ParamNames())
+	log.Println(c.ParamValues())
 
 	pending, err := rc.recipeService.getPathPending(c)
 	if err != nil {
@@ -251,12 +250,26 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		})
 	}
 
-	updatedRecipe, formErrors, err := rc.recipeService.parseFormData(c, true)
-	if err != nil {
+	createError := func(err error) error {
 		return servutil.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleUpdateRecipe()"),
 		)
+	}
+
+	id, err := rc.recipeService.getPathId(c)
+	if err != nil {
+		return createError(err)
+	}
+
+	recipe, err := rc.recipeService.readRecipe(id)
+	if err != nil {
+		return createError(err)
+	}
+
+	updatedRecipe, formErrors, err := rc.recipeService.parseFormData(c, true, id, recipe.Pending)
+	if err != nil {
+		return createError(err)
 	}
 
 	if len(formErrors) > 0 {
@@ -273,10 +286,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	}
 
 	if err := rc.recipeService.updateRecipe(&updatedRecipe); err != nil {
-		return servutil.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at HandleUpdateRecipe()"),
-		)
+		return createError(err)
 	}
 
 	return rc.RenderRecipePageHelper(c, "Rezept aktualisiert")
