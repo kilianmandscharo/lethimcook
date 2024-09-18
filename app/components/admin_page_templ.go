@@ -40,7 +40,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 			return templ_7745c5c3_Err
 		}
 		if isAdmin {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"danger-button\" hx-post=\"/auth/logout\" hx-trigger=\"click\" hx-target=\"#content\">Abmelden <i class=\"fa-solid fa-right-from-bracket\"></i></button>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"icon-button with-label\" hx-post=\"/auth/logout\" hx-trigger=\"click\" hx-target=\"#content\">Abmelden <i class=\"fa-solid fa-right-from-bracket danger\"></i></button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
