@@ -19,9 +19,9 @@ type RecipeController struct {
 	recipeService recipeService
 }
 
-func NewRecipeController() RecipeController {
+func NewRecipeController(recipeService recipeService) RecipeController {
 	return RecipeController{
-		recipeService: newRecipeService(),
+		recipeService: recipeService,
 	}
 }
 

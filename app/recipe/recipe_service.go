@@ -17,9 +17,9 @@ type recipeService struct {
 	db recipeDatabase
 }
 
-func newRecipeService() recipeService {
+func NewRecipeService(db recipeDatabase) recipeService {
 	return recipeService{
-		db: newRecipeDatabase(),
+		db: db,
 	}
 }
 

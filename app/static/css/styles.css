@@ -438,6 +438,10 @@ textarea {
     color: var(--color-primary-300);
 }
 
+.recipe-list-item-duration {
+    text-align: right;
+}
+
 .recipe-list-item-description {
     font-style: italic;
 }

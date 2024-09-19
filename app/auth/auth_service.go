@@ -22,9 +22,9 @@ type AuthService struct {
 	privateKey string
 }
 
-func NewAuthService() AuthService {
+func NewAuthService(db authDatabase) AuthService {
 	return AuthService{
-		db:         newAuthDatabase(),
+		db:         db,
 		privateKey: env.Get(env.EnvKeyJWTPrivateKey),
 	}
 }

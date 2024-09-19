@@ -19,10 +19,7 @@ type Server struct {
 	e *echo.Echo
 }
 
-func New(authService auth.AuthService) Server {
-	recipeController := recipe.NewRecipeController()
-	authController := auth.NewAuthController(authService)
-
+func New(authController auth.AuthController, recipeController recipe.RecipeController) Server {
 	e := echo.New()
 
 	e.Use(authController.ValidateTokenMiddleware)

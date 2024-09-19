@@ -25,7 +25,7 @@ type authDatabase struct {
 	handler *gorm.DB
 }
 
-func newAuthDatabase() authDatabase {
+func NewAuthDatabase() authDatabase {
 	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})

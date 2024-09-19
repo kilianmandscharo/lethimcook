@@ -16,7 +16,7 @@ type recipeDatabase struct {
 	handler *gorm.DB
 }
 
-func newRecipeDatabase() recipeDatabase {
+func NewRecipeDatabase() recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("./recipe.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("failed to connect recipe database: ", err)

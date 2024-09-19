@@ -21,8 +21,7 @@ func TestEnvironment(t *testing.T) {
 		fmt.Sprintf("\n%s=%s", EnvKeyKeyFilePath, testKeyFilePath) +
 		fmt.Sprintf("\n%s=%s", EnvKeyJWTPrivateKey, testJWTPrivateKey)
 
-	err := os.WriteFile(testFileName, []byte(envString), 0644)
-	assert.NoError(t, err)
+	assert.NoError(t, os.WriteFile(testFileName, []byte(envString), 0644))
 
 	// Then
 	assert.Equal(t, "", Get(EnvKeyCertFilePath))
@@ -37,6 +36,5 @@ func TestEnvironment(t *testing.T) {
 	assert.Equal(t, testKeyFilePath, Get(EnvKeyKeyFilePath))
 	assert.Equal(t, testJWTPrivateKey, Get(EnvKeyJWTPrivateKey))
 
-	err = os.Remove(testFileName)
-	assert.NoError(t, err)
+	assert.NoError(t, os.Remove(testFileName))
 }

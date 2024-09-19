@@ -8,9 +8,9 @@ import (
 templ RecipeCard(isAdmin bool, recipe types.Recipe) {
     <div
         if recipe.Pending {
-        class="recipe-list-item pending"
+            class="recipe-list-item pending"
         } else {
-        class="recipe-list-item"
+            class="recipe-list-item"
         }
         id={ fmt.Sprintf("recipe-%d", recipe.ID) }
         hx-target="#content"
@@ -19,7 +19,7 @@ templ RecipeCard(isAdmin bool, recipe types.Recipe) {
     >
         <div>
             <p class="recipe-list-item-title">{ recipe.Title }</p>
-            <p>{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
+            <p class="recipe-list-item-duration">{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
         </div>
         <p class="recipe-list-item-description">{ recipe.Description }</p>
         @RecipeTags(recipe.ParseTags())
