@@ -15,6 +15,10 @@ func (a *AppError) Error() string {
 	return a.Err.Error()
 }
 
+func (a *AppError) Unwrap() error {
+	return errors.Unwrap(a.Err)
+}
+
 func (a *AppError) AddMessage(message string) {
 	a.Err = fmt.Errorf("%s: %w", message, a.Err)
 }

@@ -134,8 +134,9 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		})
 	}
 
-	err, formError := ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
+	err = ac.authService.updateAdminPasswordHash(c.Request().FormValue("new-password"))
 	if err != nil {
+		formError := errors.Unwrap(err)
 		appError := errutil.AddMessageToAppError(
 			err,
 			"failed at HandleUpdatePassword()",

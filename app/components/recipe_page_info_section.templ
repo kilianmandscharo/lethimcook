@@ -11,9 +11,7 @@ templ RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) {
             <h2>{ recipe.Title }</h2>
             @RecipePageInfoSectionInfoItem("Autor", recipe.Author)
         </div>
-        if isAdmin {
         @divider()
-        }
         @RecipePageControls(isAdmin, recipe.Pending, recipe.ID)
         @divider()
         <div 

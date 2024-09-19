@@ -160,7 +160,11 @@ func RecipeListTopSection(recipes []types.Recipe) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-recipe-button\" class=\"icon-button with-label\" hx-get=\"/recipe/new\" hx-target=\"#content\" hx-trigger=\"click\" hx-push-url=\"true\" title=\"Neues Rezept\">Neu <i class=\"fa-regular fa-pen-nib fa-xl\"></i></button></div>")
+		templ_7745c5c3_Err = newRecipeButton().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

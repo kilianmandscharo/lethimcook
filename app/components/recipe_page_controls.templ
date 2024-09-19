@@ -1,83 +1,20 @@
 package components
 
-import "fmt"
-
 templ RecipePageControls(isAdmin bool, isPending bool, recipeId uint) {
-    if isAdmin {
-        <div class="recipe-page-controls">
+    <div class="recipe-page-controls">
+        @downloadRecipeJson(recipeId)
+        @copyUrlToClipboardButton()
+        if isAdmin {
             if isPending {
                 @editRecipeButton(recipeId)
-                @PendingRecipeAcceptButton(recipeId)
-                @PendingRecipeDenyButton(recipeId)
+                @pendingRecipeAcceptButton(recipeId)
+                @pendingRecipeDenyButton(recipeId)
             } else {
                 @editRecipeButton(recipeId)
-                @RecipeResetPendingButton(recipeId)
-                @RecipeDeleteButton(recipeId)
+                @recipeResetPendingButton(recipeId)
+                @recipeDeleteButton(recipeId)
             }
-        </div>
-    }
+        } 
+    </div>
 }
 
-templ PendingRecipeAcceptButton(recipeId uint) {
-	<button
-		id="pending-recipe-accept-button"
-		class="icon-button with-label"
-		hx-put={ fmt.Sprintf("/recipe/%d/pending/false", recipeId) }
-		hx-confirm="Rezept akzeptieren?"
-		hx-trigger="click"
-		hx-target="#content"
-		hx-push-url="true"
-		title="Rezept akzeptieren"
-	>
-        Annehmen
-		<i class="fa-solid fa-check success"></i>
-	</button>
-}
-
-templ PendingRecipeDenyButton(recipeId uint) {
-	<button
-		id="pending-recipe-deny-button"
-		class="icon-button with-label"
-		hx-delete={ fmt.Sprintf("/recipe/%d", recipeId) }
-		hx-confirm="Rezept ablehnen?"
-		hx-trigger="click"
-		hx-target="#content"
-		hx-push-url="true"
-		title="Rezept ablehnen"
-	>
-        Ablehnen
-		<i class="fa-solid fa-x danger"></i>
-	</button>
-}
-
-templ RecipeDeleteButton(recipeId uint) {
-	<button
-		id="delete-recipe-button"
-		class="icon-button with-label"
-		hx-delete={ fmt.Sprintf("/recipe/%d", recipeId) }
-		hx-confirm="Rezept löschen?"
-		hx-trigger="click"
-		hx-target="#content"
-		hx-push-url="true"
-		title="Rezept löschen"
-	>
-        Löschen
-		<i class="fa-solid fa-trash danger"></i>
-	</button>
-}
-
-templ RecipeResetPendingButton(recipeId uint) {
-	<button
-		id="reset-pending-button"
-		class="icon-button with-label"
-		hx-put={ fmt.Sprintf("/recipe/%d/pending/true", recipeId) }
-		hx-confirm="Rezept auf 'ausstehend' setzen?"
-		hx-trigger="click"
-		hx-target="#content"
-		hx-push-url="true"
-		title="Rezept auf 'ausstehend' setzen"
-	>
-        Zurückstellen
-		<i class="fa-solid fa-delete-left danger"></i>
-	</button>
-}

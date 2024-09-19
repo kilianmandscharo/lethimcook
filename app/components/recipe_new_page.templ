@@ -31,9 +31,11 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
             />
 		</form>
         <script>
-            loadFormFromLocalStorage();
-            attachFormEventListeners();
-            attachNewFormSubmitEventListener();
+            setTimeout(() => {
+                loadFormFromLocalStorage();
+                attachFormEventListeners();
+                attachNewFormSubmitEventListener();
+            }, 0);
         </script>
 	</main>
 }

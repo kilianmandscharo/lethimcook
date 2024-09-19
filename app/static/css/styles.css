@@ -567,6 +567,22 @@ textarea {
     flex-wrap: wrap;
 }
 
+.recipe-page-controls a {
+    all: unset;
+    cursor: pointer;
+    color: var(--color-white);
+    background-color: var(--color-surface-200);
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+    font-size: 14px;
+    width: fit-content;
+    height: fit-content;
+}
+
 .contact {
     margin-bottom: 1rem;
 }

@@ -73,7 +73,7 @@ func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"submit\"></form><script>\n            loadFormFromLocalStorage();\n            attachFormEventListeners();\n            attachNewFormSubmitEventListener();\n        </script></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"submit\"></form><script>\n            setTimeout(() => {\n                loadFormFromLocalStorage();\n                attachFormEventListeners();\n                attachNewFormSubmitEventListener();\n            }, 0);\n        </script></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,0 +1,153 @@
+package components
+
+import "fmt"
+
+templ downloadRecipeJson(recipeId uint) {
+    <a 
+        title="Rezept als JSON herunterladen" 
+        href={ templ.SafeURL(fmt.Sprintf("/recipe/%d/json", recipeId)) }
+    >
+        JSON
+        <i class="fa-solid fa-download"></i>
+    </a>
+}
+
+templ pendingRecipeAcceptButton(recipeId uint) {
+	<button
+		id="pending-recipe-accept-button"
+		class="icon-button with-label"
+		hx-put={ fmt.Sprintf("/recipe/%d/pending/false", recipeId) }
+		hx-confirm="Rezept akzeptieren?"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept akzeptieren"
+	>
+        Annehmen
+		<i class="fa-solid fa-check success"></i>
+	</button>
+}
+
+templ pendingRecipeDenyButton(recipeId uint) {
+	<button
+		id="pending-recipe-deny-button"
+		class="icon-button with-label"
+		hx-delete={ fmt.Sprintf("/recipe/%d", recipeId) }
+		hx-confirm="Rezept ablehnen?"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept ablehnen"
+	>
+        Ablehnen
+		<i class="fa-solid fa-x danger"></i>
+	</button>
+}
+
+templ recipeDeleteButton(recipeId uint) {
+	<button
+		id="delete-recipe-button"
+		class="icon-button with-label"
+		hx-delete={ fmt.Sprintf("/recipe/%d", recipeId) }
+		hx-confirm="Rezept löschen?"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept löschen"
+	>
+        Löschen
+		<i class="fa-solid fa-trash danger"></i>
+	</button>
+}
+
+templ recipeResetPendingButton(recipeId uint) {
+	<button
+		id="reset-pending-button"
+		class="icon-button with-label"
+		hx-put={ fmt.Sprintf("/recipe/%d/pending/true", recipeId) }
+		hx-confirm="Rezept auf 'ausstehend' setzen?"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept auf 'ausstehend' setzen"
+	>
+        Zurückstellen
+		<i class="fa-solid fa-delete-left danger"></i>
+	</button>
+}
+
+templ adminButton(isAdmin bool) {
+	<button
+		id="admin-button"
+		class="icon-button"
+		hx-get="/admin"
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Admin"
+	>
+        if isAdmin {
+            <i class="fa-solid fa-user fa-xl success"></i>
+        } else {
+            <i class="fa-solid fa-user fa-xl"></i>
+        }
+	</button>
+}
+
+templ homeButton() {
+	<button 
+        id="home-button" 
+        class="icon-button" 
+        hx-get="/" 
+        hx-trigger="click" 
+        hx-target="#content" 
+        hx-push-url="true"
+        title="Home"
+    >
+		<i class="fas fa-solid fa-house fa-xl"></i>
+	</button>
+}
+
+templ editRecipeButton(recipeId uint) {
+	<button
+		id="edit-recipe-button"
+		class="icon-button with-label"
+		hx-get={ fmt.Sprintf("/recipe/%d/edit", recipeId) }
+		hx-trigger="click"
+		hx-target="#content"
+		hx-push-url="true"
+		title="Rezept bearbeiten"
+	>
+        Bearbeiten
+		<i class="fa-solid fa-pen-to-square"></i>
+	</button>
+}
+
+templ newRecipeButton() {
+    <button
+        id="new-recipe-button"
+        class="icon-button with-label"
+        hx-get="/recipe/new"
+        hx-target="#content"
+        hx-trigger="click"
+        hx-push-url="true"
+        title="Neues Rezept"
+    >
+        Neu
+        <i class="fa-regular fa-pen-nib fa-xl"></i>
+    </button>
+}
+
+templ copyUrlToClipboardButton() {
+    <button
+        id="copy-url-to-clipboard-button"
+        class="icon-button with-label"
+        title="Link kopieren"
+    >
+        Link
+        <i class="fa-solid fa-copy"></i>
+    </button>
+    <script>
+        setTimeout(() => {attachEventListenerToClipboardButton();}, 0);
+    </script>
+}

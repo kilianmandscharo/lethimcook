@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -32,6 +33,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.GET("/recipe/:id", rc.RenderRecipePage)
 
 	// Actions
+	e.GET("/recipe/:id/json", rc.HandleDownloadRecipeAsJson)
 	e.POST("/search", rc.HandleSearchRecipe)
 	e.POST("/recipe", rc.HandleCreateRecipe)
 	e.PUT("/recipe/:id", rc.HandleUpdateRecipe)
@@ -325,4 +327,31 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		Component: components.RecipesPage(isAdmin, recipes),
 		Message:   "Rezept entfernt",
 	})
+}
+
+func (rc *RecipeController) HandleDownloadRecipeAsJson(c echo.Context) error {
+	createError := func(err error) error {
+		return servutil.RenderError(
+			c,
+			errutil.AddMessageToAppError(
+				err,
+				"failed at HandleDownloadRecipeAsJson()",
+			),
+		)
+	}
+	id, err := rc.recipeService.getPathId(c)
+	if err != nil {
+		return createError(err)
+	}
+	jsonRecipe, err := rc.recipeService.getRecipeAsJson(id)
+	if err != nil {
+		return createError(err)
+	}
+	c.Response().Header().Set(
+		echo.HeaderContentDisposition,
+		fmt.Sprintf("attachment; filename=reicpe_%d.json", id),
+	)
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	c.Response().Header().Set(echo.HeaderContentLength, strconv.Itoa(len(jsonRecipe)))
+	return c.Blob(http.StatusOK, echo.MIMEApplicationJSON, jsonRecipe)
 }

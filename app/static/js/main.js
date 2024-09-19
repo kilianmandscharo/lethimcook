@@ -113,4 +113,19 @@ function notify(message, type) {
     }, 3000);
 }
 
+function attachEventListenerToClipboardButton() {
+    const button = document.getElementById("copy-url-to-clipboard-button");
+    if (!button) {
+        return;
+    }
+    button.addEventListener("click", () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            notify("Link kopiert", "success");
+        }).catch(() => {
+            notify("Kopieren fehlgeschlagen", "error");
+        });
+    });
+}
+
 main();

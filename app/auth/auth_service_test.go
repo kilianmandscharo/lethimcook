@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 	"os"
 	"os/exec"
@@ -51,11 +52,10 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	authService := newTestAuthService()
 
 	// When
-	err, formError := authService.updateAdminPasswordHash("test_password")
+	err := authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.Error(t, err)
-	assert.NoError(t, formError)
 	appError, ok := err.(*errutil.AppError)
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusNotFound, appError.StatusCode)
@@ -66,22 +66,21 @@ func TestUpdateAdminPasswordHash(t *testing.T) {
 	assert.NoError(t, authService.db.createAdmin(&admin))
 
 	// When
-	err, formError = authService.updateAdminPasswordHash("aaaa")
+	err = authService.updateAdminPasswordHash("aaaa")
 
 	// Then
 	assert.Error(t, err)
-	assert.ErrorIs(t, errutil.FormErrorPasswortTooShort, formError)
+	assert.ErrorIs(t, errutil.FormErrorPasswortTooShort, errors.Unwrap(err))
 	appError, ok = err.(*errutil.AppError)
 	assert.True(t, ok)
 	assert.Equal(t, http.StatusBadRequest, appError.StatusCode)
 	assert.Equal(t, "Invalides Passwort", appError.UserMessage)
 
 	// When
-	err, formError = authService.updateAdminPasswordHash("test_password")
+	err = authService.updateAdminPasswordHash("test_password")
 
 	// Then
 	assert.NoError(t, err)
-	assert.NoError(t, formError)
 }
 
 func TestValidatePassword(t *testing.T) {

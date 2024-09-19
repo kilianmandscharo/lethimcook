@@ -560,3 +560,58 @@ func TestHandleSearchRecipe(t *testing.T) {
 		)
 	})
 }
+
+func TestHandleDownloadRecipeAsJson(t *testing.T) {
+	recipeController := newTestRecipeController()
+
+	t.Run("invalid path id", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleDownloadRecipeAsJson,
+				Method:         http.MethodGet,
+				Route:          "/recipe/json",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "xx",
+				StatusWant:     http.StatusBadRequest,
+				AssertMessage:  true,
+				MessageWant:    "Ungültiges Pfadparameter",
+			},
+		)
+	})
+
+	t.Run("recipe not found", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleDownloadRecipeAsJson,
+				Method:         http.MethodGet,
+				Route:          "/recipe/json",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				StatusWant:     http.StatusNotFound,
+				AssertMessage:  true,
+				MessageWant:    "Rezept nicht gefunden",
+			},
+		)
+	})
+
+	assert.NoError(t, recipeController.recipeService.createRecipe(&types.Recipe{ID: 1}))
+
+	t.Run("valid request", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleDownloadRecipeAsJson,
+				Method:         http.MethodGet,
+				Route:          "/recipe/json",
+				WithPathParam:  true,
+				PathParamName:  "id",
+				PathParamValue: "1",
+				StatusWant:     http.StatusOK,
+			},
+		)
+	})
+}

@@ -304,3 +304,26 @@ func TestReadAllRecipesService(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(recipes))
 }
+
+func TestGetRecipeAsJson(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+
+	// When
+	_, err := recipeService.getRecipeAsJson(1)
+
+	// Then
+	assert.Error(t, err)
+
+	// When
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{ID: 1, Title: "Naan", Author: "Phillip Jeffries"}))
+	recipeJson, err := recipeService.getRecipeAsJson(1)
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\"}"),
+		recipeJson,
+	)
+}

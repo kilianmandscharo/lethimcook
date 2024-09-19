@@ -11,16 +11,16 @@ import (
 )
 
 type Recipe struct {
-	ID           uint
-	Author       string
-	Source       string
-	Title        string
-	Description  string
-	Duration     int
-	Ingredients  string
-	Instructions string
-	Tags         string
-	Pending      bool
+	ID           uint   `json:"id"`
+	Author       string `json:"author"`
+	Source       string `json:"source"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	Duration     int    `json:"duration"`
+	Ingredients  string `json:"ingredients"`
+	Instructions string `json:"instructions"`
+	Tags         string `json:"tags"`
+	Pending      bool   `json:"-"`
 }
 
 func (r *Recipe) ParseTags() []string {

@@ -46,31 +46,42 @@ func (as *AuthService) CreateAdminIfDoesNotExist(password string) {
 	}
 }
 
-func (as *AuthService) updateAdminPasswordHash(newPassword string) (error, error) {
+func (as *AuthService) updateAdminPasswordHash(newPassword string) error {
 	if len(newPassword) < 5 {
 		return &errutil.AppError{
 			UserMessage: "Invalides Passwort",
-			Err: errors.New(
-				"failed at updateAdminPasswordHash(), newPassword too short",
+			Err: fmt.Errorf(
+				"failed at updateAdminPasswordHash(): %w",
+				errutil.FormErrorPasswortTooShort,
 			),
 			StatusCode: http.StatusBadRequest,
-		}, errutil.FormErrorPasswortTooShort
+		}
+	}
+	if len(newPassword) > 72 {
+		return &errutil.AppError{
+			UserMessage: "Invalides Passwort",
+			Err: fmt.Errorf(
+				"failed at updateAdminPasswordHash(): %w",
+				errutil.FormErrorPasswortTooLong,
+			),
+			StatusCode: http.StatusBadRequest,
+		}
 	}
 	newPasswordHash, err := as.hashPassword(newPassword)
 	if err != nil {
 		return errutil.AddMessageToAppError(
 			err,
-			"failed at updateAdminPasswordHash() with newPassword",
-		), errutil.FormErrorPasswortTooLong
+			"failed at updateAdminPasswordHash()",
+		)
 	}
 	err = as.db.updateAdminPasswordHash(newPasswordHash)
 	if err != nil {
 		return errutil.AddMessageToAppError(
 			err,
-			"failed at updateAdminPasswordHash() with newPasswordHash",
-		), nil
+			"failed at updateAdminPasswordHash()",
+		)
 	}
-	return nil, nil
+	return nil
 }
 
 func (as *AuthService) validatePassword(password string) error {

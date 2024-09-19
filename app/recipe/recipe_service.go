@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -186,9 +187,25 @@ func (rs *recipeService) parseFormData(c echo.Context, withId bool, id uint, pen
 		recipe.ID = id
 	}
 
-    recipe.Pending = pending
+	recipe.Pending = pending
 
 	return recipe, formErrors, nil
+}
+
+func (rs *recipeService) getRecipeAsJson(id uint) ([]byte, error) {
+	recipe, err := rs.db.readRecipe(id)
+	if err != nil {
+		return []byte{}, errutil.AddMessageToAppError(err, "failed at getRecipeAsJson()")
+	}
+	jsonRecipe, err := json.Marshal(recipe)
+	if err != nil {
+		return []byte{}, &errutil.AppError{
+			UserMessage: "Serverfehler",
+			Err:         fmt.Errorf("failed at getRecipeAsJson() for id %d: %w", id, err),
+			StatusCode:  http.StatusInternalServerError,
+		}
+	}
+	return jsonRecipe, nil
 }
 
 func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[string]error) []types.FormElement {
