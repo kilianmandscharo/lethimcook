@@ -20,7 +20,7 @@ templ pendingRecipeAcceptButton(recipeId uint) {
 		hx-confirm="Rezept akzeptieren?"
 		hx-trigger="click"
 		hx-target="#content"
-		hx-push-url="true"
+        hx-replace-url="/"
 		title="Rezept akzeptieren"
 	>
         Annehmen
@@ -36,7 +36,7 @@ templ pendingRecipeDenyButton(recipeId uint) {
 		hx-confirm="Rezept ablehnen?"
 		hx-trigger="click"
 		hx-target="#content"
-		hx-push-url="true"
+        hx-replace-url="/"
 		title="Rezept ablehnen"
 	>
         Ablehnen
@@ -52,7 +52,7 @@ templ recipeDeleteButton(recipeId uint) {
 		hx-confirm="Rezept löschen?"
 		hx-trigger="click"
 		hx-target="#content"
-		hx-push-url="true"
+        hx-replace-url="/"
 		title="Rezept löschen"
 	>
         Löschen
@@ -68,7 +68,7 @@ templ recipeResetPendingButton(recipeId uint) {
 		hx-confirm="Rezept auf 'ausstehend' setzen?"
 		hx-trigger="click"
 		hx-target="#content"
-		hx-push-url="true"
+        hx-replace-url="/"
 		title="Rezept auf 'ausstehend' setzen"
 	>
         Zurückstellen

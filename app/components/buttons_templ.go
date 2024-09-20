@@ -82,7 +82,7 @@ func pendingRecipeAcceptButton(recipeId uint) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept akzeptieren?\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Rezept akzeptieren\">Annehmen <i class=\"fa-solid fa-check success\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept akzeptieren?\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept akzeptieren\">Annehmen <i class=\"fa-solid fa-check success\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func pendingRecipeDenyButton(recipeId uint) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept ablehnen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Rezept ablehnen\">Ablehnen <i class=\"fa-solid fa-x danger\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept ablehnen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept ablehnen\">Ablehnen <i class=\"fa-solid fa-x danger\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -166,7 +166,7 @@ func recipeDeleteButton(recipeId uint) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept löschen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Rezept löschen\">Löschen <i class=\"fa-solid fa-trash danger\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept löschen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept löschen\">Löschen <i class=\"fa-solid fa-trash danger\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -208,7 +208,7 @@ func recipeResetPendingButton(recipeId uint) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept auf &#39;ausstehend&#39; setzen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" title=\"Rezept auf &#39;ausstehend&#39; setzen\">Zurückstellen <i class=\"fa-solid fa-delete-left danger\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept auf &#39;ausstehend&#39; setzen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept auf &#39;ausstehend&#39; setzen\">Zurückstellen <i class=\"fa-solid fa-delete-left danger\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

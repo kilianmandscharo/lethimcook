@@ -11,21 +11,22 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
         </div>
 		<form 
             if isAdmin {
-            hx-post="/recipe" 
+                hx-post="/recipe" 
             } else {
-            hx-post="/recipe?pending=true" 
-            hx-confirm="Rezept einreichen? Nach der Freischaltung durch den Admin wird das Rezept auf der Hauptseite erscheinen."
+                hx-post="/recipe?pending=true" 
+                hx-confirm="Rezept einreichen? Nach der Freischaltung durch den Admin wird das Rezept auf der Hauptseite erscheinen."
             }
             hx-target="#content"
+            hx-push-url="/"
         >
 			@Form(recipeForm)
 			<input 
                 id="recipe-new-submit"
                 type="submit" 
                 if isAdmin {
-                value="Rezept erstellen" 
+                    value="Rezept erstellen" 
                 } else {
-                value="Rezept einreichen" 
+                    value="Rezept einreichen" 
                 }
                 name="submit"
             />
