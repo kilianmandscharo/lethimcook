@@ -1,7 +1,6 @@
 package servutil
 
 import (
-	"encoding/json"
 	"log"
 
 	"github.com/a-h/templ"
@@ -42,23 +41,16 @@ func renderPrivacyNotice(c echo.Context) error {
 	})
 }
 
-func RenderError(c echo.Context, appError error) error {
-	payload, err := createMessagePayload(
-		errutil.GetAppErrorUserMessage(appError),
-		true,
+func RenderError(c echo.Context, err error) error {
+	c.Response().Header().Set("HX-Retarget", "#notification-container")
+	c.Response().Header().Set("HX-Reswap", "beforeend:#notification-container")
+	c.Response().WriteHeader(
+		errutil.GetAppErrorStatusCode(err),
 	)
-	if err != nil {
-		log.Printf("failed to create message payload: %v", err)
-	} else {
-		c.Response().Header().Set(
-			"HX-Trigger",
-			string(payload),
-		)
-	}
-	log.Println("error in RenderError():", appError)
-	return c.String(
-		errutil.GetAppErrorStatusCode(appError),
-		errutil.GetAppErrorUserMessage(appError),
+	log.Println("error in RenderError():", err)
+	return components.Notification(errutil.GetAppErrorUserMessage(err), true).Render(
+		c.Request().Context(),
+		c.Response().Writer,
 	)
 }
 
@@ -67,30 +59,6 @@ type RenderComponentOptions struct {
 	Component templ.Component
 	Message   string
 	Err       error
-}
-
-type ResponseMessage struct {
-	Value   string `json:"value"`
-	IsError bool   `json:"isError"`
-}
-
-type TriggerPayload struct {
-	Message string `json:"message"`
-}
-
-func createMessagePayload(message string, isError bool) (string, error) {
-	responseMessage, err := json.Marshal(ResponseMessage{
-		Value:   message,
-		IsError: isError,
-	})
-	if err != nil {
-		return "", err
-	}
-	payload, err := json.Marshal(TriggerPayload{Message: string(responseMessage)})
-	if err != nil {
-		return "", err
-	}
-	return string(payload), nil
 }
 
 func RenderComponent(options RenderComponentOptions) error {
@@ -114,7 +82,7 @@ func RenderComponent(options RenderComponentOptions) error {
 
 	if isHxRequest(options.Context) {
 		if len(message) > 0 {
-			return components.Joiner(options.Component, components.Notification(message, options.Err != nil)).Render(
+			return components.Joiner(options.Component, components.NotificationWithSwap(message, options.Err != nil)).Render(
 				options.Context.Request().Context(),
 				options.Context.Response().Writer,
 			)
