@@ -2,38 +2,35 @@ package testutil
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
+	"strings"
 	"testing"
 
-	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 type RequestOptions struct {
-	HandlerFunc         func(c echo.Context) error
-	Method              string
-	Route               string
-	StatusWant          int
-	Authorized          bool
-	WithFormData        bool
-	FormData            string
-	WithCookie          bool
-	Cookie              http.Cookie
-	WithPathParam       bool
-	PathParamName       string
-	PathParamValue      string
-	PathParamNames      []string
-	PathParamValues     []string
-	WithQueryParam      bool
-	QueryParam          string
-	HeaderErrorCodeWant int
-	AssertMessage       bool
-	MessageWant         string
+	HandlerFunc     func(c echo.Context) error
+	Method          string
+	Route           string
+	StatusWant      int
+	Authorized      bool
+	WithFormData    bool
+	FormData        string
+	WithCookie      bool
+	Cookie          http.Cookie
+	WithPathParam   bool
+	PathParamName   string
+	PathParamValue  string
+	PathParamNames  []string
+	PathParamValues []string
+	WithQueryParam  bool
+	QueryParam      string
+	AssertMessage   bool
+	MessageWant     string
 }
 
 func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseRecorder, echo.Context) {
@@ -54,6 +51,7 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 
 	req, err := http.NewRequest(options.Method, options.Route, body)
 	assert.NoError(t, err)
+	req.Header.Set("Hx-Request", "true")
 
 	if options.WithFormData {
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -80,24 +78,8 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 
 	assert.Equal(t, options.StatusWant, rr.Code)
 
-	if options.HeaderErrorCodeWant != 0 {
-		errorCodes := rr.Header()["Errorcode"]
-		assert.Equal(t, 1, len(errorCodes))
-		assert.Equal(t, strconv.Itoa(options.HeaderErrorCodeWant), errorCodes[0])
-	}
-
 	if options.AssertMessage {
-		headerValue := rr.Header().Get("HX-Trigger")
-		if len(headerValue) > 0 {
-			var payload servutil.TriggerPayload
-			err := json.Unmarshal([]byte(headerValue), &payload)
-			var message servutil.ResponseMessage
-			err = json.Unmarshal([]byte(payload.Message), &message)
-			assert.NoError(t, err)
-			assert.Equal(t, options.MessageWant, message.Value)
-		} else {
-			assert.Equal(t, rr.Body.String(), options.MessageWant)
-		}
+		assert.True(t, strings.Contains(rr.Body.String(), options.MessageWant))
 	}
 
 	return rr, c

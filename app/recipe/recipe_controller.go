@@ -145,8 +145,11 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 	}
 
 	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context:   c,
-		Component: components.RecipeListSwap(isAdmin, filteredRecipes),
+		Context: c,
+		Component: components.Joiner(
+			components.RecipeCount(filteredRecipes, true),
+			components.RecipeList(isAdmin, filteredRecipes),
+		),
 	})
 }
 

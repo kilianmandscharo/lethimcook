@@ -1,0 +1,22 @@
+package components
+
+templ Notification(message string, isError bool) {
+    <div hx-swap-oob="beforeend:#notification-container">
+        <div
+            if isError {
+                class="notification notification-danger"
+            } else {
+                class="notification notification-success"
+            }
+        >
+            <div
+                if isError {
+                    class="fa-regular fa-circle-exclamation"
+                } else {
+                    class="fa-solid fa-circle-info"
+                }
+            ></div>
+            <p class="notification-text">{ message }</p>
+        </div>
+    </div>
+}

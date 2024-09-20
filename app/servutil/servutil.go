@@ -3,7 +3,6 @@ package servutil
 import (
 	"encoding/json"
 	"log"
-	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -43,11 +42,23 @@ func renderPrivacyNotice(c echo.Context) error {
 	})
 }
 
-func RenderError(c echo.Context, err error) error {
-	log.Println("error in RenderError():", err)
+func RenderError(c echo.Context, appError error) error {
+	payload, err := createMessagePayload(
+		errutil.GetAppErrorUserMessage(appError),
+		true,
+	)
+	if err != nil {
+		log.Printf("failed to create message payload: %v", err)
+	} else {
+		c.Response().Header().Set(
+			"HX-Trigger",
+			string(payload),
+		)
+	}
+	log.Println("error in RenderError():", appError)
 	return c.String(
-		errutil.GetAppErrorStatusCode(err),
-		errutil.GetAppErrorUserMessage(err),
+		errutil.GetAppErrorStatusCode(appError),
+		errutil.GetAppErrorUserMessage(appError),
 	)
 }
 
@@ -67,19 +78,31 @@ type TriggerPayload struct {
 	Message string `json:"message"`
 }
 
-func RenderComponent(options RenderComponentOptions) error {
-	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+func createMessagePayload(message string, isError bool) (string, error) {
+	responseMessage, err := json.Marshal(ResponseMessage{
+		Value:   message,
+		IsError: isError,
+	})
+	if err != nil {
+		return "", err
+	}
+	payload, err := json.Marshal(TriggerPayload{Message: string(responseMessage)})
+	if err != nil {
+		return "", err
+	}
+	return string(payload), nil
+}
 
-	// Usually you would want to return the status code correctly, however,
-	// for this purpose to still render the component with htmx and still
-	// somehow mark the response as an error, the code for the error status is
-	// set in the header (there might be a better way...)
+func RenderComponent(options RenderComponentOptions) error {
+	options.Context.Response().Header().Set(
+		echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8,
+	)
+
 	if options.Err != nil {
-		log.Println("error in RenderComponent():", options.Err)
-		options.Context.Response().Header().Set(
-			"Errorcode",
-			strconv.Itoa(errutil.GetAppErrorStatusCode(options.Err)),
+		options.Context.Response().WriteHeader(
+			errutil.GetAppErrorStatusCode(options.Err),
 		)
+		log.Println("error in RenderComponent():", options.Err)
 	}
 
 	var message string
@@ -89,32 +112,18 @@ func RenderComponent(options RenderComponentOptions) error {
 		message = options.Message
 	}
 
-	if len(message) > 0 {
-		message, err := json.Marshal(ResponseMessage{
-			Value:   message,
-			IsError: options.Err != nil,
-		})
-
-		if err == nil {
-			payload, err := json.Marshal(TriggerPayload{Message: string(message)})
-
-			if err == nil {
-				options.Context.Response().Header().Set(
-					"HX-Trigger",
-					string(payload),
-				)
-			}
-		}
-
-	}
-
 	if isHxRequest(options.Context) {
+		if len(message) > 0 {
+			return components.Joiner(options.Component, components.Notification(message, options.Err != nil)).Render(
+				options.Context.Request().Context(),
+				options.Context.Response().Writer,
+			)
+		}
 		return options.Component.Render(
 			options.Context.Request().Context(),
 			options.Context.Response().Writer,
 		)
 	}
-
 	return components.Page(options.Component).Render(
 		options.Context.Request().Context(),
 		options.Context.Response().Writer,
