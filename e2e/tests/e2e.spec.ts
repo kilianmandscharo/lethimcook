@@ -1,304 +1,111 @@
-import { test, expect, Page } from "@playwright/test";
-import { describe } from "node:test";
-
-const recipe = {
-  title: "Naan",
-  description: "Indisches Fladenbrot - zubereitet in der Pfanne",
-  duration: "180",
-  author: "Phillip Jeffries",
-  source: "Indische Küche Dishoom",
-  tags: "indisch, Beilage",
-  ingredients: `**Rezept für 10 Stück**
-- 560 g Maida-Mehl
-- 10 g Salz
-- 5 g Backpulver
-- 8 g Streuzucker
-- 150 ml Milch
-- 135 ml Wasser
-- 1 Ei
-- 1 EL Pflanzenöl`,
-  instructions: `1. Das Mehl und das Salz in eine Schüssel sieben und in die Mitte eine Vertiefung drücken
-2. Backpulver, Zucker, Milch, Wasser und Ei verrühren
-3. Die Mischung dem Mehl langsam untermischen und alles 5 Minuten kneten, anschließend 5 Minuten ruhen lassen
-4. Das Öl über den Teig träufeln und diesen solange kneten bis das Öl eingearbeitet ist
-5. Den Teig in eine saubere Schüssel geben, mit einem feuchten Küchentuch abdecken und 2 Stunden ruhen lassen
-6. Aus dem Teig 70g Kugeln formen, diese dann für 30 Minuten auf einem eingeölten und mit Frischhaltefolie abgedeckten Backblech ruhen lassen
-7. Nacheinander die leicht eingeölten Kugeln auf der Arbeitsfläche ausrollen und in einer heißen Pfanne zubereiten`,
-};
-
-const editedRecipe = {
-  title: "Naanbrot",
-  description: "Leckeres indisches Fladenbrot - zubereitet in der Pfanne",
-  duration: "210",
-  author: "Dale Cooper",
-  source: "Indische Küche Dishoom (Buch)",
-  tags: "Indien",
-  ingredients: `**Rezept für 20 Stück**
-- 1120 g Maida-Mehl
-- 20 g Salz
-- 10 g Backpulver
-- 16 g Streuzucker
-- 300 ml Milch
-- 270 ml Wasser
-- 2 Eier
-- 2 EL Pflanzenöl`,
-  instructions: `1. Das Mehl und das Salz in eine Schüssel sieben und in die Mitte eine Vertiefung drücken
-2. Backpulver, Zucker, Milch, Wasser und Ei verrühren
-3. Die Mischung dem Mehl langsam untermischen und alles 5 Minuten kneten, anschließend 5 Minuten ruhen lassen
-4. Das Öl über den Teig träufeln und diesen solange kneten bis das Öl eingearbeitet ist
-5. Den Teig in eine saubere Schüssel geben, mit einem feuchten Küchentuch abdecken und 2 Stunden ruhen lassen
-6. Aus dem Teig 70g Kugeln formen, diese dann für 30 Minuten auf einem eingeölten und mit Frischhaltefolie abgedeckten Backblech ruhen lassen
-7. Nacheinander die leicht eingeölten Kugeln auf der Arbeitsfläche ausrollen und in einer heißen Pfanne zubereiten`,
-};
-
-type Recipe = typeof recipe;
-
-async function navigateToAdminPage(page: Page) {
-  await page.goto("");
-  await clickIconButton(page, "Admin");
-}
-
-async function login(page: Page, password: string) {
-  await page.getByPlaceholder("Passwort", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Anmelden" }).click();
-  await expect(page.getByRole("button", { name: "Abmelden" })).toBeVisible();
-  await expect(
-    page.getByPlaceholder("Passwort", { exact: true }),
-  ).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Anmelden" })).toBeDisabled();
-}
-
-async function logout(page: Page) {
-  await page.getByRole("button", { name: "Abmelden" }).click();
-  await expect(
-    page.getByRole("button", { name: "Abmelden" }),
-  ).not.toBeVisible();
-  await expect(
-    page.getByPlaceholder("Passwort", { exact: true }),
-  ).toBeEnabled();
-  await expect(page.getByRole("button", { name: "Anmelden" })).toBeEnabled();
-}
-
-async function changePassword(
-  page: Page,
-  oldPassword: string,
-  newPassword: string,
-) {
-  await page.getByPlaceholder("Altes Passwort").fill(oldPassword);
-  await page.getByPlaceholder("Neues Passwort").fill(newPassword);
-  await page.getByRole("button", { name: "Bestätigen" }).click();
-  await expect(page.getByPlaceholder("Altes Passwort")).toBeEmpty();
-  await expect(page.getByPlaceholder("Neues Passwort")).toBeEmpty();
-}
-
-async function testInvalidPasswordChange(page: Page) {
-  await changePassword(page, "invalid", "nimda");
-  await expect(
-    page.locator("#content").getByText("Falsches Passwort"),
-  ).toBeVisible();
-}
-
-async function testPasswordChangeTooShort(page: Page) {
-  await changePassword(page, "admin", "aaa");
-  await expect(
-    page.locator("#content").getByText("Minimale Passwortlänge: 5"),
-  ).toBeVisible();
-}
-
-async function testInvalidPassword(page: Page, invalidPassword: string) {
-  await page
-    .getByPlaceholder("Passwort", { exact: true })
-    .fill(invalidPassword);
-  await page.getByRole("button", { name: "Anmelden" }).click();
-  await page.waitForLoadState("networkidle");
-  await expect(
-    page.getByRole("button", { name: "Abmelden" }),
-  ).not.toBeVisible();
-  await expect(
-    page.locator("#content").getByText("Falsches Passwort"),
-  ).toBeVisible();
-}
-
-async function navigateToHomePage(page: Page) {
-  await clickIconButton(page, "Home");
-}
-
-async function createRecipe(page: Page, pending?: boolean) {
-  await clickIconButton(page, "Neues Rezept");
-
-  await page.getByPlaceholder("Titel").fill(recipe.title);
-  await page.getByPlaceholder("Beschreibung").fill(recipe.description);
-  await page
-    .getByPlaceholder("Zubereitungszeit (Minuten)")
-    .fill(recipe.duration);
-  await page.getByPlaceholder("Autor").fill(recipe.author);
-  await page.getByPlaceholder("Quelle").fill(recipe.source);
-  await page.getByPlaceholder("Tags").fill(recipe.tags);
-  await page.getByPlaceholder("Zutaten").fill(recipe.ingredients);
-  await page.getByPlaceholder("Anleitung").fill(recipe.instructions);
-
-  await page
-    .getByRole("button", {
-      name: pending ? "Rezept einreichen" : "Rezept erstellen",
-    })
-    .click();
-}
-
-async function checkRecipeList(page: Page, testRecipe: Recipe) {
-  await expect(page.getByText("1 Rezept")).toBeVisible();
-  await expect(page.locator(".recipe-list-item")).toHaveCount(1);
-  await expect(page.getByText(testRecipe.title)).toBeVisible();
-  await expect(page.getByText(`${testRecipe.duration} Minuten`)).toBeVisible();
-  await expect(page.getByText(testRecipe.description)).toBeVisible();
-}
-
-async function navigateToRecipePage(page: Page) {
-  await page.getByText(recipe.title).click();
-}
-
-async function checkRecipePage(page: Page, testRecipe: Recipe) {
-  await expect(page.getByText(testRecipe.title)).toBeVisible();
-  await expect(page.getByText(`${testRecipe.duration} Minuten`)).toBeVisible();
-  await expect(page.getByText(`${testRecipe.author}`)).toBeVisible();
-  await expect(page.getByText(`${testRecipe.source}`)).toBeVisible();
-  await expect(page.getByText(testRecipe.description)).toBeVisible();
-}
-
-async function navigateToEditPage(page: Page) {
-  await clickIconButton(page, "Rezept bearbeiten");
-}
-
-async function editRecipe(page: Page) {
-  await page.getByLabel("Titel").fill(editedRecipe.title);
-  await page
-    .getByLabel("Zubereitungszeit (Minuten)")
-    .fill(editedRecipe.duration);
-  await page.getByLabel("Beschreibung").fill(editedRecipe.description);
-  await page.getByPlaceholder("Autor").fill(editedRecipe.author);
-  await page.getByPlaceholder("Quelle").fill(editedRecipe.source);
-  await page.getByRole("button", { name: "Rezept aktualisieren" }).click();
-}
-
-async function deleteRecipe(page: Page) {
-  await page.goto("");
-  await navigateToRecipePage(page);
-  await clickIconButton(page, "Rezept löschen");
-  page.on("dialog", (dialog) => dialog.accept());
-  await clickIconButton(page, "Rezept löschen");
-  await page.goto("");
-  await expect(page.getByText("Keine Rezepte")).toBeVisible();
-  await expect(page.locator(".recipe-list-item")).toHaveCount(0);
-}
-
-async function clickIconButton(page: Page, title: string) {
-  const button = page.getByTitle(title);
-  await expect(button).toBeVisible();
-  await button.click();
-}
+import { test, expect } from "@playwright/test";
+import { clickButtonByTitle, navigateToEditPage, navigateToHomePage, navigateToAdminPage, navigateToRecipePage } from "../utils/utils";
+import { checkRecipeList, checkRecipePage, createRecipe, deleteRecipe, editRecipe, editedRecipe, recipe } from "../utils/recipe";
+import { changePassword, login, logout, testInvalidPassword, testInvalidPasswordChange, testPasswordChangeTooShort } from "../utils/admin";
 
 test("check title", async ({ page }) => {
-  await page.goto("");
-  await expect(page).toHaveTitle(/Let Him Cook/);
+    await page.goto("");
+    await expect(page).toHaveTitle(/Let Him Cook/);
 });
 
 test("admin tests", async ({ page }) => {
-  await page.goto("");
-  await navigateToAdminPage(page);
+    await page.goto("");
+    await navigateToAdminPage(page);
 
-  await testInvalidPasswordChange(page);
-  await testPasswordChangeTooShort(page);
+    await testInvalidPasswordChange(page);
+    await testPasswordChangeTooShort(page);
 
-  await testInvalidPassword(page, "invalid");
-  await login(page, "admin");
-  await logout(page);
-  await changePassword(page, "admin", "nimda");
-  await testInvalidPassword(page, "admin");
-  await login(page, "nimda");
-  await logout(page);
-  await changePassword(page, "nimda", "admin");
-  await testInvalidPassword(page, "nimda");
-  await login(page, "admin");
+    await testInvalidPassword(page, "invalid");
+    await login(page, "admin");
+    await logout(page);
+    await changePassword(page, "admin", "nimda");
+    await testInvalidPassword(page, "admin");
+    await login(page, "nimda");
+    await logout(page);
+    await changePassword(page, "nimda", "admin");
+    await testInvalidPassword(page, "nimda");
+    await login(page, "admin");
 });
 
 test("create recipe", async ({ page }) => {
-  await page.goto("");
-  await navigateToAdminPage(page);
-  await login(page, "admin");
-  await navigateToHomePage(page);
-  await createRecipe(page);
-  await checkRecipeList(page, recipe);
-  await navigateToRecipePage(page);
-  await checkRecipePage(page, recipe);
+    await page.goto("");
+    await navigateToAdminPage(page);
+    await login(page, "admin");
+    await navigateToHomePage(page);
+    await createRecipe(page);
+    await checkRecipeList(page, recipe);
+    await navigateToRecipePage(page, recipe.title);
+    await checkRecipePage(page, recipe);
 });
 
 test("edit recipe", async ({ page }) => {
-  await page.goto("");
-  await navigateToAdminPage(page);
-  await login(page, "admin");
-  await navigateToHomePage(page);
-  await navigateToRecipePage(page);
-  await navigateToEditPage(page);
-  await editRecipe(page);
-  await checkRecipePage(page, editedRecipe);
-  await navigateToHomePage(page);
-  await checkRecipeList(page, editedRecipe);
+    await page.goto("");
+    await navigateToAdminPage(page);
+    await login(page, "admin");
+    await navigateToHomePage(page);
+    await navigateToRecipePage(page, recipe.title);
+    await navigateToEditPage(page);
+    await editRecipe(page);
+    await checkRecipePage(page, editedRecipe);
+    await navigateToHomePage(page);
+    await checkRecipeList(page, editedRecipe);
 });
 
 test("delete recipe", async ({ page }) => {
-  await page.goto("");
-  await navigateToAdminPage(page);
-  await login(page, "admin");
-  await deleteRecipe(page);
+    await page.goto("");
+    await navigateToAdminPage(page);
+    await login(page, "admin");
+    await deleteRecipe(page);
 });
 
 test("create pending recipe", async ({ page }) => {
-  page.on("dialog", (dialog) => dialog.accept());
+    page.on("dialog", (dialog) => dialog.accept());
 
-  await page.goto("");
-  await createRecipe(page, true);
+    await page.goto("");
+    await createRecipe(page, true);
 
-  navigateToHomePage(page);
-  await expect(page.getByText("Keine Rezepte")).toBeVisible();
-  await expect(page.locator(".recipe-list-item")).toHaveCount(0);
+    navigateToHomePage(page);
+    await expect(page.getByText("Keine Rezepte")).toBeVisible();
+    await expect(page.locator(".recipe-list-item")).toHaveCount(0);
 
-  await navigateToAdminPage(page);
-  await login(page, "admin");
+    await navigateToAdminPage(page);
+    await login(page, "admin");
 
-  navigateToHomePage(page);
-  await checkRecipeList(page, recipe);
+    navigateToHomePage(page);
+    await checkRecipeList(page, recipe);
 
-  await navigateToRecipePage(page);
-  await clickIconButton(page, "Rezept akzeptieren");
+    await navigateToRecipePage(page, recipe.title);
+    await clickButtonByTitle(page, "Rezept akzeptieren");
 
-  await navigateToAdminPage(page);
-  await logout(page);
+    await navigateToAdminPage(page);
+    await logout(page);
 
-  navigateToHomePage(page);
-  await checkRecipeList(page, recipe);
+    navigateToHomePage(page);
+    await checkRecipeList(page, recipe);
 
-  await navigateToAdminPage(page);
-  await login(page, "admin");
-  navigateToHomePage(page);
-  await navigateToRecipePage(page);
-  const button = page.getByTitle("Rezept auf 'ausstehend' setzen");
-  await expect(button).toBeVisible();
-  await button.click();
+    await navigateToAdminPage(page);
+    await login(page, "admin");
+    navigateToHomePage(page);
+    await navigateToRecipePage(page, recipe.title);
+    const button = page.getByTitle("Rezept auf 'ausstehend' setzen");
+    await expect(button).toBeVisible();
+    await button.click();
 
-  await navigateToAdminPage(page);
-  await logout(page);
+    await navigateToAdminPage(page);
+    await logout(page);
 
-  navigateToHomePage(page);
-  await expect(page.getByText("Keine Rezepte")).toBeVisible();
-  await expect(page.locator(".recipe-list-item")).toHaveCount(0);
+    navigateToHomePage(page);
+    await expect(page.getByText("Keine Rezepte")).toBeVisible();
+    await expect(page.locator(".recipe-list-item")).toHaveCount(0);
 });
 
 test("clean up", async ({ page }) => {
-  await page.goto("");
-  await navigateToAdminPage(page);
-  await login(page, "admin");
-  await navigateToHomePage(page);
-  await navigateToRecipePage(page);
-  await clickIconButton(page, "Rezept ablehnen");
-  page.on("dialog", (dialog) => dialog.accept());
-  await clickIconButton(page, "Rezept ablehnen");
+    await page.goto("");
+    await navigateToAdminPage(page);
+    await login(page, "admin");
+    await navigateToHomePage(page);
+    await navigateToRecipePage(page, recipe.title);
+    await clickButtonByTitle(page, "Rezept ablehnen");
+    page.on("dialog", (dialog) => dialog.accept());
+    await clickButtonByTitle(page, "Rezept ablehnen");
 });
