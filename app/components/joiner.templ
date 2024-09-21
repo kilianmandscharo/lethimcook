@@ -1,0 +1,7 @@
+package components
+
+templ Joiner(components ...templ.Component) {
+    for _, component := range components {
+        @component
+    }
+}

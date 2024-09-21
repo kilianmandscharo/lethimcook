@@ -16,6 +16,7 @@ templ AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []t
                 hx-post="/auth/logout" 
                 hx-trigger="click" 
                 hx-target="#content"
+                title="Abmelden"
             >
                 Abmelden
                 <i class="fa-solid fa-right-from-bracket danger"></i>
