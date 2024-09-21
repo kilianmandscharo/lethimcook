@@ -42,16 +42,19 @@ func renderPrivacyNotice(c echo.Context) error {
 }
 
 func RenderError(c echo.Context, err error) error {
-	c.Response().Header().Set("HX-Retarget", "#notification-container")
-	c.Response().Header().Set("HX-Reswap", "beforeend:#notification-container")
-	c.Response().WriteHeader(
-		errutil.GetAppErrorStatusCode(err),
-	)
 	log.Println("error in RenderError():", err)
-	return components.Notification(errutil.GetAppErrorUserMessage(err), true).Render(
-		c.Request().Context(),
-		c.Response().Writer,
-	)
+	userMessage := errutil.GetAppErrorUserMessage(err)
+	statusCode := errutil.GetAppErrorStatusCode(err)
+	if isHxRequest(c) {
+		c.Response().Header().Set("HX-Retarget", "#notification-container")
+		c.Response().Header().Set("HX-Reswap", "beforeend:#notification-container")
+		c.Response().WriteHeader(statusCode)
+		return components.Notification(userMessage, true).Render(
+			c.Request().Context(),
+			c.Response().Writer,
+		)
+	}
+	return c.String(statusCode, userMessage)
 }
 
 type RenderComponentOptions struct {
@@ -73,27 +76,34 @@ func RenderComponent(options RenderComponentOptions) error {
 		log.Println("error in RenderComponent():", options.Err)
 	}
 
-	var message string
-	if options.Err != nil {
-		message = errutil.GetAppErrorUserMessage(options.Err)
-	} else {
-		message = options.Message
-	}
+	message := getRenderComponentOptionsMessage(options)
+	component := getRenderComponentOptionsComponent(options, message)
 
 	if isHxRequest(options.Context) {
-		if len(message) > 0 {
-			return components.Joiner(options.Component, components.NotificationWithSwap(message, options.Err != nil)).Render(
-				options.Context.Request().Context(),
-				options.Context.Response().Writer,
-			)
-		}
-		return options.Component.Render(
+		return component.Render(
 			options.Context.Request().Context(),
 			options.Context.Response().Writer,
 		)
 	}
-	return components.Page(options.Component).Render(
+	return components.Page(component).Render(
 		options.Context.Request().Context(),
 		options.Context.Response().Writer,
 	)
+}
+
+func getRenderComponentOptionsComponent(options RenderComponentOptions, message string) templ.Component {
+	if len(message) > 0 {
+		return components.Joiner(
+			options.Component,
+			components.NotificationWithSwap(message, options.Err != nil),
+		)
+	}
+	return options.Component
+}
+
+func getRenderComponentOptionsMessage(options RenderComponentOptions) string {
+	if options.Err != nil {
+		return errutil.GetAppErrorUserMessage(options.Err)
+	}
+	return options.Message
 }
