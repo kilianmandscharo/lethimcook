@@ -1,9 +1,7 @@
 package servutil
 
 import (
-	"encoding/json"
 	"log"
-	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -45,10 +43,18 @@ func renderPrivacyNotice(c echo.Context) error {
 
 func RenderError(c echo.Context, err error) error {
 	log.Println("error in RenderError():", err)
-	return c.String(
-		errutil.GetAppErrorStatusCode(err),
-		errutil.GetAppErrorUserMessage(err),
-	)
+	userMessage := errutil.GetAppErrorUserMessage(err)
+	statusCode := errutil.GetAppErrorStatusCode(err)
+	if isHxRequest(c) {
+		c.Response().Header().Set("HX-Retarget", "#notification-container")
+		c.Response().Header().Set("HX-Reswap", "beforeend:#notification-container")
+		c.Response().WriteHeader(statusCode)
+		return components.Notification(userMessage, true).Render(
+			c.Request().Context(),
+			c.Response().Writer,
+		)
+	}
+	return c.String(statusCode, userMessage)
 }
 
 type RenderComponentOptions struct {
@@ -58,65 +64,46 @@ type RenderComponentOptions struct {
 	Err       error
 }
 
-type ResponseMessage struct {
-	Value   string `json:"value"`
-	IsError bool   `json:"isError"`
-}
-
-type TriggerPayload struct {
-	Message string `json:"message"`
-}
-
 func RenderComponent(options RenderComponentOptions) error {
-	options.Context.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+	options.Context.Response().Header().Set(
+		echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8,
+	)
 
-	// Usually you would want to return the status code correctly, however,
-	// for this purpose to still render the component with htmx and still
-	// somehow mark the response as an error, the code for the error status is
-	// set in the header (there might be a better way...)
 	if options.Err != nil {
-		log.Println("error in RenderComponent():", options.Err)
-		options.Context.Response().Header().Set(
-			"Errorcode",
-			strconv.Itoa(errutil.GetAppErrorStatusCode(options.Err)),
+		options.Context.Response().WriteHeader(
+			errutil.GetAppErrorStatusCode(options.Err),
 		)
+		log.Println("error in RenderComponent():", options.Err)
 	}
 
-	var message string
-	if options.Err != nil {
-		message = errutil.GetAppErrorUserMessage(options.Err)
-	} else {
-		message = options.Message
-	}
-
-	if len(message) > 0 {
-		message, err := json.Marshal(ResponseMessage{
-			Value:   message,
-			IsError: options.Err != nil,
-		})
-
-		if err == nil {
-			payload, err := json.Marshal(TriggerPayload{Message: string(message)})
-
-			if err == nil {
-				options.Context.Response().Header().Set(
-					"HX-Trigger",
-					string(payload),
-				)
-			}
-		}
-
-	}
+	message := getRenderComponentOptionsMessage(options)
+	component := getRenderComponentOptionsComponent(options, message)
 
 	if isHxRequest(options.Context) {
-		return options.Component.Render(
+		return component.Render(
 			options.Context.Request().Context(),
 			options.Context.Response().Writer,
 		)
 	}
-
-	return components.Page(options.Component).Render(
+	return components.Page(component).Render(
 		options.Context.Request().Context(),
 		options.Context.Response().Writer,
 	)
+}
+
+func getRenderComponentOptionsComponent(options RenderComponentOptions, message string) templ.Component {
+	if len(message) > 0 {
+		return components.Joiner(
+			options.Component,
+			components.NotificationWithSwap(message, options.Err != nil),
+		)
+	}
+	return options.Component
+}
+
+func getRenderComponentOptionsMessage(options RenderComponentOptions) string {
+	if options.Err != nil {
+		return errutil.GetAppErrorUserMessage(options.Err)
+	}
+	return options.Message
 }

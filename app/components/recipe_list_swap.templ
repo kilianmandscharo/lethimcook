@@ -1,8 +1,0 @@
-package components
-
-import "github.com/kilianmandscharo/lethimcook/types"
-
-templ RecipeListSwap(isAdmin bool, recipes []types.Recipe) {
-    @RecipeCount(recipes, true)
-    @RecipeList(isAdmin, recipes)
-}

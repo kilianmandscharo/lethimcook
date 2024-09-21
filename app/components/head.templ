@@ -12,5 +12,15 @@ templ head() {
 		<link href="/static/fa/css/fontawesome.css" rel="stylesheet"/>
 		<link href="/static/fa/css/solid.css" rel="stylesheet"/>
 		<link rel="icon" type="image/x-icon" href="/static/favicon.ico"/>
+		<meta
+			name="htmx-config"
+			content='{
+            "responseHandling":[
+                {"code":"204", "swap": false},
+                {"code":"[23]..", "swap": true},
+                {"code":"[45]..", "swap": true, "error": true},
+                {"code":"...", "swap": true}
+            ]}'
+		/>
 	</head>
 }
