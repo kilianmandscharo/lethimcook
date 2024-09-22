@@ -6,16 +6,12 @@ templ Form(form []types.FormElement) {
   for _, element := range form {
     <div>
       <label for={ element.Name }>
-        if element.Required {
-          { element.Label }*
-        } else {
-          { element.Label }
-        }
+        { element.GetLabel() }
       </label>
       if element.Type == types.FormElementInput {
         <input 
           id={ element.Name } 
-          placeholder={ element.Label } 
+          placeholder={ element.GetPlaceholder() } 
           type={ element.InputType } 
           name={ element.Name } 
           value={ element.Value }
@@ -30,7 +26,7 @@ templ Form(form []types.FormElement) {
       if element.Type == types.FormElementTextArea {
         <textarea 
           id={ element.Name } 
-          placeholder={ element.Label } 
+          placeholder={ element.GetPlaceholder() } 
           name={ element.Name } 
           if element.Disabled {
               disabled

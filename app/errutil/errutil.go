@@ -3,6 +3,7 @@ package errutil
 import (
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 type AppError struct {
@@ -21,6 +22,14 @@ func (a *AppError) Unwrap() error {
 
 func (a *AppError) AddMessage(message string) {
 	a.Err = fmt.Errorf("%s: %w", message, a.Err)
+}
+
+func NewAppErrorNotAuthorized(functionName string) error {
+	return &AppError{
+		UserMessage: "Nicht authorisiert",
+		Err:         errors.New(fmt.Sprintf("failed at %s, not authorized", functionName)),
+		StatusCode:  http.StatusUnauthorized,
+	}
 }
 
 func AddMessageToAppError(err error, message string) error {

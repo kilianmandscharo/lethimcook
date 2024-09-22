@@ -141,13 +141,11 @@ func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {
 	return rs.readRecipe(id)
 }
 
-func (rs *recipeService) parseFormData(c echo.Context, withId bool, id uint, pending bool) (types.Recipe, map[string]error, error) {
-	var recipe types.Recipe
-
+func (rs *recipeService) updateRecipeWithFormData(c echo.Context, recipe *types.Recipe) (map[string]error, error) {
 	formErrors := make(map[string]error)
 
 	if err := c.Request().ParseForm(); err != nil {
-		return recipe, formErrors, &errutil.AppError{
+		return formErrors, &errutil.AppError{
 			UserMessage: "Fehlerhaftes Formular",
 			Err:         fmt.Errorf("failed at parseFormData(): %w", err),
 			StatusCode:  http.StatusBadRequest,
@@ -178,18 +176,11 @@ func (rs *recipeService) parseFormData(c echo.Context, withId bool, id uint, pen
 	duration, err := strconv.Atoi(c.Request().FormValue("duration"))
 	if err != nil {
 		formErrors["duration"] = errutil.FormErrorNoDuration
-		recipe.Duration = 0
 	} else {
 		recipe.Duration = duration
 	}
 
-	if withId {
-		recipe.ID = id
-	}
-
-	recipe.Pending = pending
-
-	return recipe, formErrors, nil
+	return formErrors, nil
 }
 
 func (rs *recipeService) getRecipeAsJson(id uint) ([]byte, error) {
@@ -234,13 +225,14 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 			Required:  true,
 		},
 		{
-			Type:      types.FormElementInput,
-			Name:      "duration",
-			Err:       formErrors["duration"],
-			Value:     duration,
-			InputType: "number",
-			Label:     "Zubereitungszeit (Minuten)",
-			Required:  true,
+			Type:        types.FormElementInput,
+			Name:        "duration",
+			Err:         formErrors["duration"],
+			Value:       duration,
+			InputType:   "number",
+			Label:       "Zubereitungszeit (Minuten)",
+			Placeholder: "Zubereitungszeit",
+			Required:    true,
 		},
 		{
 			Type:      types.FormElementInput,
@@ -259,28 +251,31 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 			Label:     "Quelle",
 		},
 		{
-			Type:      types.FormElementInput,
-			Name:      "tags",
-			Err:       formErrors["tags"],
-			Value:     recipe.Tags,
-			InputType: "text",
-			Label:     "Tags (getrennt durch Kommas)",
+			Type:        types.FormElementInput,
+			Name:        "tags",
+			Err:         formErrors["tags"],
+			Value:       recipe.Tags,
+			InputType:   "text",
+			Label:       "Tags (getrennt durch Kommas)",
+			Placeholder: "Tags",
 		},
 		{
-			Type:     types.FormElementTextArea,
-			Name:     "ingredients",
-			Err:      formErrors["ingredients"],
-			Value:    recipe.Ingredients,
-			Label:    "Zutaten",
-			Required: true,
+			Type:        types.FormElementTextArea,
+			Name:        "ingredients",
+			Err:         formErrors["ingredients"],
+			Value:       recipe.Ingredients,
+			Label:       "Zutaten (Markdown)",
+			Placeholder: "Zutaten",
+			Required:    true,
 		},
 		{
-			Type:     types.FormElementTextArea,
-			Name:     "instructions",
-			Err:      formErrors["instructions"],
-			Value:    recipe.Instructions,
-			Label:    "Anleitung",
-			Required: true,
+			Type:        types.FormElementTextArea,
+			Name:        "instructions",
+			Err:         formErrors["instructions"],
+			Value:       recipe.Instructions,
+			Label:       "Anleitung (Markdown)",
+			Placeholder: "Anleitung",
+			Required:    true,
 		},
 	}
 }

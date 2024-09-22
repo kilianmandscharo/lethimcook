@@ -11,16 +11,18 @@ import (
 )
 
 type Recipe struct {
-	ID           uint   `json:"id"`
-	Author       string `json:"author"`
-	Source       string `json:"source"`
-	Title        string `json:"title"`
-	Description  string `json:"description"`
-	Duration     int    `json:"duration"`
-	Ingredients  string `json:"ingredients"`
-	Instructions string `json:"instructions"`
-	Tags         string `json:"tags"`
-	Pending      bool   `json:"-"`
+	ID             uint   `json:"id"`
+	Author         string `json:"author"`
+	Source         string `json:"source"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	Duration       int    `json:"duration"`
+	Ingredients    string `json:"ingredients"`
+	Instructions   string `json:"instructions"`
+	Tags           string `json:"tags"`
+	Pending        bool   `json:"-"`
+	CreatedAt      string `json:"createdAt"`
+	LastModifiedAt string `json:"-"`
 }
 
 func (r *Recipe) ParseTags() []string {
@@ -103,12 +105,27 @@ const (
 )
 
 type FormElement struct {
-	Type      FormElementType
-	Name      string
-	Err       error
-	Value     string
-	InputType string
-	Label     string
-	Required  bool
-	Disabled  bool
+	Type        FormElementType
+	Name        string
+	Err         error
+	Value       string
+	InputType   string
+	Label       string
+	Required    bool
+	Disabled    bool
+	Placeholder string
+}
+
+func (f *FormElement) GetPlaceholder() string {
+	if len(f.Placeholder) > 0 {
+		return f.Placeholder
+	}
+	return f.Label
+}
+
+func (f *FormElement) GetLabel() string {
+	if f.Required {
+		return f.Label + "*"
+	}
+	return f.Label
 }

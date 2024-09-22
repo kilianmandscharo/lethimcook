@@ -33,7 +33,7 @@ templ pendingRecipeDenyButton(recipeId uint) {
 		id="pending-recipe-deny-button"
 		class="icon-button with-label"
 		hx-delete={ fmt.Sprintf("/recipe/%d", recipeId) }
-		hx-confirm="Rezept ablehnen?"
+		hx-confirm="Rezept ablehnen? Das Rezept wird gelöscht."
 		hx-trigger="click"
 		hx-target="#content"
         hx-replace-url="/"

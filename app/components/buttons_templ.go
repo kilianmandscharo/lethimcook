@@ -124,7 +124,7 @@ func pendingRecipeDenyButton(recipeId uint) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept ablehnen?\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept ablehnen\">Ablehnen <i class=\"fa-solid fa-x danger\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-confirm=\"Rezept ablehnen? Das Rezept wird gelöscht.\" hx-trigger=\"click\" hx-target=\"#content\" hx-replace-url=\"/\" title=\"Rezept ablehnen\">Ablehnen <i class=\"fa-solid fa-x danger\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

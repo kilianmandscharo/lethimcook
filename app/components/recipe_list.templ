@@ -3,13 +3,14 @@ package components
 import (
 	"fmt"
 	"github.com/kilianmandscharo/lethimcook/types"
+	"slices"
 )
 
 templ RecipeList(isAdmin bool, recipes []types.Recipe) {
 	<div id="recipe-list" class="recipe-list">
 		if len(recipes) > 0 {
 			<div>
-				for _, recipe := range recipes {
+				for _, recipe := range slices.Backward(recipes) {
 					@RecipeCard(isAdmin, recipe)
 				}
 			</div>
@@ -21,7 +22,7 @@ templ RecipeCount(recipes []types.Recipe, swapOob bool) {
     <p 
         id="recipe-count"
         if swapOob {
-        hx-swap-oob="true"
+            hx-swap-oob="true"
         }
     >
     switch len(recipes) {

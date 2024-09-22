@@ -58,7 +58,7 @@ export async function createRecipe(page: Page, pending?: boolean) {
     await page.getByPlaceholder("Titel").fill(recipe.title);
     await page.getByPlaceholder("Beschreibung").fill(recipe.description);
     await page
-        .getByPlaceholder("Zubereitungszeit (Minuten)")
+        .getByPlaceholder("Zubereitungszeit")
         .fill(recipe.duration);
     await page.getByPlaceholder("Autor").fill(recipe.author);
     await page.getByPlaceholder("Quelle").fill(recipe.source);

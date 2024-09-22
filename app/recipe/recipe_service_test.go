@@ -159,7 +159,7 @@ func TestGetPathPending(t *testing.T) {
 	assert.False(t, pending)
 }
 
-func TestParseFormData(t *testing.T) {
+func TestUpdateRecipeWithFormData(t *testing.T) {
 	// Given
 	recipeService := newTestRecipeService()
 
@@ -239,7 +239,7 @@ func TestParseFormData(t *testing.T) {
 		c := newTestContext(t, newTestContextOptions{
 			formData: test.formData,
 		})
-		_, formErrors, err := recipeService.parseFormData(c, false, 0, false)
+		formErrors, err := recipeService.updateRecipeWithFormData(c, &types.Recipe{})
 
 		assert.NoError(t, err)
 		assert.Equal(t, len(test.formErrors), len(formErrors))
@@ -257,26 +257,26 @@ func TestParseFormData(t *testing.T) {
 	}
 
 	// Given
-	formData := "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=20"
+	formData := "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=20&tags=vegan"
 	c := newTestContext(t, newTestContextOptions{
 		formData: formData,
 		pathId:   "1",
 	})
 
 	// When
-	parsedRecipe, _, err := recipeService.parseFormData(c, true, 1, true)
+	var recipe types.Recipe
+	_, err := recipeService.updateRecipeWithFormData(c, &recipe)
 
 	// Then
 	assert.NoError(t, err)
-	assertRecipesEqual(t, types.Recipe{
-		ID:           uint(1),
+	assert.True(t, recipe == types.Recipe{
 		Title:        "title",
 		Description:  "description",
 		Instructions: "instructions",
 		Ingredients:  "ingredients",
 		Duration:     20,
-		Pending:      true,
-	}, parsedRecipe)
+		Tags:         "vegan",
+	})
 }
 
 func TestReadAllRecipesService(t *testing.T) {
@@ -323,7 +323,7 @@ func TestGetRecipeAsJson(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(
 		t,
-		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\"}"),
+		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\",\"createdAt\":\"\"}"),
 		recipeJson,
 	)
 }

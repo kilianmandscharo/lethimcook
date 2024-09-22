@@ -88,11 +88,7 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 	if !servutil.IsAuthorized(c) {
 		return servutil.RenderError(
 			c,
-			&errutil.AppError{
-				UserMessage: "Nicht authorisiert",
-				Err:         errors.New("failed at HandleLogout(), not authorized"),
-				StatusCode:  http.StatusUnauthorized,
-			},
+			errutil.NewAppErrorNotAuthorized("HandleLogout()"),
 		)
 	}
 

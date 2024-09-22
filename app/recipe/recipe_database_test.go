@@ -14,17 +14,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func assertRecipesEqual(t *testing.T, first, second types.Recipe) {
-	assert.True(
-		t,
-		first.ID == second.ID &&
-			first.Description == second.Description &&
-			first.Duration == second.Duration &&
-			first.Ingredients == second.Ingredients &&
-			first.Instructions == second.Instructions,
-	)
-}
-
 func newTestRecipeDatabase() recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
@@ -86,7 +75,7 @@ func TestReadRecipe(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assertRecipesEqual(t, r, retrievedRecipe)
+	assert.True(t, r == retrievedRecipe)
 }
 
 func TestReadAllRecipes(t *testing.T) {
@@ -110,7 +99,7 @@ func TestReadAllRecipes(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(recipes))
-	assertRecipesEqual(t, r, recipes[0])
+	assert.True(t, r == recipes[0])
 
 	// Given
 	r = types.NewTestRecipe()
@@ -147,7 +136,7 @@ func TestReadAllRecipesWithPending(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(recipes))
-	assertRecipesEqual(t, r, recipes[0])
+	assert.True(t, r == recipes[0])
 
 	// Given
 	r = types.NewTestRecipe()
@@ -208,7 +197,7 @@ func TestUpdateRecipe(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assertRecipesEqual(t, r, retrievedRecipe)
+	assert.True(t, r == retrievedRecipe)
 }
 
 func TestUpdatePending(t *testing.T) {
