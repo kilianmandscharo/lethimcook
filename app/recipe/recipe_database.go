@@ -68,7 +68,7 @@ func (db *recipeDatabase) readRecipe(id uint) (types.Recipe, error) {
 	return recipe, nil
 }
 
-func (db *recipeDatabase) readAllRecipes() ([]types.Recipe, error) {
+func (db *recipeDatabase) readAllRecipesWithoutPending() ([]types.Recipe, error) {
 	var recipes []types.Recipe
 	if err := db.handler.Where("pending IS NULL OR pending = 0").Find(&recipes).Error; err != nil {
 		return recipes, &errutil.AppError{

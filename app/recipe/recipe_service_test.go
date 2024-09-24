@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/cache"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/testutil"
@@ -18,8 +19,9 @@ import (
 func newTestRecipeService() recipeService {
 	logger := logging.New()
 	return recipeService{
-		db:     newTestRecipeDatabase(),
-		logger: &logger,
+		db:          newTestRecipeDatabase(),
+		logger:      &logger,
+		recipeCache: cache.NewRecipeCache(&logger),
 	}
 }
 

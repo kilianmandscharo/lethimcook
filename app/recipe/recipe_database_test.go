@@ -81,7 +81,7 @@ func TestReadAllRecipes(t *testing.T) {
 	db := newTestRecipeDatabase()
 
 	// When
-	recipes, err := db.readAllRecipes()
+	recipes, err := db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)
@@ -92,7 +92,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
-	recipes, err = db.readAllRecipes()
+	recipes, err = db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)
@@ -105,7 +105,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
-	recipes, err = db.readAllRecipes()
+	recipes, err = db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)

@@ -61,7 +61,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 	if err != nil {
 		appError := errutil.AddMessageToAppError(
 			err,
-			"failed at HandleLogin(), invalid password",
+			"failed at HandleLogin()",
 		)
 		return ac.renderAdminPage(renderAdminPageOptions{
 			c:              c,
@@ -84,6 +84,8 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	c.Set("authorized", true)
 
+	ac.logger.Info("admin login successful")
+
 	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
 		isAuthorized: servutil.IsAuthorized(c),
@@ -103,6 +105,8 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 	c.SetCookie(&cookie)
 
 	c.Set("authorized", false)
+
+	ac.logger.Info("admin logout successful")
 
 	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
@@ -151,6 +155,8 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 			newPasswordError: formError,
 		})
 	}
+
+	ac.logger.Info("admin password updated successfully")
 
 	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
