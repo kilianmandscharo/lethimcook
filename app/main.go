@@ -12,10 +12,10 @@ import (
 )
 
 func main() {
-	env.LoadEnvironment(".env")
-
-	logger := logging.New()
+	logger := logging.New(logging.Debug)
 	renderer := render.New(&logger)
+
+	env.LoadEnvironment(".env", &logger)
 
 	authDatabase := auth.NewAuthDatabase(&logger)
 	authService := auth.NewAuthService(authDatabase, &logger)
@@ -26,9 +26,10 @@ func main() {
 	recipeController := recipe.NewRecipeController(recipeService, &logger, &renderer)
 
 	var password = flag.String("init-admin", "", "the admin password")
+	var isProd = flag.Bool("prod", false, "shoudl the app run in production mode")
 	flag.Parse()
-	authService.CreateAdminIfDoesNotExist(*password)
 
-	server := server.New(authController, recipeController, &logger, &renderer)
+	authService.CreateAdminIfDoesNotExist(*password)
+	server := server.New(authController, recipeController, &logger, &renderer, *isProd)
 	server.Start()
 }

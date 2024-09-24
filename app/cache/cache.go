@@ -33,7 +33,7 @@ func (r *RecipeCache) getWithPending() *[]types.Recipe {
 }
 
 func (r *RecipeCache) getWithoutPending() *[]types.Recipe {
-	var recipes []types.Recipe
+	recipes := make([]types.Recipe, 0)
 	if r.recipes == nil {
 		return &recipes
 	}

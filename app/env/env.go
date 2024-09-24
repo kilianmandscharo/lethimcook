@@ -1,10 +1,10 @@
 package env
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/kilianmandscharo/lethimcook/logging"
 )
 
 const (
@@ -13,11 +13,10 @@ const (
 	EnvKeyJWTPrivateKey = "JWT_PRIVATE_KEY"
 )
 
-func LoadEnvironment(envName string) {
+func LoadEnvironment(envName string, logger *logging.Logger) {
 	err := godotenv.Load(envName)
 	if err != nil {
-		fmt.Println("failed to load", envName)
-		os.Exit(1)
+		logger.Fatal("failed to load", envName)
 	}
 }
 

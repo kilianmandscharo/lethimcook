@@ -12,7 +12,7 @@ import (
 )
 
 func newTestRecipeController() RecipeController {
-	logger := logging.New()
+	logger := logging.New(logging.Debug)
 	renderer := render.New(&logger)
 	recipeService := newTestRecipeService()
 	return NewRecipeController(recipeService, &logger, &renderer)

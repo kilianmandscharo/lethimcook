@@ -138,3 +138,12 @@ func ConstructTestFormDataString(options TestFormDataStringOptions) string {
 
 	return formData
 }
+
+func NewEmptyTestContext(t *testing.T) echo.Context {
+	var body io.Reader
+	req, err := http.NewRequest("", "", body)
+	assert.NoError(t, err)
+	rr := httptest.NewRecorder()
+	c := echo.New().NewContext(req, rr)
+	return c
+}

@@ -22,7 +22,7 @@ type controllerOptions struct {
 }
 
 func newTestAuthController(options controllerOptions) AuthController {
-	logger := logging.New()
+	logger := logging.New(logging.Debug)
 	renderer := render.New(&logger)
 	authService := newTestAuthService()
 
