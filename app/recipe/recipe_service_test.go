@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/testutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
@@ -15,8 +16,10 @@ import (
 )
 
 func newTestRecipeService() recipeService {
+	logger := logging.New()
 	return recipeService{
-		db: newTestRecipeDatabase(),
+		db:     newTestRecipeDatabase(),
+		logger: &logger,
 	}
 }
 

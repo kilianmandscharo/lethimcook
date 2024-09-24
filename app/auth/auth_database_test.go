@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,17 +18,14 @@ func newTestAuthDatabase() authDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
-
 	if err != nil {
 		fmt.Println("failed to connect test database: ", err)
 		os.Exit(1)
 	}
-
 	db.Migrator().DropTable(&admin{})
-
 	db.AutoMigrate(&admin{})
-
-	return authDatabase{handler: db}
+	logger := logging.New()
+	return authDatabase{handler: db, logger: &logger}
 }
 
 func newTestAdmin() admin {

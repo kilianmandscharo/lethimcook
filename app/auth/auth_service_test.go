@@ -9,13 +9,16 @@ import (
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/stretchr/testify/assert"
 )
 
 func newTestAuthService() AuthService {
+	logger := logging.New()
 	return AuthService{
 		db:         newTestAuthDatabase(),
 		privateKey: "test_private_key",
+		logger:     &logger,
 	}
 }
 

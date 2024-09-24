@@ -9,18 +9,18 @@ import (
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 )
 
 type recipeService struct {
-	db recipeDatabase
+	db     recipeDatabase
+	logger *logging.Logger
 }
 
-func NewRecipeService(db recipeDatabase) recipeService {
-	return recipeService{
-		db: db,
-	}
+func NewRecipeService(db recipeDatabase, logger *logging.Logger) recipeService {
+	return recipeService{db: db, logger: logger}
 }
 
 func (rs *recipeService) createRecipe(recipe *types.Recipe) error {

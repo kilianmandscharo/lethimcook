@@ -4,15 +4,18 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/render"
 	"github.com/kilianmandscharo/lethimcook/testutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/stretchr/testify/assert"
 )
 
 func newTestRecipeController() RecipeController {
-	return RecipeController{
-		recipeService: newTestRecipeService(),
-	}
+	logger := logging.New()
+	renderer := render.New(&logger)
+	recipeService := newTestRecipeService()
+	return NewRecipeController(recipeService, &logger, &renderer)
 }
 
 func TestRenderRecipeListPage(t *testing.T) {

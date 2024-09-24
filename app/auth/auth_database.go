@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -23,9 +24,10 @@ func newAdmin(passwordHash string) admin {
 
 type authDatabase struct {
 	handler *gorm.DB
+	logger  *logging.Logger
 }
 
-func NewAuthDatabase() authDatabase {
+func NewAuthDatabase(log *logging.Logger) authDatabase {
 	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -34,7 +36,7 @@ func NewAuthDatabase() authDatabase {
 		os.Exit(1)
 	}
 	db.AutoMigrate(&admin{})
-	return authDatabase{handler: db}
+	return authDatabase{handler: db, logger: log}
 }
 
 func (db *authDatabase) createAdmin(admin *admin) error {

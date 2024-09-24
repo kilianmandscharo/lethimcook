@@ -9,28 +9,52 @@ import (
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/auth"
+	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/env"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/recipe"
+	"github.com/kilianmandscharo/lethimcook/render"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
-	e *echo.Echo
+	e        *echo.Echo
+	logger   *logging.Logger
+	renderer *render.Renderer
 }
 
-func New(authController auth.AuthController, recipeController recipe.RecipeController) Server {
+func New(
+	authController auth.AuthController,
+	recipeController recipe.RecipeController,
+	logger *logging.Logger,
+	renderer *render.Renderer,
+) Server {
 	e := echo.New()
 
 	e.Use(authController.ValidateTokenMiddleware)
 	e.Static("/static", "./static")
 
-	servutil.AttachHandlerFunctions(e)
+	e.GET("/imprint", func(c echo.Context) error {
+		return renderer.RenderComponent(render.RenderComponentOptions{
+			Context:   c,
+			Component: components.Imprint(servutil.IsAuthorized(c)),
+		})
+	})
+	e.GET("/privacy-notice", func(c echo.Context) error {
+		return renderer.RenderComponent(render.RenderComponentOptions{
+			Context:   c,
+			Component: components.PrivacyNotice(servutil.IsAuthorized(c)),
+		})
+	})
+
 	recipeController.AttachHandlerFunctions(e)
 	authController.AttachHandlerFunctions(e)
 
 	return Server{
-		e: e,
+		e:        e,
+		logger:   logger,
+		renderer: renderer,
 	}
 }
 

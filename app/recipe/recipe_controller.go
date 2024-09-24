@@ -9,6 +9,8 @@ import (
 
 	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/render"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
@@ -16,11 +18,15 @@ import (
 
 type RecipeController struct {
 	recipeService recipeService
+	logger        *logging.Logger
+	renderer      *render.Renderer
 }
 
-func NewRecipeController(recipeService recipeService) RecipeController {
+func NewRecipeController(recipeService recipeService, logger *logging.Logger, renderer *render.Renderer) RecipeController {
 	return RecipeController{
 		recipeService: recipeService,
+		logger:        logger,
+		renderer:      renderer,
 	}
 }
 
@@ -49,13 +55,13 @@ func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message s
 
 	recipes, err := rc.recipeService.readAllRecipes(isAdmin)
 	if err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at renderRecipeListPageHelper()"),
 		)
 	}
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipesPage(isAdmin, recipes),
 		Message:   message,
@@ -64,7 +70,7 @@ func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message s
 
 func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 	formElements := rc.recipeService.createRecipeForm(types.Recipe{}, make(map[string]error))
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipeNewPage(formElements, servutil.IsAuthorized(c)),
 	})
@@ -73,7 +79,7 @@ func (rc *RecipeController) RenderRecipeNewPage(c echo.Context) error {
 func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 	if !isAdmin {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.NewAppErrorNotAuthorized("RenderRecipeEditPage()"),
 		)
@@ -81,14 +87,14 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 
 	recipe, err := rc.recipeService.getRecipeById(c)
 	if err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at RenderRecipeNewPage()"),
 		)
 	}
 
 	formElements := rc.recipeService.createRecipeForm(recipe, make(map[string]error))
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipeEditPage(isAdmin, recipe.ID, formElements),
 	})
@@ -101,14 +107,14 @@ func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
 func (rc *RecipeController) RenderRecipePageHelper(c echo.Context, message string) error {
 	recipe, err := rc.recipeService.getRecipeById(c)
 	if err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at RenderRecipePageHelper()"),
 		)
 	}
 
 	if err := recipe.RenderMarkdown(); err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at RenderRecipePageHelper()"),
 		)
@@ -116,7 +122,7 @@ func (rc *RecipeController) RenderRecipePageHelper(c echo.Context, message strin
 
 	c.Response().Header().Set("HX-Push-Url", fmt.Sprintf("/recipe/%d", recipe.ID))
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipePage(servutil.IsAuthorized(c), recipe, recipe.ParseTags()),
 		Message:   message,
@@ -127,7 +133,7 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 
 	if err := c.Request().ParseForm(); err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleSearchRecipe()"),
 		)
@@ -136,13 +142,13 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 
 	filteredRecipes, err := rc.recipeService.getFilteredRecipes(query, isAdmin)
 	if err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleSearchRecipe()"),
 		)
 	}
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context: c,
 		Component: components.Joiner(
 			components.RecipeCount(filteredRecipes, true),
@@ -156,7 +162,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 
 	if !isAdmin && !pending {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.NewAppErrorNotAuthorized("HandleCreateRecipe()"),
 		)
@@ -166,7 +172,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 
 	formErrors, err := rc.recipeService.updateRecipeWithFormData(c, &recipe)
 	if err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleCreateRecipe()"),
 		)
@@ -174,7 +180,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 
 	if len(formErrors) > 0 {
 		formElements := rc.recipeService.createRecipeForm(recipe, formErrors)
-		return servutil.RenderComponent(servutil.RenderComponentOptions{
+		return rc.renderer.RenderComponent(render.RenderComponentOptions{
 			Context:   c,
 			Component: components.RecipeNewPage(formElements, servutil.IsAuthorized(c)),
 			Err: &errutil.AppError{
@@ -189,7 +195,7 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 	recipe.CreatedAt = time.Now().Format(time.RFC3339)
 
 	if err := rc.recipeService.createRecipe(&recipe); err != nil {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleCreateRecipe()"),
 		)
@@ -204,14 +210,14 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 	if !isAdmin {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.NewAppErrorNotAuthorized("HandleUpdatePending()"),
 		)
 	}
 
 	createError := func(err error) error {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleToggleRecipe()"),
 		)
@@ -242,13 +248,13 @@ func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
 func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 	if !isAdmin {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c, errutil.NewAppErrorNotAuthorized("HandleCreateRecipe()"),
 		)
 	}
 
 	createError := func(err error) error {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleUpdateRecipe()"),
 		)
@@ -271,7 +277,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 
 	if len(formErrors) > 0 {
 		formElements := rc.recipeService.createRecipeForm(recipe, formErrors)
-		return servutil.RenderComponent(servutil.RenderComponentOptions{
+		return rc.renderer.RenderComponent(render.RenderComponentOptions{
 			Context:   c,
 			Component: components.RecipeEditPage(isAdmin, recipe.ID, formElements),
 			Err: &errutil.AppError{
@@ -294,14 +300,14 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 	isAdmin := servutil.IsAuthorized(c)
 	if !isAdmin {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.NewAppErrorNotAuthorized("HandleDeleteRecipe()"),
 		)
 	}
 
 	createError := func(err error) error {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleDeleteRecipe()"),
 		)
@@ -322,7 +328,7 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return createError(err)
 	}
 
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipesPage(isAdmin, recipes),
 		Message:   "Rezept entfernt",
@@ -331,7 +337,7 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 
 func (rc *RecipeController) HandleDownloadRecipeAsJson(c echo.Context) error {
 	createError := func(err error) error {
-		return servutil.RenderError(
+		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(
 				err,

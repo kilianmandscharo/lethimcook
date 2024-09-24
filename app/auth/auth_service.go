@@ -8,21 +8,20 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/env"
 	"github.com/kilianmandscharo/lethimcook/errutil"
-	"github.com/kilianmandscharo/lethimcook/servutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/types"
-	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
 	db         authDatabase
 	privateKey string
+	logger     *logging.Logger
 }
 
-func NewAuthService(db authDatabase) AuthService {
+func NewAuthService(db authDatabase, logger *logging.Logger) AuthService {
 	return AuthService{
 		db:         db,
 		privateKey: env.Get(env.EnvKeyJWTPrivateKey),
@@ -207,27 +206,4 @@ func (as *AuthService) createNewPasswordForm(oldPasswordError error, newPassword
 			Required:  true,
 		},
 	}
-}
-
-type createAdminPageOptions struct {
-	c                echo.Context
-	isAuthorized     bool
-	loginFormError   error
-	message          string
-	err              error
-	oldPasswordError error
-	newPasswordError error
-}
-
-func (as *AuthService) createAdminPage(options createAdminPageOptions) error {
-	return servutil.RenderComponent(servutil.RenderComponentOptions{
-		Context: options.c,
-		Component: components.AdminPage(
-			options.isAuthorized,
-			as.createLoginForm(options.isAuthorized, options.loginFormError),
-			as.createNewPasswordForm(options.oldPasswordError, options.newPasswordError),
-		),
-		Message: options.message,
-		Err:     options.err,
-	})
 }

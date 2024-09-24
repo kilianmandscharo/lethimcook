@@ -6,18 +6,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/render"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/labstack/echo/v4"
 )
 
 type AuthController struct {
 	authService AuthService
+	logger      *logging.Logger
+	renderer    *render.Renderer
 }
 
-func NewAuthController(authService AuthService) AuthController {
+func NewAuthController(authService AuthService, logger *logging.Logger, renderer *render.Renderer) AuthController {
 	return AuthController{
 		authService: authService,
+		logger:      logger,
+		renderer:    renderer,
 	}
 }
 
@@ -32,7 +39,7 @@ func (ac *AuthController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (ac *AuthController) RenderAdminPage(c echo.Context) error {
-	return ac.authService.createAdminPage(createAdminPageOptions{
+	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
 		isAuthorized: servutil.IsAuthorized(c),
 	})
@@ -40,7 +47,7 @@ func (ac *AuthController) RenderAdminPage(c echo.Context) error {
 
 func (ac *AuthController) HandleLogin(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		return servutil.RenderError(c, &errutil.AppError{
+		return ac.renderer.RenderError(c, &errutil.AppError{
 			UserMessage: "Fehlerhaftes Formular",
 			Err: fmt.Errorf(
 				"failed at HandleLogin(), invalid form: %w",
@@ -56,7 +63,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 			err,
 			"failed at HandleLogin(), invalid password",
 		)
-		return ac.authService.createAdminPage(createAdminPageOptions{
+		return ac.renderAdminPage(renderAdminPageOptions{
 			c:              c,
 			isAuthorized:   servutil.IsAuthorized(c),
 			loginFormError: errutil.FormErrorInvalidPassword,
@@ -66,7 +73,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	token, err := ac.authService.createToken()
 	if err != nil {
-		return servutil.RenderError(
+		return ac.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at HandleLogin()"),
 		)
@@ -77,7 +84,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 	c.Set("authorized", true)
 
-	return ac.authService.createAdminPage(createAdminPageOptions{
+	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
 		isAuthorized: servutil.IsAuthorized(c),
 		message:      "Angemeldet",
@@ -86,7 +93,7 @@ func (ac *AuthController) HandleLogin(c echo.Context) error {
 
 func (ac *AuthController) HandleLogout(c echo.Context) error {
 	if !servutil.IsAuthorized(c) {
-		return servutil.RenderError(
+		return ac.renderer.RenderError(
 			c,
 			errutil.NewAppErrorNotAuthorized("HandleLogout()"),
 		)
@@ -97,7 +104,7 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 
 	c.Set("authorized", false)
 
-	return ac.authService.createAdminPage(createAdminPageOptions{
+	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
 		isAuthorized: servutil.IsAuthorized(c),
 		message:      "Abgemeldet",
@@ -106,7 +113,7 @@ func (ac *AuthController) HandleLogout(c echo.Context) error {
 
 func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		return servutil.RenderError(c, &errutil.AppError{
+		return ac.renderer.RenderError(c, &errutil.AppError{
 			UserMessage: "Fehlerhaftes Formular",
 			Err: fmt.Errorf(
 				"failed at HandleUpdatePassword(), invalid form: %w",
@@ -122,7 +129,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 			err,
 			"failed at HandleUpdatePassword()",
 		)
-		return ac.authService.createAdminPage(createAdminPageOptions{
+		return ac.renderAdminPage(renderAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
 			err:              appError,
@@ -137,7 +144,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 			err,
 			"failed at HandleUpdatePassword()",
 		)
-		return ac.authService.createAdminPage(createAdminPageOptions{
+		return ac.renderAdminPage(renderAdminPageOptions{
 			c:                c,
 			isAuthorized:     servutil.IsAuthorized(c),
 			err:              appError,
@@ -145,7 +152,7 @@ func (ac *AuthController) HandleUpdatePassword(c echo.Context) error {
 		})
 	}
 
-	return ac.authService.createAdminPage(createAdminPageOptions{
+	return ac.renderAdminPage(renderAdminPageOptions{
 		c:            c,
 		isAuthorized: servutil.IsAuthorized(c),
 		message:      "Passwort aktualisiert",
@@ -164,4 +171,27 @@ func (ac *AuthController) ValidateTokenMiddleware(next echo.HandlerFunc) echo.Ha
 
 		return next(c)
 	}
+}
+
+type renderAdminPageOptions struct {
+	c                echo.Context
+	isAuthorized     bool
+	loginFormError   error
+	message          string
+	err              error
+	oldPasswordError error
+	newPasswordError error
+}
+
+func (ac *AuthController) renderAdminPage(options renderAdminPageOptions) error {
+	return ac.renderer.RenderComponent(render.RenderComponentOptions{
+		Context: options.c,
+		Component: components.AdminPage(
+			options.isAuthorized,
+			ac.authService.createLoginForm(options.isAuthorized, options.loginFormError),
+			ac.authService.createNewPasswordForm(options.oldPasswordError, options.newPasswordError),
+		),
+		Message: options.message,
+		Err:     options.err,
+	})
 }

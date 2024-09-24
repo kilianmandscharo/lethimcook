@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/render"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/testutil"
 	"github.com/stretchr/testify/assert"
@@ -20,13 +22,15 @@ type controllerOptions struct {
 }
 
 func newTestAuthController(options controllerOptions) AuthController {
+	logger := logging.New()
+	renderer := render.New(&logger)
 	authService := newTestAuthService()
 
 	if options.withAdmin {
 		authService.createAdmin(testPassword)
 	}
 
-	return NewAuthController(authService)
+	return NewAuthController(authService, &logger, &renderer)
 }
 
 func newTestCookie(t *testing.T, authController *AuthController) http.Cookie {

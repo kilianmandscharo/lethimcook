@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -14,16 +15,17 @@ import (
 
 type recipeDatabase struct {
 	handler *gorm.DB
+	logger  *logging.Logger
 }
 
-func NewRecipeDatabase() recipeDatabase {
+func NewRecipeDatabase(logger *logging.Logger) recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("./recipe.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("failed to connect recipe database: ", err)
 		os.Exit(1)
 	}
 	db.AutoMigrate(&types.Recipe{})
-	return recipeDatabase{handler: db}
+	return recipeDatabase{handler: db, logger: logger}
 }
 
 func (db *recipeDatabase) createRecipe(recipe *types.Recipe) error {
