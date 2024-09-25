@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kilianmandscharo/lethimcook/cache"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/types"
@@ -15,15 +16,21 @@ import (
 )
 
 type recipeService struct {
-	db     recipeDatabase
-	logger *logging.Logger
+	db          recipeDatabase
+	logger      *logging.Logger
+	recipeCache cache.RecipeCache
 }
 
 func NewRecipeService(db recipeDatabase, logger *logging.Logger) recipeService {
-	return recipeService{db: db, logger: logger}
+	return recipeService{
+		db:          db,
+		logger:      logger,
+		recipeCache: cache.NewRecipeCache(logger),
+	}
 }
 
 func (rs *recipeService) createRecipe(recipe *types.Recipe) error {
+	rs.recipeCache.Invalidate()
 	return rs.db.createRecipe(recipe)
 }
 
@@ -32,34 +39,33 @@ func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 }
 
 func (rs *recipeService) readAllRecipes(isAdmin bool) ([]types.Recipe, error) {
-	var recipes []types.Recipe
-	var err error
-
-	if isAdmin {
-		recipes, err = rs.db.readAllRecipesWithPending()
-	} else {
-		recipes, err = rs.db.readAllRecipes()
+	if rs.recipeCache.IsValid() {
+		recipes := *rs.recipeCache.Get(isAdmin)
+		return recipes, nil
 	}
-
+	recipes, err := rs.db.readAllRecipesWithPending()
 	if err != nil {
 		errutil.AddMessageToAppError(
 			err,
 			fmt.Sprintf("failed at readAllRecipes() with isAdmin = %t", isAdmin),
 		)
 	}
-
-	return recipes, nil
+	rs.recipeCache.Set(recipes)
+	return *rs.recipeCache.Get(isAdmin), nil
 }
 
 func (rs *recipeService) deleteRecipe(id uint) error {
+	rs.recipeCache.Invalidate()
 	return rs.db.deleteRecipe(id)
 }
 
 func (rs *recipeService) updateRecipe(recipe *types.Recipe) error {
+	rs.recipeCache.Invalidate()
 	return rs.db.updateRecipe(recipe)
 }
 
 func (rs *recipeService) updatePending(id uint, pending bool) error {
+	rs.recipeCache.Invalidate()
 	return rs.db.updatePending(id, pending)
 }
 

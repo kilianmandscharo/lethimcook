@@ -25,7 +25,7 @@ func newTestRecipeDatabase() recipeDatabase {
 	}
 	db.Migrator().DropTable(&types.Recipe{})
 	db.AutoMigrate(&types.Recipe{})
-	logger := logging.New()
+	logger := logging.New(logging.Debug)
 	return recipeDatabase{handler: db, logger: &logger}
 }
 
@@ -81,7 +81,7 @@ func TestReadAllRecipes(t *testing.T) {
 	db := newTestRecipeDatabase()
 
 	// When
-	recipes, err := db.readAllRecipes()
+	recipes, err := db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)
@@ -92,7 +92,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
-	recipes, err = db.readAllRecipes()
+	recipes, err = db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)
@@ -105,7 +105,7 @@ func TestReadAllRecipes(t *testing.T) {
 	assert.NoError(t, db.createRecipe(&r))
 
 	// When
-	recipes, err = db.readAllRecipes()
+	recipes, err = db.readAllRecipesWithoutPending()
 
 	// Then
 	assert.NoError(t, err)

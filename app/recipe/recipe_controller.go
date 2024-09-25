@@ -202,8 +202,10 @@ func (rc *RecipeController) HandleCreateRecipe(c echo.Context) error {
 	}
 
 	if pending {
+		rc.logger.Info("created pending recipe", recipe.ID)
 		return rc.renderRecipeListPageHelper(c, "Rezept eingereicht")
 	}
+	rc.logger.Info("created recipe", recipe.ID)
 	return rc.renderRecipeListPageHelper(c, "Rezept erstellt")
 }
 
@@ -239,8 +241,10 @@ func (rc *RecipeController) HandleUpdatePending(c echo.Context) error {
 	}
 
 	if pending {
+		rc.logger.Infof("set recipe %d to pending", id)
 		return rc.renderRecipeListPageHelper(c, "Rezept auf 'ausstehend' gesetzt")
 	} else {
+		rc.logger.Infof("set recipe %d to not pending", id)
 		return rc.renderRecipeListPageHelper(c, "Rezept angenommen")
 	}
 }
@@ -269,6 +273,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	if err != nil {
 		return createError(err)
 	}
+    rc.logger.Info("old recipe:", recipe.String())
 
 	formErrors, err := rc.recipeService.updateRecipeWithFormData(c, &recipe)
 	if err != nil {
@@ -294,6 +299,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		return createError(err)
 	}
 
+    rc.logger.Info("updated recipe:", recipe.String())
 	return rc.RenderRecipePageHelper(c, "Rezept aktualisiert")
 }
 
@@ -328,6 +334,7 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return createError(err)
 	}
 
+	rc.logger.Info("deleted recipe", id)
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipesPage(isAdmin, recipes),

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
@@ -23,6 +24,35 @@ type Recipe struct {
 	Pending        bool   `json:"-"`
 	CreatedAt      string `json:"createdAt"`
 	LastModifiedAt string `json:"-"`
+}
+
+func (r *Recipe) String() string {
+	buf := new(bytes.Buffer)
+	buf.WriteString("\n    id: ")
+	buf.WriteString(strconv.Itoa(int(r.ID)))
+	buf.WriteString("\n    author: ")
+	buf.WriteString(r.Author)
+	buf.WriteString("\n    source: ")
+	buf.WriteString(r.Source)
+	buf.WriteString("\n    title: ")
+	buf.WriteString(r.Title)
+	buf.WriteString("\n    description: ")
+	buf.WriteString(r.Description)
+	buf.WriteString("\n    duration: ")
+	buf.WriteString(strconv.Itoa(r.Duration))
+	buf.WriteString("\n    ingredients: ")
+	buf.WriteString(r.Ingredients)
+	buf.WriteString("\n    instructions: ")
+	buf.WriteString(r.Instructions)
+	buf.WriteString("\n    tags: ")
+	buf.WriteString(r.Tags)
+	buf.WriteString("\n    pending: ")
+	buf.WriteString(strconv.FormatBool(r.Pending))
+	buf.WriteString("\n    created at: ")
+	buf.WriteString(r.CreatedAt)
+	buf.WriteString("\n    last modified at: ")
+	buf.WriteString(r.LastModifiedAt)
+	return buf.String()
 }
 
 func (r *Recipe) ParseTags() []string {

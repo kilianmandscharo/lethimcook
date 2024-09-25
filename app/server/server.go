@@ -22,6 +22,7 @@ type Server struct {
 	e        *echo.Echo
 	logger   *logging.Logger
 	renderer *render.Renderer
+	isProd   bool
 }
 
 func New(
@@ -29,6 +30,7 @@ func New(
 	recipeController recipe.RecipeController,
 	logger *logging.Logger,
 	renderer *render.Renderer,
+	isProd bool,
 ) Server {
 	e := echo.New()
 
@@ -55,6 +57,7 @@ func New(
 		e:        e,
 		logger:   logger,
 		renderer: renderer,
+		isProd:   isProd,
 	}
 }
 
@@ -62,7 +65,10 @@ func (s *Server) Start() {
 	certFilePath := env.Get(env.EnvKeyCertFilePath)
 	keyFilePath := env.Get(env.EnvKeyKeyFilePath)
 
-	if len(certFilePath) > 0 && len(keyFilePath) > 0 {
+	if s.isProd {
+		if len(certFilePath) == 0 || len(keyFilePath) == 0 {
+			s.logger.Fatal("env variables certFilePath and keyFilePath need to be defined when running in production mode")
+		}
 		s.startProd(certFilePath, keyFilePath)
 	} else {
 		s.startDev()
@@ -71,23 +77,20 @@ func (s *Server) Start() {
 
 func (s *Server) startDev() {
 	go func() {
-		log.Fatal(s.e.Start(":8080"))
+		s.logger.Fatal(s.e.Start(":8080"))
 	}()
-
 	s.listenForShutdown()
 }
 
 func (s *Server) startProd(certFilePath, keyFilePath string) {
 	go func() {
-		s.e.Logger.Fatal(s.e.StartTLS(":443", certFilePath, keyFilePath))
+		s.logger.Fatal(s.e.StartTLS(":443", certFilePath, keyFilePath))
 	}()
-
 	go func() {
-		log.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		s.logger.Fatal(http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			http.Redirect(w, req, "https://"+req.Host+req.URL.String(), http.StatusMovedPermanently)
 		})))
 	}()
-
 	s.listenForShutdown()
 }
 

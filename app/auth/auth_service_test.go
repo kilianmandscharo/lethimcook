@@ -14,7 +14,7 @@ import (
 )
 
 func newTestAuthService() AuthService {
-	logger := logging.New()
+	logger := logging.New(logging.Debug)
 	return AuthService{
 		db:         newTestAuthDatabase(),
 		privateKey: "test_private_key",

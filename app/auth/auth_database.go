@@ -4,13 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type admin struct {
@@ -27,16 +25,13 @@ type authDatabase struct {
 	logger  *logging.Logger
 }
 
-func NewAuthDatabase(log *logging.Logger) authDatabase {
-	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
+func NewAuthDatabase(logger *logging.Logger) authDatabase {
+	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{})
 	if err != nil {
-		fmt.Println("failed to connect auth database: ", err)
-		os.Exit(1)
+		logger.Fatal("failed to connect auth database: ", err)
 	}
 	db.AutoMigrate(&admin{})
-	return authDatabase{handler: db, logger: log}
+	return authDatabase{handler: db, logger: logger}
 }
 
 func (db *authDatabase) createAdmin(admin *admin) error {

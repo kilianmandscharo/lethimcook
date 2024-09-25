@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +30,8 @@ func TestEnvironment(t *testing.T) {
 	assert.Equal(t, "", Get(EnvKeyJWTPrivateKey))
 
 	// When
-	LoadEnvironment(testFileName)
+    logger := logging.New(logging.Debug)
+	LoadEnvironment(testFileName, &logger)
 
 	// Then
 	assert.Equal(t, testCertFilePath, Get(EnvKeyCertFilePath))

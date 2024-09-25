@@ -25,22 +25,21 @@ func NewAuthService(db authDatabase, logger *logging.Logger) AuthService {
 	return AuthService{
 		db:         db,
 		privateKey: env.Get(env.EnvKeyJWTPrivateKey),
+		logger:     logger,
 	}
 }
 
 func (as *AuthService) CreateAdminIfDoesNotExist(password string) {
 	if as.doesAdminExist() {
 		if len(password) > 0 {
-			fmt.Println("Admin found, ignoring provided 'init-admin'")
+			as.logger.Warn("Admin found, ignoring provided 'init-admin'")
 		}
 	} else {
 		if len(password) == 0 {
-			fmt.Println("No admin found")
-			fmt.Printf("Usage: %s --init-admin <password>\n", os.Args[0])
-			os.Exit(1)
+			as.logger.Fatalf("no admin found, usage: %s [--init-admin] <password> [--prod]\n", os.Args[0])
 		} else {
 			as.createAdmin(password)
-			fmt.Println("Initialized admin")
+			as.logger.Info("Initialized admin")
 		}
 	}
 }
@@ -101,8 +100,7 @@ func (as *AuthService) validatePassword(password string) error {
 func (as *AuthService) doesAdminExist() bool {
 	doesAdminExist, err := as.db.doesAdminExist()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		as.logger.Fatal(err)
 	}
 	return doesAdminExist
 }
@@ -110,13 +108,11 @@ func (as *AuthService) doesAdminExist() bool {
 func (as *AuthService) createAdmin(password string) {
 	passwordHash, err := as.hashPassword(password)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		as.logger.Fatal(err)
 	}
 	err = as.db.createAdmin(&admin{PasswordHash: passwordHash})
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		as.logger.Fatal(err)
 	}
 }
 
