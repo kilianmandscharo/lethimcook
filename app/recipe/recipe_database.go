@@ -68,7 +68,7 @@ func (db *recipeDatabase) readRecipe(id uint) (types.Recipe, error) {
 
 func (db *recipeDatabase) readAllRecipesWithoutPending() ([]types.Recipe, error) {
 	var recipes []types.Recipe
-	if err := db.handler.Where("pending IS NULL OR pending = 0").Find(&recipes).Error; err != nil {
+	if err := db.handler.Order("id desc").Where("pending IS NULL OR pending = 0").Find(&recipes).Error; err != nil {
 		return recipes, &errutil.AppError{
 			UserMessage: "Datenbankfehler",
 			Err: fmt.Errorf(
@@ -83,7 +83,7 @@ func (db *recipeDatabase) readAllRecipesWithoutPending() ([]types.Recipe, error)
 
 func (db *recipeDatabase) readAllRecipesWithPending() ([]types.Recipe, error) {
 	var recipes []types.Recipe
-	if err := db.handler.Find(&recipes).Error; err != nil {
+	if err := db.handler.Order("id desc").Find(&recipes).Error; err != nil {
 		return recipes, &errutil.AppError{
 			UserMessage: "Datenbankfehler",
 			Err: fmt.Errorf(

@@ -73,7 +73,7 @@ func TestGetFilteredRecipes(t *testing.T) {
 	}
 
 	for _, test := range testCases {
-		filteredRecipes, err := recipeService.getFilteredRecipes(test.query, false)
+		filteredRecipes, err := recipeService.readFilteredRecipes(test.query, false)
 		assert.NoError(t, err)
 		assert.Equal(t, test.hits, len(filteredRecipes))
 	}

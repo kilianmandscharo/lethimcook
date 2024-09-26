@@ -51,9 +51,7 @@ func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
 }
 
 func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message string) error {
-	isAdmin := servutil.IsAuthorized(c)
-
-	recipes, err := rc.recipeService.readAllRecipes(isAdmin)
+	recipes, err := rc.recipeService.readRecipes(c)
 	if err != nil {
 		return rc.renderer.RenderError(
 			c,
@@ -63,7 +61,7 @@ func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message s
 
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipesPage(isAdmin, recipes),
+		Component: components.RecipesPage(servutil.IsAuthorized(c), recipes),
 		Message:   message,
 	})
 }
@@ -140,7 +138,7 @@ func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
 	}
 	query := strings.ToLower(c.FormValue("query"))
 
-	filteredRecipes, err := rc.recipeService.getFilteredRecipes(query, isAdmin)
+	filteredRecipes, err := rc.recipeService.readFilteredRecipes(query, isAdmin)
 	if err != nil {
 		return rc.renderer.RenderError(
 			c,
@@ -273,7 +271,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	if err != nil {
 		return createError(err)
 	}
-    rc.logger.Info("old recipe:", recipe.String())
+	rc.logger.Info("old recipe:", recipe.String())
 
 	formErrors, err := rc.recipeService.updateRecipeWithFormData(c, &recipe)
 	if err != nil {
@@ -299,7 +297,7 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 		return createError(err)
 	}
 
-    rc.logger.Info("updated recipe:", recipe.String())
+	rc.logger.Info("updated recipe:", recipe.String())
 	return rc.RenderRecipePageHelper(c, "Rezept aktualisiert")
 }
 

@@ -11,7 +11,6 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 	"github.com/kilianmandscharo/lethimcook/types"
-	"slices"
 )
 
 func RecipeList(isAdmin bool, recipes []types.Recipe) templ.Component {
@@ -44,7 +43,7 @@ func RecipeList(isAdmin bool, recipes []types.Recipe) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, recipe := range slices.Backward(recipes) {
+			for _, recipe := range recipes {
 				templ_7745c5c3_Err = RecipeCard(isAdmin, recipe).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -113,7 +112,7 @@ func RecipeCount(recipes []types.Recipe, swapOob bool) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(recipes)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_list.templ`, Line: 34, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/recipe_list.templ`, Line: 33, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

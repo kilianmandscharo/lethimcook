@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/cache"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 )
@@ -36,6 +38,82 @@ func (rs *recipeService) createRecipe(recipe *types.Recipe) error {
 
 func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
+}
+
+type readRecipesOptions struct {
+	query          string
+	page, pageSize int
+	isAdmin        bool
+}
+
+func (rs *recipeService) getReadRecipeOptionsFromRequest(c echo.Context) readRecipesOptions {
+	isAdmin := servutil.IsAuthorized(c)
+	query := c.QueryParam("search")
+	page, err := strconv.Atoi(c.QueryParam("page"))
+	if err != nil {
+		rs.logger.Warnf(
+			"invalid query param '%s' at getReadRecipeOptionsFromRequest(), using 0 for page",
+			c.QueryParam("page"),
+		)
+		page = 0
+	}
+	pageSize, err := strconv.Atoi(c.QueryParam("pageSize"))
+	if err != nil {
+		rs.logger.Warnf(
+			"invalid query param '%s' at getReadRecipeOptionsFromRequest(), using 0 for page size",
+			c.QueryParam("pageSize"),
+		)
+		pageSize = 0
+	}
+	return readRecipesOptions{
+		isAdmin:  isAdmin,
+		query:    query,
+		page:     page,
+		pageSize: pageSize,
+	}
+}
+
+func (rs *recipeService) readRecipes(c echo.Context) ([]types.Recipe, error) {
+	options := rs.getReadRecipeOptionsFromRequest(c)
+
+	var recipes []types.Recipe
+	var err error
+
+	if options.page <= 0 || options.pageSize <= 0 {
+		return recipes, nil
+	}
+
+	if len(options.query) == 0 {
+		recipes, err = rs.readAllRecipes(options.isAdmin)
+	} else {
+		recipes, err = rs.readFilteredRecipes(options.query, options.isAdmin)
+	}
+	if err != nil {
+		return recipes, errutil.AddMessageToAppError(
+			err,
+			fmt.Sprintf("failed at readRecipes() with options %v", options),
+		)
+	}
+
+	numberOfPages := int(math.Ceil(float64(len(recipes)) / float64(options.pageSize)))
+	if numberOfPages == 0 {
+		return recipes, nil
+	}
+
+	start := (options.page - 1) * options.pageSize
+    if start >= len(recipes) {
+        return []types.Recipe{}, nil
+    }
+
+	end := options.pageSize * options.page
+
+    rs.logger.Debug(options.page, numberOfPages, start, end)
+
+	if end > len(recipes) {
+		end = len(recipes)
+	}
+
+	return recipes[start:end], nil
 }
 
 func (rs *recipeService) readAllRecipes(isAdmin bool) ([]types.Recipe, error) {
@@ -69,7 +147,7 @@ func (rs *recipeService) updatePending(id uint, pending bool) error {
 	return rs.db.updatePending(id, pending)
 }
 
-func (rs *recipeService) getFilteredRecipes(query string, isAdmin bool) ([]types.Recipe, error) {
+func (rs *recipeService) readFilteredRecipes(query string, isAdmin bool) ([]types.Recipe, error) {
 	recipes, err := rs.readAllRecipes(isAdmin)
 	if err != nil {
 		return []types.Recipe{}, errutil.AddMessageToAppError(

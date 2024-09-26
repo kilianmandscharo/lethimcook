@@ -3,14 +3,13 @@ package components
 import (
 	"fmt"
 	"github.com/kilianmandscharo/lethimcook/types"
-	"slices"
 )
 
 templ RecipeList(isAdmin bool, recipes []types.Recipe) {
 	<div id="recipe-list" class="recipe-list">
 		if len(recipes) > 0 {
 			<div>
-				for _, recipe := range slices.Backward(recipes) {
+				for _, recipe := range recipes {
 					@RecipeCard(isAdmin, recipe)
 				}
 			</div>
