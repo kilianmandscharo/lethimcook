@@ -9,6 +9,7 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
             <h1>Neues Rezept</h1>
             <i class="fa-regular fa-pen-nib fa-xl"></i>
         </div>
+        @divider()
 		<form 
             if isAdmin {
                 hx-post="/recipe" 

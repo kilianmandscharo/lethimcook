@@ -19,9 +19,9 @@ templ Header(isAdmin bool, buttons ...templ.Component) {
 				for _, button := range buttons {
 					@button
 				}
+                @infoButton()
 				@adminButton(isAdmin)
 				@homeButton()
-                @infoButton()
 			</div>
 		</div>
 	</header>

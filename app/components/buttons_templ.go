@@ -381,7 +381,7 @@ func newRecipeButton() templ.Component {
 			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-recipe-button\" class=\"icon-button with-background\" hx-get=\"/recipe/new\" hx-target=\"#content\" hx-trigger=\"click\" hx-push-url=\"true\" title=\"Neues Rezept\"><i class=\"fa-solid fa-plus\"></i></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-recipe-button\" class=\"icon-button with-background\" hx-get=\"/recipe/new\" hx-target=\"#content\" hx-trigger=\"click\" hx-push-url=\"true\" title=\"Neues Rezept\"><i class=\"fa-regular fa-pen-nib\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -35,7 +35,15 @@ func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"label-with-icon\"><h1>Neues Rezept</h1><i class=\"fa-regular fa-pen-nib fa-xl\"></i></div><form")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"label-with-icon\"><h1>Neues Rezept</h1><i class=\"fa-regular fa-pen-nib fa-xl\"></i></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = divider().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -12,6 +12,7 @@ templ RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) {
             <h1>Rezept bearbeiten</h1>
             <i class="fa-solid fa-pen-to-square fa-xl"></i>
         </div>
+        @divider()
 		<form hx-put={ fmt.Sprintf("/recipe/%d", id) } hx-target="#content">
 			@Form(recipeForm)
 			<input type="submit" value="Rezept aktualisieren" name="submit"/>
