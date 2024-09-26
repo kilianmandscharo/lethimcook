@@ -126,15 +126,14 @@ templ editRecipeButton(recipeId uint) {
 templ newRecipeButton() {
     <button
         id="new-recipe-button"
-        class="icon-button with-label"
+        class="icon-button with-background"
         hx-get="/recipe/new"
         hx-target="#content"
         hx-trigger="click"
         hx-push-url="true"
         title="Neues Rezept"
     >
-        Neu
-        <i class="fa-regular fa-pen-nib fa-xl"></i>
+        <i class="fa-solid fa-plus"></i>
     </button>
 }
 

@@ -16,6 +16,7 @@ templ RecipeCard(isAdmin bool, recipe types.Recipe) {
         hx-target="#content"
         hx-trigger="click"
         hx-get={ fmt.Sprintf("/recipe/%d", recipe.ID) }
+        hx-push-url={ fmt.Sprintf("/recipe/%d", recipe.ID) }
     >
         <div>
             <p class="recipe-list-item-title">{ recipe.Title }</p>

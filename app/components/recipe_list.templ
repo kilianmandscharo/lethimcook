@@ -3,43 +3,65 @@ package components
 import (
 	"fmt"
 	"github.com/kilianmandscharo/lethimcook/types"
-	"slices"
+	"strconv"
 )
 
-templ RecipeList(isAdmin bool, recipes []types.Recipe) {
-	<div id="recipe-list" class="recipe-list">
-		if len(recipes) > 0 {
-			<div>
-				for _, recipe := range slices.Backward(recipes) {
-					@RecipeCard(isAdmin, recipe)
-				}
-			</div>
-		}
-	</div>
+templ RecipeList(isAdmin bool, recipes []types.Recipe, paginationInfo types.PaginationInfo) {
+    <div id="recipe-list" class="recipe-list">
+        if len(recipes) > 0 {
+                for _, recipe := range recipes {
+                    @RecipeCard(isAdmin, recipe)
+                }
+        }
+    </div>
 }
 
-templ RecipeCount(recipes []types.Recipe, swapOob bool) {
+templ PageControl(paginationInfo types.PaginationInfo, swapOob bool) {
+    <div 
+        id="page-control"true
+        if swapOob {
+            hx-swap-oob="true"
+        }
+    >
+        for i := range paginationInfo.GetPageLabels() {
+            if i + 1 == paginationInfo.CurrentPage {
+                <div class="current">{ strconv.Itoa(i + 1) }</div>
+            } else {
+                <div
+                    hx-target="#recipe-list"
+                    hx-swap="outerHTML"
+                    hx-get={ fmt.Sprintf("/?page=%d", i + 1) }
+                    hx-push-url="true"
+                >
+                    { strconv.Itoa(i + 1) }
+                </div>
+            }
+        }
+    </div>
+}
+
+templ RecipeCount(recipeCount int, swapOob bool) {
     <p 
         id="recipe-count"
         if swapOob {
             hx-swap-oob="true"
         }
     >
-    switch len(recipes) {
+    switch recipeCount {
         case 0:
             Keine Rezepte
         case 1:
             1 Rezept
         default:
-            { fmt.Sprintf("%d", len(recipes)) } Rezepte
+            { fmt.Sprintf("%d", recipeCount) } Rezepte
     }
     </p>
 }
 
-templ RecipeListTopSection(recipes []types.Recipe) {
+templ RecipeListTopSection(recipeCount int) {
     <div class="recipe-list-top-section">
         <div>
-            @RecipeCount(recipes, false)
+            @RecipeCount(recipeCount, false)
             @newRecipeButton()
         </div>
         @SearchBar()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/cache"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
+	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
 )
@@ -36,6 +38,73 @@ func (rs *recipeService) createRecipe(recipe *types.Recipe) error {
 
 func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
+}
+
+func (rs *recipeService) getReadRecipeOptionsFromRequest(c echo.Context) readRecipesOptions {
+	isAdmin := servutil.IsAuthorized(c)
+	query := c.QueryParam("search")
+	page, err := strconv.Atoi(c.QueryParam("page"))
+	if err != nil {
+		page = 1
+	}
+	pageSize, err := strconv.Atoi(c.QueryParam("pageSize"))
+	if err != nil {
+		pageSize = 10
+	}
+	return readRecipesOptions{
+		isAdmin:  isAdmin,
+		query:    query,
+		page:     page,
+		pageSize: pageSize,
+	}
+}
+
+type readRecipesOptions struct {
+	query          string
+	page, pageSize int
+	isAdmin        bool
+}
+
+func (rs *recipeService) readRecipes(options readRecipesOptions) ([]types.Recipe, types.PaginationInfo, error) {
+	recipes := []types.Recipe{}
+	paginationInfo := types.PaginationInfo{}
+	var err error
+
+	if options.page <= 0 || options.pageSize <= 0 {
+		return recipes, paginationInfo, nil
+	}
+	paginationInfo.CurrentPage = options.page
+
+	recipes, err = rs.readAllRecipes(options.isAdmin)
+	if err != nil {
+		return recipes, paginationInfo, errutil.AddMessageToAppError(
+			err,
+			fmt.Sprintf("failed at readRecipes() with options %v", options),
+		)
+	}
+
+	if len(options.query) > 0 {
+		recipes = rs.filterRecipes(recipes, options.query)
+	}
+	paginationInfo.TotalRecipes = len(recipes)
+
+	numberOfPages := int(math.Ceil(float64(len(recipes)) / float64(options.pageSize)))
+	if numberOfPages == 0 {
+		return recipes, paginationInfo, nil
+	}
+	paginationInfo.TotalPages = numberOfPages
+
+	start := (options.page - 1) * options.pageSize
+	if start >= len(recipes) {
+		return []types.Recipe{}, paginationInfo, nil
+	}
+
+	end := options.page * options.pageSize
+	if end > len(recipes) {
+		end = len(recipes)
+	}
+
+	return recipes[start:end], paginationInfo, nil
 }
 
 func (rs *recipeService) readAllRecipes(isAdmin bool) ([]types.Recipe, error) {
@@ -69,29 +138,18 @@ func (rs *recipeService) updatePending(id uint, pending bool) error {
 	return rs.db.updatePending(id, pending)
 }
 
-func (rs *recipeService) getFilteredRecipes(query string, isAdmin bool) ([]types.Recipe, error) {
-	recipes, err := rs.readAllRecipes(isAdmin)
-	if err != nil {
-		return []types.Recipe{}, errutil.AddMessageToAppError(
-			err,
-			fmt.Sprintf("failed at getFilteredRecipes() with query '%s'", query),
-		)
-	}
-
-	query = strings.TrimSpace(query)
-
+func (rs *recipeService) filterRecipes(recipes []types.Recipe, query string) []types.Recipe {
+	query = strings.ToLower(strings.TrimSpace(query))
 	if len(query) == 0 {
-		return recipes, err
+		return recipes
 	}
-
 	var filteredRecipes []types.Recipe
 	for _, recipe := range recipes {
 		if recipe.ContainsQuery(query) {
 			filteredRecipes = append(filteredRecipes, recipe)
 		}
 	}
-
-	return filteredRecipes, nil
+	return filteredRecipes
 }
 
 func (rs *recipeService) getPathId(c echo.Context) (uint, error) {

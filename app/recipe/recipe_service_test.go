@@ -49,17 +49,16 @@ func newTestContext(t *testing.T, options newTestContextOptions) echo.Context {
 }
 
 func TestGetFilteredRecipes(t *testing.T) {
-	// Given
 	recipeService := newTestRecipeService()
-	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
-		Title: "Naan",
-		Tags:  "indisch, Beilage",
-	}))
-	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
-		Description: "Italienische Knoblauchnudeln",
-	}))
+	recipes := []types.Recipe{
+		{Description: "Italienische Knoblauchnudeln"},
+		{
+			Title: "Naan",
+			Tags:  "indisch, Beilage",
+		},
+	}
 
-	testCases := []struct {
+	tests := []struct {
 		query string
 		hits  int
 	}{
@@ -72,10 +71,9 @@ func TestGetFilteredRecipes(t *testing.T) {
 		{"Beilage", 1},
 	}
 
-	for _, test := range testCases {
-		filteredRecipes, err := recipeService.getFilteredRecipes(test.query, false)
-		assert.NoError(t, err)
-		assert.Equal(t, test.hits, len(filteredRecipes))
+	for _, tt := range tests {
+		filteredRecipes := recipeService.filterRecipes(recipes, tt.query)
+		assert.Equal(t, tt.hits, len(filteredRecipes))
 	}
 }
 
@@ -331,4 +329,199 @@ func TestGetRecipeAsJson(t *testing.T) {
 		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\",\"createdAt\":\"\"}"),
 		recipeJson,
 	)
+}
+
+func TestReadRecipes(t *testing.T) {
+	tests := []struct {
+		options            readRecipesOptions
+		wantRecipes        []types.Recipe
+		wantPaginationInfo types.PaginationInfo
+	}{
+		{
+			options: readRecipesOptions{
+				page:     1,
+				pageSize: 0,
+			},
+			wantRecipes: []types.Recipe{},
+		},
+		{
+			options: readRecipesOptions{
+				page:     0,
+				pageSize: 1,
+			},
+			wantRecipes: []types.Recipe{},
+		},
+		{
+			options: readRecipesOptions{
+				page:     1,
+				pageSize: 5,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 10},
+				{ID: 9},
+				{ID: 8},
+				{ID: 7},
+				{ID: 6},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   2,
+				CurrentPage:  1,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     1,
+				pageSize: 10,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 10},
+				{ID: 9},
+				{ID: 8},
+				{ID: 7},
+				{ID: 6},
+				{ID: 5},
+				{ID: 4},
+				{ID: 3},
+				{ID: 2},
+				{ID: 1},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   1,
+				CurrentPage:  1,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     1,
+				pageSize: 9,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 10},
+				{ID: 9},
+				{ID: 8},
+				{ID: 7},
+				{ID: 6},
+				{ID: 5},
+				{ID: 4},
+				{ID: 3},
+				{ID: 2},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   2,
+				CurrentPage:  1,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     1,
+				pageSize: 11,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 10},
+				{ID: 9},
+				{ID: 8},
+				{ID: 7},
+				{ID: 6},
+				{ID: 5},
+				{ID: 4},
+				{ID: 3},
+				{ID: 2},
+				{ID: 1},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   1,
+				CurrentPage:  1,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     2,
+				pageSize: 10,
+			},
+			wantRecipes: []types.Recipe{},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   1,
+				CurrentPage:  2,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     2,
+				pageSize: 5,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 5},
+				{ID: 4},
+				{ID: 3},
+				{ID: 2},
+				{ID: 1},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   2,
+				CurrentPage:  2,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     3,
+				pageSize: 5,
+			},
+			wantRecipes: []types.Recipe{},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   2,
+				CurrentPage:  3,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     2,
+				pageSize: 3,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 7},
+				{ID: 6},
+				{ID: 5},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   4,
+				CurrentPage:  2,
+			},
+		},
+		{
+			options: readRecipesOptions{
+				page:     3,
+				pageSize: 3,
+			},
+			wantRecipes: []types.Recipe{
+				{ID: 4},
+				{ID: 3},
+				{ID: 2},
+			},
+			wantPaginationInfo: types.PaginationInfo{
+				TotalRecipes: 10,
+				TotalPages:   4,
+				CurrentPage:  3,
+			},
+		},
+	}
+
+	recipeService := newTestRecipeService()
+	for range 10 {
+		assert.NoError(t, recipeService.createRecipe(&types.Recipe{}))
+	}
+
+	for _, tt := range tests {
+		recipes, paginationInfo, err := recipeService.readRecipes(tt.options)
+		assert.NoError(t, err)
+		assert.Equal(t, tt.wantRecipes, recipes)
+		assert.Equal(t, tt.wantPaginationInfo, paginationInfo)
+	}
 }

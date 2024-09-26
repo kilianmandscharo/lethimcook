@@ -159,3 +159,16 @@ func (f *FormElement) GetLabel() string {
 	}
 	return f.Label
 }
+
+type PaginationInfo struct {
+	TotalRecipes int
+	CurrentPage  int
+	TotalPages   int
+}
+
+func (p *PaginationInfo) GetPageLabels() int {
+	if p.TotalPages > 5 {
+		return 5
+	}
+	return p.TotalPages
+}

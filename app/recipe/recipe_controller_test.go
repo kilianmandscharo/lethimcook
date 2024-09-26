@@ -545,24 +545,6 @@ func TestHandleDeleteRecipe(t *testing.T) {
 	})
 }
 
-func TestHandleSearchRecipe(t *testing.T) {
-	recipeController := newTestRecipeController()
-
-	t.Run("valid request", func(t *testing.T) {
-		testutil.AssertRequest(
-			t,
-			testutil.RequestOptions{
-				HandlerFunc:  recipeController.HandleSearchRecipe,
-				Method:       http.MethodPost,
-				Route:        "/search",
-				WithFormData: true,
-				FormData:     "query=test",
-				StatusWant:   http.StatusOK,
-			},
-		)
-	})
-}
-
 func TestHandleDownloadRecipeAsJson(t *testing.T) {
 	recipeController := newTestRecipeController()
 
@@ -613,6 +595,22 @@ func TestHandleDownloadRecipeAsJson(t *testing.T) {
 				PathParamName:  "id",
 				PathParamValue: "1",
 				StatusWant:     http.StatusOK,
+			},
+		)
+	})
+}
+
+func TestHandleGetPaginatedRecipe(t *testing.T) {
+	recipeController := newTestRecipeController()
+
+	t.Run("valid request", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc: recipeController.HandleGetPaginatedRecipes,
+				Method:      http.MethodGet,
+				Route:       "/",
+				StatusWant:  http.StatusOK,
 			},
 		)
 	})

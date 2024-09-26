@@ -7,6 +7,7 @@
     --header-height: 60px;
     --footer-height: 48px;
     --footer-margin-top: 1rem;
+    --page-control-height: 2rem;
 
     --color-primary-100: #4caf50;
     --color-primary-200: #63b863;
@@ -91,12 +92,12 @@ header>div>div {
 main {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     max-width: 672px;
     min-width: 320px;
     margin: 0 auto;
     padding: 0 0.5rem;
-    padding-top: calc(var(--header-height) + 1.5rem);
+    padding-top: calc(var(--header-height) + 1rem);
     position: relative;
 }
 
@@ -251,6 +252,18 @@ button {
     color: var(--color-white);
 }
 
+.icon-button.with-background {
+    all: unset;
+    cursor: pointer;
+    background-color: var(--color-surface-200);
+    border-radius: 8px;
+    height: 2rem;
+    width: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .icon-button.with-label {
     background-color: var(--color-surface-200);
     padding: 0.5rem 0.75rem;
@@ -359,7 +372,7 @@ textarea {
 
 .recipe-list-top-section {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     justify-content: space-between;
     align-items: center;
 }
@@ -368,35 +381,59 @@ textarea {
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
 .recipe-list {
     display: flex;
-    justify-content: flex-start;
     flex-direction: column;
     gap: 1rem;
+    max-height: calc(100vh - var(--footer-height) - var(--footer-margin-top) - var(--page-control-height) - 106px);
+    min-height: 130px;
+    overflow-y: scroll;
 }
 
-.recipe-list>div:first-child {
+#page-control {
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: calc(100vh - var(--footer-height) - var(--footer-margin-top) - 106px);
-    overflow-y: scroll;
+    justify-items: center;
+    align-items: center;
+    gap: 0.5rem;
+    height: var(--page-control-height);
+}
+
+#page-control>div {
+    border: solid 2px var(--color-surface-200);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#page-control>div.current {
+    color: var(--color-primary-400);
+    border: solid 2px var(--color-primary-400);
+    cursor: default;
 }
 
 #recipe-count {
     background-color: var(--color-primary-300);
-    padding: 0.5rem 0.75rem;
     color: var(--color-surface-100);
+    padding: 0 0.5rem;
     border-radius: 8px;
     width: fit-content;
     align-self: flex-start;
     margin: 0;
-    font-size: 14px;
-    height: fit-content;
+    font-size: 12px;
+    height: 2rem;
     width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
 }
 
 .recipe-list-item {
