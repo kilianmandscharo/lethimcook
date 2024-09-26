@@ -40,30 +40,16 @@ func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
 }
 
-type readRecipesOptions struct {
-	query          string
-	page, pageSize int
-	isAdmin        bool
-}
-
 func (rs *recipeService) getReadRecipeOptionsFromRequest(c echo.Context) readRecipesOptions {
 	isAdmin := servutil.IsAuthorized(c)
 	query := c.QueryParam("search")
 	page, err := strconv.Atoi(c.QueryParam("page"))
 	if err != nil {
-		rs.logger.Warnf(
-			"invalid query param '%s' at getReadRecipeOptionsFromRequest(), using 0 for page",
-			c.QueryParam("page"),
-		)
-		page = 0
+		page = 1
 	}
 	pageSize, err := strconv.Atoi(c.QueryParam("pageSize"))
 	if err != nil {
-		rs.logger.Warnf(
-			"invalid query param '%s' at getReadRecipeOptionsFromRequest(), using 0 for page size",
-			c.QueryParam("pageSize"),
-		)
-		pageSize = 0
+		pageSize = 10
 	}
 	return readRecipesOptions{
 		isAdmin:  isAdmin,
@@ -73,47 +59,52 @@ func (rs *recipeService) getReadRecipeOptionsFromRequest(c echo.Context) readRec
 	}
 }
 
-func (rs *recipeService) readRecipes(c echo.Context) ([]types.Recipe, error) {
-	options := rs.getReadRecipeOptionsFromRequest(c)
+type readRecipesOptions struct {
+	query          string
+	page, pageSize int
+	isAdmin        bool
+}
 
-	var recipes []types.Recipe
+func (rs *recipeService) readRecipes(options readRecipesOptions) ([]types.Recipe, types.PaginationInfo, error) {
+	recipes := []types.Recipe{}
+	paginationInfo := types.PaginationInfo{}
 	var err error
 
 	if options.page <= 0 || options.pageSize <= 0 {
-		return recipes, nil
+		return recipes, paginationInfo, nil
 	}
+	paginationInfo.CurrentPage = options.page
 
-	if len(options.query) == 0 {
-		recipes, err = rs.readAllRecipes(options.isAdmin)
-	} else {
-		recipes, err = rs.readFilteredRecipes(options.query, options.isAdmin)
-	}
+	recipes, err = rs.readAllRecipes(options.isAdmin)
 	if err != nil {
-		return recipes, errutil.AddMessageToAppError(
+		return recipes, paginationInfo, errutil.AddMessageToAppError(
 			err,
 			fmt.Sprintf("failed at readRecipes() with options %v", options),
 		)
 	}
 
+	if len(options.query) > 0 {
+		recipes = rs.filterRecipes(recipes, options.query)
+	}
+	paginationInfo.TotalRecipes = len(recipes)
+
 	numberOfPages := int(math.Ceil(float64(len(recipes)) / float64(options.pageSize)))
 	if numberOfPages == 0 {
-		return recipes, nil
+		return recipes, paginationInfo, nil
 	}
+	paginationInfo.TotalPages = numberOfPages
 
 	start := (options.page - 1) * options.pageSize
-    if start >= len(recipes) {
-        return []types.Recipe{}, nil
-    }
+	if start >= len(recipes) {
+		return []types.Recipe{}, paginationInfo, nil
+	}
 
-	end := options.pageSize * options.page
-
-    rs.logger.Debug(options.page, numberOfPages, start, end)
-
+	end := options.page * options.pageSize
 	if end > len(recipes) {
 		end = len(recipes)
 	}
 
-	return recipes[start:end], nil
+	return recipes[start:end], paginationInfo, nil
 }
 
 func (rs *recipeService) readAllRecipes(isAdmin bool) ([]types.Recipe, error) {
@@ -147,29 +138,18 @@ func (rs *recipeService) updatePending(id uint, pending bool) error {
 	return rs.db.updatePending(id, pending)
 }
 
-func (rs *recipeService) readFilteredRecipes(query string, isAdmin bool) ([]types.Recipe, error) {
-	recipes, err := rs.readAllRecipes(isAdmin)
-	if err != nil {
-		return []types.Recipe{}, errutil.AddMessageToAppError(
-			err,
-			fmt.Sprintf("failed at getFilteredRecipes() with query '%s'", query),
-		)
-	}
-
-	query = strings.TrimSpace(query)
-
+func (rs *recipeService) filterRecipes(recipes []types.Recipe, query string) []types.Recipe {
+	query = strings.ToLower(strings.TrimSpace(query))
 	if len(query) == 0 {
-		return recipes, err
+		return recipes
 	}
-
 	var filteredRecipes []types.Recipe
 	for _, recipe := range recipes {
 		if recipe.ContainsQuery(query) {
 			filteredRecipes = append(filteredRecipes, recipe)
 		}
 	}
-
-	return filteredRecipes, nil
+	return filteredRecipes
 }
 
 func (rs *recipeService) getPathId(c echo.Context) (uint, error) {

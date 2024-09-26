@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/kilianmandscharo/lethimcook/components"
@@ -39,7 +38,6 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 
 	// Actions
 	e.GET("/recipe/:id/json", rc.HandleDownloadRecipeAsJson)
-	e.POST("/search", rc.HandleSearchRecipe)
 	e.POST("/recipe", rc.HandleCreateRecipe)
 	e.PUT("/recipe/:id", rc.HandleUpdateRecipe)
 	e.PUT("/recipe/:id/pending/:pending", rc.HandleUpdatePending)
@@ -47,22 +45,30 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 }
 
 func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
+	if c.Request().Header.Get("Hx-Target") == "recipe-list" {
+		return rc.HandleGetPaginatedRecipes(c)
+	}
 	return rc.renderRecipeListPageHelper(c, "")
 }
 
 func (rc *RecipeController) renderRecipeListPageHelper(c echo.Context, message string) error {
-	recipes, err := rc.recipeService.readRecipes(c)
+	recipes, paginationInfo, err := rc.recipeService.readRecipes(
+		rc.recipeService.getReadRecipeOptionsFromRequest(c),
+	)
 	if err != nil {
 		return rc.renderer.RenderError(
 			c,
 			errutil.AddMessageToAppError(err, "failed at renderRecipeListPageHelper()"),
 		)
 	}
-
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
-		Context:   c,
-		Component: components.RecipesPage(servutil.IsAuthorized(c), recipes),
-		Message:   message,
+		Context: c,
+		Component: components.RecipesPage(
+			servutil.IsAuthorized(c),
+			recipes,
+			paginationInfo,
+		),
+		Message: message,
 	})
 }
 
@@ -99,58 +105,41 @@ func (rc *RecipeController) RenderRecipeEditPage(c echo.Context) error {
 }
 
 func (rc *RecipeController) RenderRecipePage(c echo.Context) error {
-	return rc.RenderRecipePageHelper(c, "")
-}
-
-func (rc *RecipeController) RenderRecipePageHelper(c echo.Context, message string) error {
+	createError := func(err error) error {
+		return rc.renderer.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at RenderRecipePage()"),
+		)
+	}
 	recipe, err := rc.recipeService.getRecipeById(c)
 	if err != nil {
-		return rc.renderer.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at RenderRecipePageHelper()"),
-		)
+		return createError(err)
 	}
-
 	if err := recipe.RenderMarkdown(); err != nil {
-		return rc.renderer.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at RenderRecipePageHelper()"),
-		)
+		return createError(err)
 	}
-
-	c.Response().Header().Set("HX-Push-Url", fmt.Sprintf("/recipe/%d", recipe.ID))
-
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
 		Component: components.RecipePage(servutil.IsAuthorized(c), recipe, recipe.ParseTags()),
-		Message:   message,
 	})
 }
 
-func (rc *RecipeController) HandleSearchRecipe(c echo.Context) error {
-	isAdmin := servutil.IsAuthorized(c)
-
-	if err := c.Request().ParseForm(); err != nil {
-		return rc.renderer.RenderError(
-			c,
-			errutil.AddMessageToAppError(err, "failed at HandleSearchRecipe()"),
-		)
-	}
-	query := strings.ToLower(c.FormValue("query"))
-
-	filteredRecipes, err := rc.recipeService.readFilteredRecipes(query, isAdmin)
+func (rc *RecipeController) HandleGetPaginatedRecipes(c echo.Context) error {
+	recipes, paginationInfo, err := rc.recipeService.readRecipes(
+		rc.recipeService.getReadRecipeOptionsFromRequest(c),
+	)
 	if err != nil {
 		return rc.renderer.RenderError(
 			c,
-			errutil.AddMessageToAppError(err, "failed at HandleSearchRecipe()"),
+			errutil.AddMessageToAppError(err, "failed at HandleGetPaginatedRecipes()"),
 		)
 	}
-
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context: c,
 		Component: components.Joiner(
-			components.RecipeCount(filteredRecipes, true),
-			components.RecipeList(isAdmin, filteredRecipes),
+			components.RecipeCount(paginationInfo.TotalRecipes, true),
+			components.RecipeList(servutil.IsAuthorized(c), recipes, paginationInfo),
+			components.PageControl(paginationInfo, true),
 		),
 	})
 }
@@ -292,13 +281,22 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	}
 
 	recipe.LastModifiedAt = time.Now().Format(time.RFC3339)
-
 	if err := rc.recipeService.updateRecipe(&recipe); err != nil {
 		return createError(err)
 	}
 
-	rc.logger.Info("updated recipe:", recipe.String())
-	return rc.RenderRecipePageHelper(c, "Rezept aktualisiert")
+	if err := recipe.RenderMarkdown(); err != nil {
+		return rc.renderer.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at RenderRecipePageHelper()"),
+		)
+	}
+
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
+		Context:   c,
+		Component: components.RecipePage(servutil.IsAuthorized(c), recipe, recipe.ParseTags()),
+		Message:   "Rezept aktualisiert",
+	})
 }
 
 func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
@@ -327,7 +325,9 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 		return createError(err)
 	}
 
-	recipes, err := rc.recipeService.readAllRecipes(isAdmin)
+	recipes, paginationInfo, err := rc.recipeService.readRecipes(
+		rc.recipeService.getReadRecipeOptionsFromRequest(c),
+	)
 	if err != nil {
 		return createError(err)
 	}
@@ -335,7 +335,7 @@ func (rc *RecipeController) HandleDeleteRecipe(c echo.Context) error {
 	rc.logger.Info("deleted recipe", id)
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
 		Context:   c,
-		Component: components.RecipesPage(isAdmin, recipes),
+		Component: components.RecipesPage(isAdmin, recipes, paginationInfo),
 		Message:   "Rezept entfernt",
 	})
 }

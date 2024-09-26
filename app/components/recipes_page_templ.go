@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-func RecipesPage(isAdmin bool, recipes []types.Recipe) templ.Component {
+func RecipesPage(isAdmin bool, recipes []types.Recipe, paginationInfo types.PaginationInfo) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -39,11 +39,15 @@ func RecipesPage(isAdmin bool, recipes []types.Recipe) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipeListTopSection(recipes).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = RecipeListTopSection(paginationInfo.TotalRecipes).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipeList(isAdmin, recipes).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = RecipeList(isAdmin, recipes, paginationInfo).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = PageControl(paginationInfo, false).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
