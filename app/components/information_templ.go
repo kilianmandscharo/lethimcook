@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Header(isAdmin bool, buttons ...templ.Component) templ.Component {
+func Information(isAdmin bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,29 +29,27 @@ func Header(isAdmin bool, buttons ...templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><div><div class=\"heading\" hx-get=\"/\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><svg height=\"32\" width=\"52\"><image href=\"/static/logo.svg\" height=\"28\"></image></svg><div class=\"title\">Lethimcook</div></div><div>")
+		templ_7745c5c3_Err = Header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, button := range buttons {
-			templ_7745c5c3_Err = button.Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = adminButton(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><div class=\"label-with-icon\"><h1>Informationen</h1><i class=\"fa-solid fa-circle-info fa-xl\"></i></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = homeButton().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = divider().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = infoButton().Render(ctx, templ_7745c5c3_Buffer)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button hx-get=\"/imprint\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" class=\"icon-button with-label\">Impressum <i class=\"fa-solid fa-stamp\"></i></button> <button hx-get=\"/privacy-notice\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\" class=\"icon-button with-label\">Datenschutz <i class=\"fa-solid fa-file-signature\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></header>")
+		templ_7745c5c3_Err = divider().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div>Logo: © 2024 Dominik Heller</div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

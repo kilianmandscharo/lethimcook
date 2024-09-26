@@ -108,6 +108,20 @@ templ homeButton() {
 	</button>
 }
 
+templ infoButton() {
+	<button 
+        id="home-button" 
+        class="icon-button" 
+        hx-get="/info" 
+        hx-trigger="click" 
+        hx-target="#content" 
+        hx-push-url="true"
+        title="Informationen"
+    >
+        <i class="fa-solid fa-circle-info fa-xl"></i>
+	</button>
+}
+
 templ editRecipeButton(recipeId uint) {
 	<button
 		id="edit-recipe-button"
@@ -150,3 +164,5 @@ templ copyUrlToClipboardButton() {
         setTimeout(() => {attachEventListenerToClipboardButton();}, 0);
     </script>
 }
+
+

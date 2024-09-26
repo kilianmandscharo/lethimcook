@@ -3,7 +3,11 @@ package components
 templ Imprint(isAdmin bool) {
 	@Header(isAdmin)
 	<main>
-		<h1>Impressum</h1>
+        <div class="label-with-icon">
+            <h1>Impressum</h1>
+            <i class="fa-solid fa-stamp fa-xl"></i>
+        </div>
+        @divider()
 		<div class="contact">
 			<h2>Kontakt</h2>
 			<p>Dominik Heller</p>

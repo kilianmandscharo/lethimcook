@@ -3,7 +3,11 @@ package components
 templ PrivacyNotice(isAdmin bool) {
 	@Header(isAdmin)
 	<main>
-		<h1>Datenschutz</h1>
+        <div class="label-with-icon">
+            <h1>Datenschutz</h1>
+            <i class="fa-solid fa-file-signature fa-xl"></i>
+        </div>
+        @divider()
 		<div>
 			<h2>1. Datenschutz auf einen Blick</h2>
 			<h3>Allgemeine Hinweise</h3>

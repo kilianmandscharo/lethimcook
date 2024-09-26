@@ -49,6 +49,12 @@ func New(
 			Component: components.PrivacyNotice(servutil.IsAuthorized(c)),
 		})
 	})
+	e.GET("/info", func(c echo.Context) error {
+		return renderer.RenderComponent(render.RenderComponentOptions{
+			Context:   c,
+			Component: components.Information(servutil.IsAuthorized(c)),
+		})
+	})
 
 	recipeController.AttachHandlerFunctions(e)
 	authController.AttachHandlerFunctions(e)

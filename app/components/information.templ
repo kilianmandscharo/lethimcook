@@ -1,0 +1,34 @@
+package components
+
+templ Information(isAdmin bool) {
+	@Header(isAdmin)
+	<main>
+        <div class="label-with-icon">
+            <h1>Informationen</h1>
+            <i class="fa-solid fa-circle-info fa-xl"></i>
+        </div>
+        @divider()
+		<button 
+            hx-get="/imprint" 
+            hx-trigger="click"
+            hx-target="#content"
+            hx-push-url="true"
+            class="icon-button with-label"
+        >
+			Impressum
+            <i class="fa-solid fa-stamp"></i>
+		</button>
+		<button 
+            hx-get="/privacy-notice"
+            hx-trigger="click"
+            hx-target="#content"
+            hx-push-url="true"
+            class="icon-button with-label"
+        >
+            Datenschutz
+            <i class="fa-solid fa-file-signature"></i>
+		</button>
+        @divider()
+        <div>Logo: © 2024 Dominik Heller</div>
+	</main>
+}
