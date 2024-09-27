@@ -13,7 +13,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/types"
 )
 
-func RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) templ.Component {
+func recipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -51,7 +51,7 @@ func RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipePageInfoSectionInfoItem("Autor", recipe.Author).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Autor", recipe.Author).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,7 +90,7 @@ func RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipeTags(tags).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipeTags(tags).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,15 +98,15 @@ func RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipePageInfoSectionInfoItem("Beschreibung", recipe.Description).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Beschreibung", recipe.Description).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipePageInfoSectionInfoItem("Quelle", recipe.Source).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Quelle", recipe.Source).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

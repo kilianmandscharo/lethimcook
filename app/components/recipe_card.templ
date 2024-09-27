@@ -5,7 +5,7 @@ import (
 	"github.com/kilianmandscharo/lethimcook/types"
 )
 
-templ RecipeCard(isAdmin bool, recipe types.Recipe) {
+templ recipeCard(isAdmin bool, recipe types.Recipe) {
     <div
         if recipe.Pending {
             class="recipe-list-item pending"
@@ -23,6 +23,6 @@ templ RecipeCard(isAdmin bool, recipe types.Recipe) {
             <p class="recipe-list-item-duration">{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
         </div>
         <p class="recipe-list-item-description">{ recipe.Description }</p>
-        @RecipeTags(recipe.ParseTags())
+        @recipeTags(recipe.ParseTags())
     </div>
 }

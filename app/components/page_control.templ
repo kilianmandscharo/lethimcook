@@ -1,0 +1,32 @@
+package components
+
+import (
+    "strconv"
+	"fmt"
+	"github.com/kilianmandscharo/lethimcook/types"
+)
+
+templ PageControl(paginationInfo types.PaginationInfo, swapOob bool) {
+    <div 
+        id="page-control"true
+        if swapOob {
+            hx-swap-oob="true"
+        }
+    >
+        for i := range paginationInfo.GetPageLabels() {
+            if i + 1 == paginationInfo.CurrentPage {
+                <div class="current">{ strconv.Itoa(i + 1) }</div>
+            } else {
+                <div
+                    hx-target="#recipe-list"
+                    hx-swap="outerHTML"
+                    hx-get={ fmt.Sprintf("/?page=%d", i + 1) }
+                    hx-push-url="true"
+                    hx-vals="js:{search: document.getElementById('search-input')?.value || ''}"
+                >
+                    { strconv.Itoa(i + 1) }
+                </div>
+            }
+        }
+    </div>
+}

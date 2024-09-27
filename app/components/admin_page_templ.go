@@ -31,7 +31,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -49,7 +49,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Form(loginForm).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = form(loginForm).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -67,7 +67,7 @@ func AdminPage(isAdmin bool, loginForm []types.FormElement, newPasswordForm []ty
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Form(newPasswordForm).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = form(newPasswordForm).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

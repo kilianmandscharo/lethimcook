@@ -3,9 +3,9 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 templ RecipesPage(isAdmin bool, recipes []types.Recipe, paginationInfo types.PaginationInfo) {
-	@Header(isAdmin)
+	@header(isAdmin)
 	<main>
-        @RecipeListTopSection(paginationInfo.TotalRecipes)
+        @recipeListTopSection(paginationInfo.TotalRecipes)
 		@RecipeList(isAdmin, recipes, paginationInfo)
         @PageControl(paginationInfo, false)
 	</main>

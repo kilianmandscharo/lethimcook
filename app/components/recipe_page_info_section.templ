@@ -5,27 +5,27 @@ import (
 	"github.com/kilianmandscharo/lethimcook/types"
 )
 
-templ RecipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) {
+templ recipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) {
     <section class="recipe-heading">
         <div class="recipe-heading-title">
             <h2>{ recipe.Title }</h2>
-            @RecipePageInfoSectionInfoItem("Autor", recipe.Author)
+            @recipePageInfoSectionInfoItem("Autor", recipe.Author)
         </div>
         @divider()
         @RecipePageControls(isAdmin, recipe.Pending, recipe.ID)
         @divider()
         <div 
             if len(tags) == 0 {
-            class="recipe-info-container justify-right"
+                class="recipe-info-container justify-right"
             } else {
-            class="recipe-info-container"
+                class="recipe-info-container"
             }
         >
-            @RecipeTags(tags)
+            @recipeTags(tags)
             <div class="recipe-info-right-section">
-                @RecipePageInfoSectionInfoItem("Beschreibung", recipe.Description)
-                @RecipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration))
-                @RecipePageInfoSectionInfoItem("Quelle", recipe.Source)
+                @recipePageInfoSectionInfoItem("Beschreibung", recipe.Description)
+                @recipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration))
+                @recipePageInfoSectionInfoItem("Quelle", recipe.Source)
             </div>
         </div>
         @divider()

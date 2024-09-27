@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Header(isAdmin bool, buttons ...templ.Component) templ.Component {
+func header(isAdmin bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -32,12 +32,6 @@ func Header(isAdmin bool, buttons ...templ.Component) templ.Component {
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><div><div class=\"heading\" hx-get=\"/\" hx-trigger=\"click\" hx-target=\"#content\" hx-push-url=\"true\"><svg height=\"32\" width=\"52\"><image href=\"/static/logo.svg\" height=\"28\"></image></svg><div class=\"title\">Lethimcook</div></div><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
-		}
-		for _, button := range buttons {
-			templ_7745c5c3_Err = button.Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 		}
 		templ_7745c5c3_Err = infoButton().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

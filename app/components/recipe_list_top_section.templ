@@ -1,0 +1,11 @@
+package components
+
+templ recipeListTopSection(recipeCount int) {
+    <div class="recipe-list-top-section">
+        <div>
+            @RecipeCount(recipeCount, false)
+            @newRecipeButton()
+        </div>
+        @searchBar()
+    </div>
+}

@@ -2,47 +2,47 @@ package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
-templ Form(form []types.FormElement) {
-  for _, element := range form {
-    <div>
-      <label for={ element.Name }>
-        { element.GetLabel() }
-      </label>
-      if element.Type == types.FormElementInput {
-        <input 
-          id={ element.Name } 
-          placeholder={ element.GetPlaceholder() } 
-          type={ element.InputType } 
-          name={ element.Name } 
-          value={ element.Value }
-          if element.Disabled {
-              disabled
-          }
-          if element.Err != nil {
-            class="input-error"
-          }
-        />
-      }
-      if element.Type == types.FormElementTextArea {
-        <textarea 
-          id={ element.Name } 
-          placeholder={ element.GetPlaceholder() } 
-          name={ element.Name } 
-          if element.Disabled {
-              disabled
-          }
-          if element.Err != nil {
-            class="input-error"
-          }
-        >
-          { element.Value }
-        </textarea>
-      }
-      <div class="form-error-message">
-        if element.Err != nil {
-          { element.Err.Error() }
-        }
-      </div>
-    </div>
-  }
+templ form(form []types.FormElement) {
+    for _, element := range form {
+        <div>
+            <label for={ element.Name }>
+                { element.GetLabel() }
+            </label>
+            if element.Type == types.FormElementInput {
+                <input 
+                    id={ element.Name } 
+                    placeholder={ element.GetPlaceholder() } 
+                    type={ element.InputType } 
+                    name={ element.Name } 
+                    value={ element.Value }
+                    if element.Disabled {
+                        disabled
+                    }
+                    if element.Err != nil {
+                        class="input-error"
+                    }
+                />
+            }
+            if element.Type == types.FormElementTextArea {
+                <textarea 
+                    id={ element.Name } 
+                    placeholder={ element.GetPlaceholder() } 
+                    name={ element.Name } 
+                    if element.Disabled {
+                        disabled
+                    }
+                    if element.Err != nil {
+                        class="input-error"
+                    }
+                >
+                    { element.Value }
+                </textarea>
+            }
+            <div class="form-error-message">
+                if element.Err != nil {
+                    { element.Err.Error() }
+                }
+            </div>
+        </div>
+    }
 }

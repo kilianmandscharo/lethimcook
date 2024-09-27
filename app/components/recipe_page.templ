@@ -3,10 +3,10 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 templ RecipePage(isAdmin bool, recipe types.Recipe, tags []string) {
-    @Header(isAdmin)
+    @header(isAdmin)
 	<main>
 		<div class="recipe">
-            @RecipePageInfoSection(isAdmin, recipe, tags)
+            @recipePageInfoSection(isAdmin, recipe, tags)
 			<section>
 				<h3>Zutaten</h3>
 				<div>

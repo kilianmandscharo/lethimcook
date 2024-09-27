@@ -3,7 +3,7 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
-	@Header(isAdmin)
+	@header(isAdmin)
 	<main>
         <div class="label-with-icon">
             <h1>Neues Rezept</h1>
@@ -20,7 +20,7 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
             hx-target="#content"
             hx-push-url="/"
         >
-			@Form(recipeForm)
+			@form(recipeForm)
 			<input 
                 id="recipe-new-submit"
                 type="submit" 

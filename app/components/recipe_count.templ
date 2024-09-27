@@ -1,0 +1,22 @@
+package components
+
+import "fmt"
+
+templ RecipeCount(recipeCount int, swapOob bool) {
+    <p 
+        id="recipe-count"
+        if swapOob {
+            hx-swap-oob="true"
+        }
+    >
+    switch recipeCount {
+        case 0:
+            Keine Rezepte
+        case 1:
+            1 Rezept
+        default:
+            { fmt.Sprintf("%d", recipeCount) } Rezepte
+    }
+    </p>
+}
+

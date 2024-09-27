@@ -6,7 +6,7 @@ import (
 )
 
 templ RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) {
-	@Header(isAdmin)
+	@header(isAdmin)
 	<main>
         <div class="label-with-icon">
             <h1>Rezept bearbeiten</h1>
@@ -14,7 +14,7 @@ templ RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) {
         </div>
         @divider()
 		<form hx-put={ fmt.Sprintf("/recipe/%d", id) } hx-target="#content">
-			@Form(recipeForm)
+			@form(recipeForm)
 			<input type="submit" value="Rezept aktualisieren" name="submit"/>
 		</form>
 	</main>

@@ -31,7 +31,7 @@ func RecipePage(isAdmin bool, recipe types.Recipe, tags []string) templ.Componen
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = header(isAdmin).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -39,7 +39,7 @@ func RecipePage(isAdmin bool, recipe types.Recipe, tags []string) templ.Componen
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = RecipePageInfoSection(isAdmin, recipe, tags).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSection(isAdmin, recipe, tags).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
