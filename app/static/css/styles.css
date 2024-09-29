@@ -99,7 +99,7 @@ main {
 }
 
 #content {
-    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 #notification-container {
@@ -364,7 +364,7 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: calc(100vh - 60px - 16px - 46px - 16px - 16px - 32px - 16px);
+    height: calc(100dvh - 60px - 16px - 46px - 16px - 16px - 32px - 16px);
     overflow-y: scroll;
 }
 
