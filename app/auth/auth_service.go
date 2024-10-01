@@ -16,13 +16,13 @@ import (
 )
 
 type AuthService struct {
-	db         authDatabase
+	db         *authDatabase
 	privateKey string
 	logger     *logging.Logger
 }
 
-func NewAuthService(db authDatabase, logger *logging.Logger) AuthService {
-	return AuthService{
+func NewAuthService(db *authDatabase, logger *logging.Logger) *AuthService {
+	return &AuthService{
 		db:         db,
 		privateKey: env.Get(env.EnvKeyJWTPrivateKey),
 		logger:     logger,

@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestRecipeController() RecipeController {
+func newTestRecipeController() *RecipeController {
 	logger := logging.New(logging.Debug)
-	renderer := render.New(&logger)
+	renderer := render.New(logger)
 	recipeService := newTestRecipeService()
-	return NewRecipeController(recipeService, &logger, &renderer)
+	return NewRecipeController(recipeService, logger, renderer)
 }
 
 func TestRenderRecipeListPage(t *testing.T) {

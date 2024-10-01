@@ -13,8 +13,8 @@ type Renderer struct {
 	logger *logging.Logger
 }
 
-func New(logger *logging.Logger) Renderer {
-	return Renderer{logger: logger}
+func New(logger *logging.Logger) *Renderer {
+	return &Renderer{logger: logger}
 }
 
 func (r *Renderer) RenderError(c echo.Context, err error) error {

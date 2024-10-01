@@ -21,16 +21,16 @@ type controllerOptions struct {
 	withAdmin bool
 }
 
-func newTestAuthController(options controllerOptions) AuthController {
+func newTestAuthController(options controllerOptions) *AuthController {
 	logger := logging.New(logging.Debug)
-	renderer := render.New(&logger)
+	renderer := render.New(logger)
 	authService := newTestAuthService()
 
 	if options.withAdmin {
 		authService.createAdmin(testPassword)
 	}
 
-	return NewAuthController(authService, &logger, &renderer)
+	return NewAuthController(authService, logger, renderer)
 }
 
 func newTestCookie(t *testing.T, authController *AuthController) http.Cookie {
@@ -149,7 +149,7 @@ func TestHandleLogout(t *testing.T) {
 				Route:       "/auth/logout",
 				StatusWant:  http.StatusOK,
 				WithCookie:  true,
-				Cookie:      newTestCookie(t, &authController),
+				Cookie:      newTestCookie(t, authController),
 				Authorized:  true,
 			},
 		)

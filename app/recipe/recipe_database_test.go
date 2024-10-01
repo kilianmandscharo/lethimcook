@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func newTestRecipeDatabase() recipeDatabase {
+func newTestRecipeDatabase() *recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -25,8 +25,7 @@ func newTestRecipeDatabase() recipeDatabase {
 	}
 	db.Migrator().DropTable(&types.Recipe{})
 	db.AutoMigrate(&types.Recipe{})
-	logger := logging.New(logging.Debug)
-	return recipeDatabase{handler: db, logger: &logger}
+	return &recipeDatabase{handler: db, logger: logging.New(logging.Debug)}
 }
 
 func TestCreateRecipe(t *testing.T) {

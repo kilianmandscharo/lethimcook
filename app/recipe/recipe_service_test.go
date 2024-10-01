@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestRecipeService() recipeService {
+func newTestRecipeService() *recipeService {
 	logger := logging.New(logging.Debug)
-	return recipeService{
+	return &recipeService{
 		db:          newTestRecipeDatabase(),
-		logger:      &logger,
-		recipeCache: cache.NewRecipeCache(&logger),
+		logger:      logger,
+		recipeCache: cache.NewRecipeCache(logger),
 	}
 }
 

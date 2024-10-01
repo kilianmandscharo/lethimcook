@@ -25,13 +25,13 @@ type authDatabase struct {
 	logger  *logging.Logger
 }
 
-func NewAuthDatabase(logger *logging.Logger) authDatabase {
+func NewAuthDatabase(logger *logging.Logger) *authDatabase {
 	db, err := gorm.Open(sqlite.Open("./auth.db"), &gorm.Config{})
 	if err != nil {
 		logger.Fatal("failed to connect auth database: ", err)
 	}
 	db.AutoMigrate(&admin{})
-	return authDatabase{handler: db, logger: logger}
+	return &authDatabase{handler: db, logger: logger}
 }
 
 func (db *authDatabase) createAdmin(admin *admin) error {

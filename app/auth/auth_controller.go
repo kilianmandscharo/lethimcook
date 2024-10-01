@@ -15,13 +15,13 @@ import (
 )
 
 type AuthController struct {
-	authService AuthService
+	authService *AuthService
 	logger      *logging.Logger
 	renderer    *render.Renderer
 }
 
-func NewAuthController(authService AuthService, logger *logging.Logger, renderer *render.Renderer) AuthController {
-	return AuthController{
+func NewAuthController(authService *AuthService, logger *logging.Logger, renderer *render.Renderer) *AuthController {
+	return &AuthController{
 		authService: authService,
 		logger:      logger,
 		renderer:    renderer,

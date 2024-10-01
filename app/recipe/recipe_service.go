@@ -18,13 +18,13 @@ import (
 )
 
 type recipeService struct {
-	db          recipeDatabase
+	db          *recipeDatabase
 	logger      *logging.Logger
-	recipeCache cache.RecipeCache
+	recipeCache *cache.RecipeCache
 }
 
-func NewRecipeService(db recipeDatabase, logger *logging.Logger) recipeService {
-	return recipeService{
+func NewRecipeService(db *recipeDatabase, logger *logging.Logger) *recipeService {
+	return &recipeService{
 		db:          db,
 		logger:      logger,
 		recipeCache: cache.NewRecipeCache(logger),

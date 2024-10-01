@@ -16,13 +16,13 @@ import (
 )
 
 type RecipeController struct {
-	recipeService recipeService
+	recipeService *recipeService
 	logger        *logging.Logger
 	renderer      *render.Renderer
 }
 
-func NewRecipeController(recipeService recipeService, logger *logging.Logger, renderer *render.Renderer) RecipeController {
-	return RecipeController{
+func NewRecipeController(recipeService *recipeService, logger *logging.Logger, renderer *render.Renderer) *RecipeController {
+	return &RecipeController{
 		recipeService: recipeService,
 		logger:        logger,
 		renderer:      renderer,

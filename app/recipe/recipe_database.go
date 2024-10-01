@@ -17,13 +17,13 @@ type recipeDatabase struct {
 	logger  *logging.Logger
 }
 
-func NewRecipeDatabase(logger *logging.Logger) recipeDatabase {
+func NewRecipeDatabase(logger *logging.Logger) *recipeDatabase {
 	db, err := gorm.Open(sqlite.Open("./recipe.db"), &gorm.Config{})
 	if err != nil {
-        logger.Fatal("failed to connect recipe database: ", err)
+		logger.Fatal("failed to connect recipe database: ", err)
 	}
 	db.AutoMigrate(&types.Recipe{})
-	return recipeDatabase{handler: db, logger: logger}
+	return &recipeDatabase{handler: db, logger: logger}
 }
 
 func (db *recipeDatabase) createRecipe(recipe *types.Recipe) error {

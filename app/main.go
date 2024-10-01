@@ -16,27 +16,27 @@ func main() {
 	var isProd = flag.Bool("prod", false, "shoudl the app run in production mode")
 	flag.Parse()
 
-    var logLevel logging.LoggerLevel
-    if *isProd {
-        logLevel = logging.Info
-    } else {
-        logLevel = logging.Debug
-    }
+	var logLevel logging.LoggerLevel
+	if *isProd {
+		logLevel = logging.Info
+	} else {
+		logLevel = logging.Debug
+	}
 
 	logger := logging.New(logLevel)
-	renderer := render.New(&logger)
+	renderer := render.New(logger)
 
-	env.LoadEnvironment(".env", &logger)
+	env.LoadEnvironment(".env", logger)
 
-	authDatabase := auth.NewAuthDatabase(&logger)
-	authService := auth.NewAuthService(authDatabase, &logger)
-	authController := auth.NewAuthController(authService, &logger, &renderer)
+	authDatabase := auth.NewAuthDatabase(logger)
+	authService := auth.NewAuthService(authDatabase, logger)
+	authController := auth.NewAuthController(authService, logger, renderer)
 
-	recipeDatabase := recipe.NewRecipeDatabase(&logger)
-	recipeService := recipe.NewRecipeService(recipeDatabase, &logger)
-	recipeController := recipe.NewRecipeController(recipeService, &logger, &renderer)
+	recipeDatabase := recipe.NewRecipeDatabase(logger)
+	recipeService := recipe.NewRecipeService(recipeDatabase, logger)
+	recipeController := recipe.NewRecipeController(recipeService, logger, renderer)
 
 	authService.CreateAdminIfDoesNotExist(*password)
-	server := server.New(authController, recipeController, &logger, &renderer, *isProd)
+	server := server.New(authController, recipeController, logger, renderer, *isProd)
 	server.Start()
 }

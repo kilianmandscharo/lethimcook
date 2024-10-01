@@ -10,8 +10,8 @@ type RecipeCache struct {
 	logger  *logging.Logger
 }
 
-func NewRecipeCache(logger *logging.Logger) RecipeCache {
-	return RecipeCache{logger: logger}
+func NewRecipeCache(logger *logging.Logger) *RecipeCache {
+	return &RecipeCache{logger: logger}
 }
 
 func (r *RecipeCache) Get(isAdmin bool) *[]types.Recipe {

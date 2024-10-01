@@ -8,9 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestRecipeCache() RecipeCache {
-	logger := logging.New(logging.Debug)
-	return NewRecipeCache(&logger)
+func newTestRecipeCache() *RecipeCache {
+	return NewRecipeCache(logging.New(logging.Debug))
 }
 
 func TestSet(t *testing.T) {

@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func newTestAuthDatabase() authDatabase {
+func newTestAuthDatabase() *authDatabase {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
@@ -24,8 +24,7 @@ func newTestAuthDatabase() authDatabase {
 	}
 	db.Migrator().DropTable(&admin{})
 	db.AutoMigrate(&admin{})
-	logger := logging.New(logging.Debug)
-	return authDatabase{handler: db, logger: &logger}
+	return &authDatabase{handler: db, logger: logging.New(logging.Debug)}
 }
 
 func newTestAdmin() admin {

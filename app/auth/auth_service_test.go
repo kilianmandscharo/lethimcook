@@ -13,12 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newTestAuthService() AuthService {
-	logger := logging.New(logging.Debug)
-	return AuthService{
+func newTestAuthService() *AuthService {
+	return &AuthService{
 		db:         newTestAuthDatabase(),
 		privateKey: "test_private_key",
-		logger:     &logger,
+		logger:     logging.New(logging.Debug),
 	}
 }
 

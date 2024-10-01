@@ -24,9 +24,9 @@ type Logger struct {
 	fatalLogger *log.Logger
 }
 
-func New(level LoggerLevel) Logger {
+func New(level LoggerLevel) *Logger {
 	flags := log.Ldate | log.Ltime
-	return Logger{
+	return &Logger{
 		level:       level,
 		debugLogger: log.New(os.Stdout, "[DEBUG] ", flags),
 		infoLogger:  log.New(os.Stdout, "[INFO] ", flags),

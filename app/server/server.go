@@ -26,8 +26,8 @@ type Server struct {
 }
 
 func New(
-	authController auth.AuthController,
-	recipeController recipe.RecipeController,
+	authController *auth.AuthController,
+	recipeController *recipe.RecipeController,
 	logger *logging.Logger,
 	renderer *render.Renderer,
 	isProd bool,
