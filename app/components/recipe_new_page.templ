@@ -37,6 +37,7 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
                 loadFormFromLocalStorage();
                 attachFormEventListeners();
                 attachNewFormSubmitEventListener();
+                attachTextAreaKeyupEventListeners();
             }, 0);
         </script>
 	</main>

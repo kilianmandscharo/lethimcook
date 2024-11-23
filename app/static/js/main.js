@@ -24,6 +24,35 @@ function attachMutationObserverToNotificationContainer() {
     observer.observe(notificationContainer, { childList: true });
 }
 
+function attachTextAreaKeyupEventListeners() {
+    document.getElementById("ingredients")?.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            insertStringInInputAtCursor(e.target, "- ");
+        }
+    })
+    document.getElementById("instructions")?.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            const lastListNumber = getLastListNumberBeforeCursor(e.target);
+            if (lastListNumber) {
+                insertStringInInputAtCursor(e.target, `${parseInt(lastListNumber) + 1}. `);
+            }
+        }
+    })
+}
+
+function getLastListNumberBeforeCursor(el) {
+    const re = /(\n(\d+)|^(\d+))\./g;
+    const matches = [...el.value.slice(0, el.selectionStart).matchAll(re)];
+    return matches.length > 0 ? matches[matches.length - 1][1] : null;
+}
+
+function insertStringInInputAtCursor(el, s) {
+    const cursorPos = el.selectionStart;
+    const newCursorPos = cursorPos + s.length;
+    el.value = el.value.slice(0, cursorPos) + s + el.value.slice(el.selectionEnd);
+    el.selectionStart = el.selectionEnd = newCursorPos;
+}
+
 function attachNewFormSubmitEventListener() {
     const submit = document.getElementById("recipe-new-submit");
     if (!submit) {

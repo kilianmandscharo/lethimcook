@@ -17,5 +17,10 @@ templ RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) {
 			@form(recipeForm)
 			<input type="submit" value="Rezept aktualisieren" name="submit"/>
 		</form>
+        <script>
+            setTimeout(() => {
+                attachTextAreaKeyupEventListeners();
+            }, 0);
+        </script>
 	</main>
 }
