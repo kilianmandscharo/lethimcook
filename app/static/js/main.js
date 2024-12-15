@@ -73,7 +73,9 @@ function fetchLink(target) {
         }
         const recipe = recipes[0];
         const link = `[${recipe.title}](http://localhost:8080/recipe/${recipe.id})`;
+        const newCursorPos = cursorPos + link.length;
         target.value = target.value.slice(0, i) + link + target.value.slice(cursorPos);
+        target.selectionStart = target.selectionEnd = newCursorPos - (cursorPos - i);
     }).catch(console.error);
 }
 
