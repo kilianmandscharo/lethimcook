@@ -525,3 +525,57 @@ func TestReadRecipes(t *testing.T) {
 		assert.Equal(t, tt.wantPaginationInfo, paginationInfo)
 	}
 }
+
+func TestGetRecipeLinks(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
+		Title: "Naan",
+	}))
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
+		Title: "Pita",
+	}))
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
+		Title: "Muffins",
+		Pending: true,
+	}))
+
+	// When
+	links, err := recipeService.getRecipeLinks(false, "Naan")
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, []recipeLinkData{{ID: 1, Title: "Naan"}}, links)
+
+	// When
+	links, err = recipeService.getRecipeLinks(false, "")
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, []recipeLinkData{
+		{ID: 2, Title: "Pita"},
+		{ID: 1, Title: "Naan"},
+	}, links)
+
+	// When
+	links, err = recipeService.getRecipeLinks(false, "nope")
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, []recipeLinkData{}, links)
+}
+
+func TestGetRecipeLinksPayload(t *testing.T) {
+	// Given
+	recipeService := newTestRecipeService()
+	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
+		Title: "Naan",
+	}))
+
+	// When
+	links, err := recipeService.getRecipeLinksPayload(false, "Naan")
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, "[{\"id\":1,\"title\":\"Naan\"}]", links)
+}

@@ -343,3 +343,45 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 		},
 	}
 }
+
+type recipeLinkData struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+}
+
+func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]recipeLinkData, error) {
+	links := []recipeLinkData{}
+	recipes, err := rs.readAllRecipes(isAdmin)
+	if err != nil {
+		return links, errutil.AddMessageToAppError(err, "failed at getRecipeLinks()")
+	}
+	if len(query) > 0 {
+		recipes = rs.filterRecipes(recipes, query)
+	}
+	for _, recipe := range recipes {
+		if recipe.Pending {
+			continue
+		}
+		links = append(links, recipeLinkData{
+			ID:    recipe.ID,
+			Title: recipe.Title,
+		})
+	}
+	return links, nil
+}
+
+func (rs *recipeService) getRecipeLinksPayload(isAdmin bool, query string) (string, error) {
+	links, err := rs.getRecipeLinks(isAdmin, query)
+	if err != nil {
+		return "", errutil.AddMessageToAppError(err, "failed at getRecipeLinksPayload()")
+	}
+	payload, err := json.Marshal(links)
+	if err != nil {
+		return "", &errutil.AppError{
+			UserMessage: "Fehler beim Verarbeiten der Payload",
+			Err:         err,
+			StatusCode:  http.StatusInternalServerError,
+		}
+	}
+	return string(payload), nil
+}

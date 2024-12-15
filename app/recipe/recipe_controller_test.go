@@ -615,3 +615,30 @@ func TestHandleGetPaginatedRecipe(t *testing.T) {
 		)
 	})
 }
+
+func TestHandleGetRecipeLinks(t *testing.T) {
+	recipeController := newTestRecipeController()
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{Title: "Naan"}),
+	)
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{Title: "Pita", Pending: true}),
+	)
+	t.Run("valid request", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleGetRecipeLinks,
+				Method:         http.MethodGet,
+				Route:          "/recipe/link/:query",
+				WithQueryParam: true,
+				QueryParam:     "Naan",
+				StatusWant:     http.StatusOK,
+				AssertMessage:  true,
+				MessageWant:    "[{\"id\":1,\"title\":\"Naan\"}]",
+			},
+		)
+	})
+}
