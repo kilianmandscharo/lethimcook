@@ -36,7 +36,6 @@ function attachMutationObserverToNotificationContainer() {
 }
 
 function fetchLink(target) {
-    console.log("fetchLink");
     const cursorPos = target.selectionStart;
     if (target.value.length === 0) {
         return;
@@ -53,30 +52,92 @@ function fetchLink(target) {
         }
         bracketContentReversed += target.value[i];
     }
-    const bracketContent = bracketContentReversed.split("").reverse().join("");
-    if (!bracketContent.startsWith("link") && !bracketContent.startsWith("Link")) {
-        return;
-    }
-    const split = bracketContent.split(" ");
-    if (split.length < 2) {
-        return;
-    }
     const params = new URLSearchParams({
-        query: split.slice(1).join(" "),
+        query: bracketContentReversed.split("").reverse().join(""),
     });
     fetch(
         `${window.location.origin}/recipe/link?` + params.toString()
     ).then(res => res.json()).then(recipes => {
-        console.log(recipes);
         if (recipes.length === 0) {
             return;
         }
-        const recipe = recipes[0];
-        const link = `[${recipe.title}](http://localhost:8080/recipe/${recipe.id})`;
-        const newCursorPos = cursorPos + link.length;
-        target.value = target.value.slice(0, i) + link + target.value.slice(cursorPos);
-        target.selectionStart = target.selectionEnd = newCursorPos - (cursorPos - i);
+        const insertLinkIntoTextfield = (title, id) => {
+            const link = `[${title}](${window.location.origin}/recipe/${id})`;
+            const newCursorPos = cursorPos + link.length;
+            target.value = target.value.slice(0, i) + link + target.value.slice(cursorPos);
+            target.selectionStart = target.selectionEnd = newCursorPos - (cursorPos - i);
+        }
+        if (recipes.length === 1) {
+            const recipe = recipes[0];
+            insertLinkIntoTextfield(recipe.title, recipe.id);
+        } else {
+            openSelectDialog(recipes, insertLinkIntoTextfield);
+        }
     }).catch(console.error);
+}
+
+function openSelectDialog(options, cb) {
+    const dialogContainer = document.createElement("div");
+    dialogContainer.style.top = dialogContainer.getBoundingClientRect().top;
+    dialogContainer.id = "select-dialog-container";
+
+    const closeDialog = () => {
+        document.getElementById("select-dialog-container")?.remove();
+    }
+
+    const listenForCloseDialog = () => {
+        closeDialog();
+        document.removeEventListener("keydown", listenForCloseDialog);
+    }
+
+    document.addEventListener("keydown", listenForCloseDialog);
+
+    const dialog = document.createElement("div");
+    dialog.id = "select-dialog";
+
+    dialogContainer.appendChild(dialog);
+
+    const dialogHeader = document.createElement("div");
+    dialogHeader.className = "header";
+
+    const dialogHeaderTitleContainer = document.createElement("div");
+    dialogHeaderTitleContainer.className = "title-container";
+
+    const dialogHeaderTitle = document.createElement("div");
+    dialogHeaderTitle.innerText = "Rezept auswählen";
+
+    const titleIcon = document.createElement("i");
+    titleIcon.className = "fa-solid fa-caret-right";
+
+    dialogHeaderTitleContainer.appendChild(titleIcon)
+    dialogHeaderTitleContainer.appendChild(dialogHeaderTitle)
+    dialogHeader.appendChild(dialogHeaderTitleContainer);
+
+    const icon = document.createElement("i");
+    icon.className = "fa-regular fa-circle-xmark fa-xl";
+    icon.onclick = closeDialog;
+    dialogHeader.appendChild(icon)
+
+    const optionsContainer = document.createElement("div");
+    optionsContainer.id = "options-container";
+
+    options.forEach(option => {
+        const optionElement = document.createElement("div");
+        optionElement.innerText = option.title;
+        optionElement.onclick = () => {
+            cb(option.title, option.id);
+            closeDialog();
+        }
+        optionsContainer.appendChild(optionElement);
+    })
+
+    const dialogFooter = document.createElement("div");
+
+    dialog.appendChild(dialogHeader);
+    dialog.appendChild(optionsContainer);
+    dialog.appendChild(dialogFooter);
+
+    document.body.appendChild(dialogContainer);
 }
 
 function attachTextAreaKeyupEventListeners() {

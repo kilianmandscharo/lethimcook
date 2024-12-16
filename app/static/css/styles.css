@@ -669,3 +669,76 @@ textarea {
         transform: rotateZ(360deg);
     }
 }
+
+#select-dialog-container {
+    position: fixed;
+    right: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    min-width: 300px;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+}
+
+#select-dialog-container i {
+    cursor: pointer;
+}
+
+#select-dialog {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: scroll;
+    background-color: var(--color-surface-200);
+    border-radius: 4px;
+    height: calc(100% - 1rem);
+    width: calc(100% - 1rem);
+    max-width: 800px;
+    max-height: 800px;
+    border: solid 2px var(--color-primary-200);
+}
+
+#select-dialog .header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+#select-dialog .header .title-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#select-dialog .header .title-container i {
+    color: var(--color-primary-200);
+}
+
+#options-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: scroll;
+    width: 100%;
+    gap: 4px;
+}
+
+#options-container div {
+    padding: 0.5rem;
+    cursor: pointer;
+    width: 100%;
+    background-color: var(--color-surface-300);
+    border-radius: 4px;
+}
+
+#options-container div:hover {
+    background-color: var(--color-primary-200);
+}
