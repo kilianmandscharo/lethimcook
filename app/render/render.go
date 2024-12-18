@@ -34,10 +34,11 @@ func (r *Renderer) RenderError(c echo.Context, err error) error {
 }
 
 type RenderComponentOptions struct {
-	Context   echo.Context
-	Component templ.Component
-	Message   string
-	Err       error
+	Context       echo.Context
+	Component     templ.Component
+	Message       string
+	Err           error
+	OnlyComponent bool
 }
 
 func (r *Renderer) RenderComponent(options RenderComponentOptions) error {
@@ -55,7 +56,7 @@ func (r *Renderer) RenderComponent(options RenderComponentOptions) error {
 	message := getRenderComponentOptionsMessage(options)
 	component := getRenderComponentOptionsComponent(options, message)
 
-	if servutil.IsHxRequest(options.Context) {
+	if servutil.IsHxRequest(options.Context) || options.OnlyComponent {
 		return component.Render(
 			options.Context.Request().Context(),
 			options.Context.Response().Writer,

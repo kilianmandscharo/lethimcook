@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -369,7 +370,7 @@ func (rc *RecipeController) HandleDownloadRecipeAsJson(c echo.Context) error {
 }
 
 func (rc *RecipeController) HandleGetRecipeLinks(c echo.Context) error {
-	payload, err := rc.recipeService.getRecipeLinksPayload(
+	recipes, err := rc.recipeService.getRecipeLinks(
 		servutil.IsAuthorized(c),
 		c.QueryParam("query"),
 	)
@@ -379,5 +380,23 @@ func (rc *RecipeController) HandleGetRecipeLinks(c echo.Context) error {
 			errutil.AddMessageToAppError(err, "failed at HandleGetRecipeLink()"),
 		)
 	}
-	return c.String(http.StatusOK, payload)
+	if len(recipes) == 1 {
+		payload, err := json.Marshal(recipes[0])
+		if err != nil {
+			return rc.renderer.RenderError(
+				c,
+				&errutil.AppError{
+					UserMessage: "Fehler bei der Datenverarbeitung",
+					Err:         err,
+					StatusCode:  http.StatusInternalServerError,
+				},
+			)
+		}
+		return c.String(http.StatusOK, string(payload))
+	}
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
+		Context:   c,
+		Component: components.SelectDialog(recipes),
+		OnlyComponent: true,
+	})
 }

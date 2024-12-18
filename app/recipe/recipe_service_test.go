@@ -545,14 +545,14 @@ func TestGetRecipeLinks(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, []recipeLinkData{{ID: 1, Title: "Naan"}}, links)
+	assert.Equal(t, []types.RecipeLinkData{{ID: 1, Title: "Naan"}}, links)
 
 	// When
 	links, err = recipeService.getRecipeLinks(false, "")
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, []recipeLinkData{
+	assert.Equal(t, []types.RecipeLinkData{
 		{ID: 2, Title: "Pita"},
 		{ID: 1, Title: "Naan"},
 	}, links)
@@ -562,7 +562,7 @@ func TestGetRecipeLinks(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, []recipeLinkData{}, links)
+	assert.Equal(t, []types.RecipeLinkData{}, links)
 }
 
 func TestGetRecipeLinksPayload(t *testing.T) {

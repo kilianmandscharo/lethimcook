@@ -1,0 +1,36 @@
+package components
+
+import "github.com/kilianmandscharo/lethimcook/types"
+
+script optionOnClickHandler(title string, id uint) {
+    injectLinkIntoTextarea(title, id);
+    closeDialog();
+}
+
+script exitButtonOnClickHandler() {
+    closeDialog();
+}
+
+templ SelectDialog(options []types.RecipeLinkData) {
+    <div id="select-dialog">
+        <div class="header">
+            <div class="title-container">
+                <i class="fa-solid fa-caret-right"></i>
+                <div>Rezept auswählen</div>
+            </div>
+            <i 
+                onclick={ exitButtonOnClickHandler() } 
+                class="fa-regular fa-circle-xmark fa-xl"
+            ></i>
+        </div>
+        <div id="options-container">
+            for _, opt := range options {
+                <div 
+                    onclick={ optionOnClickHandler(opt.Title, opt.ID) }
+                >
+                    { opt.Title }
+                </div>
+            }
+        </div>
+    </div>
+}

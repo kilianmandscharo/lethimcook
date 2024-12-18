@@ -344,13 +344,8 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 	}
 }
 
-type recipeLinkData struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
-}
-
-func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]recipeLinkData, error) {
-	links := []recipeLinkData{}
+func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]types.RecipeLinkData, error) {
+	links := []types.RecipeLinkData{}
 	recipes, err := rs.readAllRecipes(isAdmin)
 	if err != nil {
 		return links, errutil.AddMessageToAppError(err, "failed at getRecipeLinks()")
@@ -362,7 +357,7 @@ func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]recipeLin
 		if recipe.Pending {
 			continue
 		}
-		links = append(links, recipeLinkData{
+		links = append(links, types.RecipeLinkData{
 			ID:    recipe.ID,
 			Title: recipe.Title,
 		})
