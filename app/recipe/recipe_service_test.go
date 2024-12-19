@@ -536,7 +536,7 @@ func TestGetRecipeLinks(t *testing.T) {
 		Title: "Pita",
 	}))
 	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
-		Title: "Muffins",
+		Title:   "Muffins",
 		Pending: true,
 	}))
 
@@ -563,19 +563,4 @@ func TestGetRecipeLinks(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, []types.RecipeLinkData{}, links)
-}
-
-func TestGetRecipeLinksPayload(t *testing.T) {
-	// Given
-	recipeService := newTestRecipeService()
-	assert.NoError(t, recipeService.createRecipe(&types.Recipe{
-		Title: "Naan",
-	}))
-
-	// When
-	links, err := recipeService.getRecipeLinksPayload(false, "Naan")
-
-	// Then
-	assert.NoError(t, err)
-	assert.Equal(t, "[{\"id\":1,\"title\":\"Naan\"}]", links)
 }

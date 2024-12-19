@@ -364,19 +364,3 @@ func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]types.Rec
 	}
 	return links, nil
 }
-
-func (rs *recipeService) getRecipeLinksPayload(isAdmin bool, query string) (string, error) {
-	links, err := rs.getRecipeLinks(isAdmin, query)
-	if err != nil {
-		return "", errutil.AddMessageToAppError(err, "failed at getRecipeLinksPayload()")
-	}
-	payload, err := json.Marshal(links)
-	if err != nil {
-		return "", &errutil.AppError{
-			UserMessage: "Fehler beim Verarbeiten der Payload",
-			Err:         err,
-			StatusCode:  http.StatusInternalServerError,
-		}
-	}
-	return string(payload), nil
-}

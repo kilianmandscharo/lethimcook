@@ -637,7 +637,7 @@ func TestHandleGetRecipeLinks(t *testing.T) {
 				QueryParam:     "Naan",
 				StatusWant:     http.StatusOK,
 				AssertMessage:  true,
-				MessageWant:    "[{\"id\":1,\"title\":\"Naan\"}]",
+				MessageWant:    "{\"id\":1,\"title\":\"Naan\"}",
 			},
 		)
 	})

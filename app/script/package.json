@@ -1,0 +1,19 @@
+{
+    "name": "script",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./src/main.ts",
+    "scripts": {
+        "compile": "npx tsc",
+        "build": "npx tsc && esbuild ./dist/main.js --outdir='../static/js' --minify",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^22.10.2",
+        "esbuild": "^0.24.0",
+        "typescript": "^5.7.2"
+    }
+}
