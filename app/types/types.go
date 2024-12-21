@@ -172,3 +172,9 @@ func (p *PaginationInfo) GetPageLabels() int {
 	}
 	return p.TotalPages
 }
+
+type RecipeLinkData struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+}
+

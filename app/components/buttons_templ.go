@@ -389,6 +389,16 @@ func newRecipeButton() templ.Component {
 	})
 }
 
+func copyUrlToClipboardButtonOnClickHandler() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_copyUrlToClipboardButtonOnClickHandler_79a0`,
+		Function: `function __templ_copyUrlToClipboardButtonOnClickHandler_79a0(){handleCopyUrlToClipboardButton();
+}`,
+		Call:       templ.SafeScript(`__templ_copyUrlToClipboardButtonOnClickHandler_79a0`),
+		CallInline: templ.SafeScriptInline(`__templ_copyUrlToClipboardButtonOnClickHandler_79a0`),
+	}
+}
+
 func copyUrlToClipboardButton() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -410,7 +420,20 @@ func copyUrlToClipboardButton() templ.Component {
 			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"copy-url-to-clipboard-button\" class=\"icon-button with-label\" title=\"Link kopieren\">Link <i class=\"fa-solid fa-copy\"></i></button><script>\n        setTimeout(() => {attachEventListenerToClipboardButton();}, 0);\n    </script>")
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, copyUrlToClipboardButtonOnClickHandler())
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"copy-url-to-clipboard-button\" class=\"icon-button with-label\" title=\"Link kopieren\" onclick=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var18 templ.ComponentScript = copyUrlToClipboardButtonOnClickHandler()
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18.Call)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Link <i class=\"fa-solid fa-copy\"></i></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

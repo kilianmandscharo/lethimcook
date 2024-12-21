@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -42,6 +43,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.PUT("/recipe/:id", rc.HandleUpdateRecipe)
 	e.PUT("/recipe/:id/pending/:pending", rc.HandleUpdatePending)
 	e.DELETE("/recipe/:id", rc.HandleDeleteRecipe)
+	e.GET("/recipe/link", rc.HandleGetRecipeLinks)
 }
 
 func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
@@ -365,4 +367,36 @@ func (rc *RecipeController) HandleDownloadRecipeAsJson(c echo.Context) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set(echo.HeaderContentLength, strconv.Itoa(len(jsonRecipe)))
 	return c.Blob(http.StatusOK, echo.MIMEApplicationJSON, jsonRecipe)
+}
+
+func (rc *RecipeController) HandleGetRecipeLinks(c echo.Context) error {
+	recipes, err := rc.recipeService.getRecipeLinks(
+		servutil.IsAuthorized(c),
+		c.QueryParam("query"),
+	)
+	if err != nil {
+		return rc.renderer.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at HandleGetRecipeLink()"),
+		)
+	}
+	if len(recipes) == 1 {
+		payload, err := json.Marshal(recipes[0])
+		if err != nil {
+			return rc.renderer.RenderError(
+				c,
+				&errutil.AppError{
+					UserMessage: "Fehler bei der Datenverarbeitung",
+					Err:         err,
+					StatusCode:  http.StatusInternalServerError,
+				},
+			)
+		}
+		return c.String(http.StatusOK, string(payload))
+	}
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
+		Context:   c,
+		Component: components.SelectDialog(recipes),
+		OnlyComponent: true,
+	})
 }

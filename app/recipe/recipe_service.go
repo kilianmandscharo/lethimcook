@@ -343,3 +343,24 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 		},
 	}
 }
+
+func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]types.RecipeLinkData, error) {
+	links := []types.RecipeLinkData{}
+	recipes, err := rs.readAllRecipes(isAdmin)
+	if err != nil {
+		return links, errutil.AddMessageToAppError(err, "failed at getRecipeLinks()")
+	}
+	if len(query) > 0 {
+		recipes = rs.filterRecipes(recipes, query)
+	}
+	for _, recipe := range recipes {
+		if recipe.Pending {
+			continue
+		}
+		links = append(links, types.RecipeLinkData{
+			ID:    recipe.ID,
+			Title: recipe.Title,
+		})
+	}
+	return links, nil
+}
