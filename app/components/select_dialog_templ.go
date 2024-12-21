@@ -12,22 +12,22 @@ import "github.com/kilianmandscharo/lethimcook/types"
 
 func optionOnClickHandler(title string, id uint) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_optionOnClickHandler_db9c`,
-		Function: `function __templ_optionOnClickHandler_db9c(title, id){injectLinkIntoTextarea(title, id);
-    closeDialog();
+		Name: `__templ_optionOnClickHandler_cf9a`,
+		Function: `function __templ_optionOnClickHandler_cf9a(title, id){SelectDialog.injectLinkIntoTextarea(title, id);
+    SelectDialog.close();
 }`,
-		Call:       templ.SafeScript(`__templ_optionOnClickHandler_db9c`, title, id),
-		CallInline: templ.SafeScriptInline(`__templ_optionOnClickHandler_db9c`, title, id),
+		Call:       templ.SafeScript(`__templ_optionOnClickHandler_cf9a`, title, id),
+		CallInline: templ.SafeScriptInline(`__templ_optionOnClickHandler_cf9a`, title, id),
 	}
 }
 
 func exitButtonOnClickHandler() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_exitButtonOnClickHandler_b418`,
-		Function: `function __templ_exitButtonOnClickHandler_b418(){closeDialog();
+		Name: `__templ_exitButtonOnClickHandler_b0af`,
+		Function: `function __templ_exitButtonOnClickHandler_b0af(){SelectDialog.close();
 }`,
-		Call:       templ.SafeScript(`__templ_exitButtonOnClickHandler_b418`),
-		CallInline: templ.SafeScriptInline(`__templ_exitButtonOnClickHandler_b418`),
+		Call:       templ.SafeScript(`__templ_exitButtonOnClickHandler_b0af`),
+		CallInline: templ.SafeScriptInline(`__templ_exitButtonOnClickHandler_b0af`),
 	}
 }
 

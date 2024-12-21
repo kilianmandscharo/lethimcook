@@ -2,6 +2,10 @@ package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
+script onBlurHandler() {
+    LocalStorageUtil.saveForm();
+}
+
 templ form(form []types.FormElement) {
     for _, element := range form {
         <div>
@@ -15,6 +19,7 @@ templ form(form []types.FormElement) {
                     type={ element.InputType } 
                     name={ element.Name } 
                     value={ element.Value }
+                    onblur={ onBlurHandler() }
                     if element.Disabled {
                         disabled
                     }
@@ -28,6 +33,7 @@ templ form(form []types.FormElement) {
                     id={ element.Name } 
                     placeholder={ element.GetPlaceholder() } 
                     name={ element.Name } 
+                    onblur={ onBlurHandler() }
                     if element.Disabled {
                         disabled
                     }

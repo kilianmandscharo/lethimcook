@@ -2,6 +2,10 @@ package components
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
+script submitOnClickHandler() {
+    LocalStorageUtil.deleteForm();
+}
+
 templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
 	@header(isAdmin)
 	<main>
@@ -30,14 +34,13 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
                     value="Rezept einreichen" 
                 }
                 name="submit"
+                onclick={ submitOnClickHandler() }
             />
 		</form>
         <script>
             setTimeout(() => {
-                loadFormFromLocalStorage();
-                attachFormEventListeners();
-                attachNewFormSubmitEventListener();
-                attachTextAreaKeyupEventListeners();
+                LocalStorageUtil.loadForm();
+                attachTextAreaEventListeners();
             }, 0);
         </script>
 	</main>

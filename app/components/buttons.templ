@@ -151,18 +151,20 @@ templ newRecipeButton() {
     </button>
 }
 
+script copyUrlToClipboardButtonOnClickHandler() {
+    handleCopyUrlToClipboardButton();
+}
+
 templ copyUrlToClipboardButton() {
     <button
         id="copy-url-to-clipboard-button"
         class="icon-button with-label"
         title="Link kopieren"
+        onclick={ copyUrlToClipboardButtonOnClickHandler() }
     >
         Link
         <i class="fa-solid fa-copy"></i>
     </button>
-    <script>
-        setTimeout(() => {attachEventListenerToClipboardButton();}, 0);
-    </script>
 }
 
 

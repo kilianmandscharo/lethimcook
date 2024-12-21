@@ -10,6 +10,16 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/kilianmandscharo/lethimcook/types"
 
+func submitOnClickHandler() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_submitOnClickHandler_5b76`,
+		Function: `function __templ_submitOnClickHandler_5b76(){LocalStorageUtil.deleteForm();
+}`,
+		Call:       templ.SafeScript(`__templ_submitOnClickHandler_5b76`),
+		CallInline: templ.SafeScriptInline(`__templ_submitOnClickHandler_5b76`),
+	}
+}
+
 func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -66,6 +76,10 @@ func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, submitOnClickHandler())
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input id=\"recipe-new-submit\" type=\"submit\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -81,7 +95,16 @@ func RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) templ.Component
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"submit\"></form><script>\n            setTimeout(() => {\n                loadFormFromLocalStorage();\n                attachFormEventListeners();\n                attachNewFormSubmitEventListener();\n                attachTextAreaKeyupEventListeners();\n            }, 0);\n        </script></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"submit\" onclick=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 templ.ComponentScript = submitOnClickHandler()
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2.Call)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></form><script>\n            setTimeout(() => {\n                LocalStorageUtil.loadForm();\n                attachTextAreaEventListeners();\n            }, 0);\n        </script></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

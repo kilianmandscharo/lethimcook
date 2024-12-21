@@ -3,12 +3,12 @@ package components
 import "github.com/kilianmandscharo/lethimcook/types"
 
 script optionOnClickHandler(title string, id uint) {
-    injectLinkIntoTextarea(title, id);
-    closeDialog();
+    SelectDialog.injectLinkIntoTextarea(title, id);
+    SelectDialog.close();
 }
 
 script exitButtonOnClickHandler() {
-    closeDialog();
+    SelectDialog.close();
 }
 
 templ SelectDialog(options []types.RecipeLinkData) {

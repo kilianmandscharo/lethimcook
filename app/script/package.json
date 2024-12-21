@@ -5,7 +5,7 @@
     "main": "./src/main.ts",
     "scripts": {
         "compile": "tsc",
-        "build": "tsc && esbuild ./dist/main.js --outdir='../static/js' --minify --target=es6",
+        "build": "tsc && esbuild ./dist/main.js --outdir='../static/js' --target=es6 --bundle --minify",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
