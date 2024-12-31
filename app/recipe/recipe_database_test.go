@@ -23,8 +23,8 @@ func newTestRecipeDatabase() *recipeDatabase {
 		fmt.Println("failed to connect test database: ", err)
 		os.Exit(1)
 	}
-	db.Migrator().DropTable(&types.Recipe{})
-	db.AutoMigrate(&types.Recipe{})
+	db.Migrator().DropTable(&types.Recipe{}, &types.RecipeVersion{})
+	db.AutoMigrate(&types.Recipe{}, &types.RecipeVersion{})
 	return &recipeDatabase{handler: db, logger: logging.New(logging.Debug)}
 }
 
@@ -220,4 +220,45 @@ func TestUpdatePending(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
+}
+
+func TestCreateRecipeVersion(t *testing.T) {
+	// Given
+	db := newTestRecipeDatabase()
+	recipe := types.Recipe{Title: "Test Recipe"}
+	assert.NoError(t, db.createRecipe(&recipe))
+
+	// When
+	recipe.Title = "Test Recipe Version"
+	recipeVersion := types.NewRecipeVersion(&recipe)
+	err := db.createRecipeVersion(recipeVersion)
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, uint(1), recipeVersion.ID)
+}
+
+func TestReadRecipeVersionsForRecipe(t *testing.T) {
+	// Given
+	db := newTestRecipeDatabase()
+	recipe := types.Recipe{Title: "Test Recipe"}
+	assert.NoError(t, db.createRecipe(&recipe))
+
+	recipe.Title = "Test Recipe Version"
+	recipeVersion := types.NewRecipeVersion(&recipe)
+	assert.NoError(t, db.createRecipeVersion(recipeVersion))
+
+	recipe.Title = "Test Recipe Version 2"
+	recipeVersion2 := types.NewRecipeVersion(&recipe)
+	assert.NoError(t, db.createRecipeVersion(recipeVersion2))
+
+	// When
+	recipeVersions, err := db.readRecipeVersionsForRecipe(recipe.ID)
+
+	// Then
+	assert.NoError(t, err)
+	assert.Equal(t, []types.RecipeVersion{
+		{ID: 2, Title: "Test Recipe Version 2", RecipeID: 1},
+		{ID: 1, Title: "Test Recipe Version", RecipeID: 1},
+	}, recipeVersions)
 }

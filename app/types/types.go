@@ -178,3 +178,36 @@ type RecipeLinkData struct {
 	Title string `json:"title"`
 }
 
+type RecipeVersion struct {
+	ID             uint   `json:"id"`
+	Author         string `json:"author"`
+	Source         string `json:"source"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	Duration       int    `json:"duration"`
+	Ingredients    string `json:"ingredients"`
+	Instructions   string `json:"instructions"`
+	Tags           string `json:"tags"`
+	Pending        bool   `json:"-"`
+	CreatedAt      string `json:"createdAt"`
+	LastModifiedAt string `json:"-"`
+	RecipeID       uint   `json:"-"`
+	Recipe         Recipe `gorm:"constraint:OnDelete:CASCADE;"`
+}
+
+func NewRecipeVersion(recipe *Recipe) *RecipeVersion {
+	return &RecipeVersion{
+		Author:         recipe.Author,
+		Source:         recipe.Source,
+		Title:          recipe.Title,
+		Description:    recipe.Description,
+		Duration:       recipe.Duration,
+		Ingredients:    recipe.Ingredients,
+		Instructions:   recipe.Instructions,
+		Tags:           recipe.Tags,
+		Pending:        recipe.Pending,
+		CreatedAt:      recipe.CreatedAt,
+		LastModifiedAt: recipe.LastModifiedAt,
+		RecipeID:       recipe.ID,
+	}
+}

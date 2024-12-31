@@ -22,7 +22,7 @@ func NewRecipeDatabase(logger *logging.Logger) *recipeDatabase {
 	if err != nil {
 		logger.Fatal("failed to connect recipe database: ", err)
 	}
-	db.AutoMigrate(&types.Recipe{})
+	db.AutoMigrate(&types.Recipe{}, &types.RecipeVersion{})
 	return &recipeDatabase{handler: db, logger: logger}
 }
 
@@ -140,7 +140,7 @@ func (db *recipeDatabase) updatePending(id uint, pending bool) error {
 	createError := func(err error) error {
 		return errutil.AddMessageToAppError(
 			err,
-			fmt.Sprintf("failed at acceptRecipe() with id %d", id),
+			fmt.Sprintf("failed at updatePending() with id %d", id),
 		)
 	}
 	recipe, err := db.readRecipe(id)
@@ -153,4 +153,34 @@ func (db *recipeDatabase) updatePending(id uint, pending bool) error {
 		return createError(err)
 	}
 	return nil
+}
+
+func (db *recipeDatabase) createRecipeVersion(recipeVersion *types.RecipeVersion) error {
+	if err := db.handler.Create(recipeVersion).Error; err != nil {
+		return &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at createRecipeVersion() with recipe %v, database failure: %w",
+				*recipeVersion,
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return nil
+}
+
+func (db *recipeDatabase) readRecipeVersionsForRecipe(id uint) ([]types.RecipeVersion, error) {
+	var recipeVersions []types.RecipeVersion
+	if err := db.handler.Order("id desc").Where("recipe_id = ?", id).Find(&recipeVersions).Error; err != nil {
+		return recipeVersions, &errutil.AppError{
+			UserMessage: "Datenbankfehler",
+			Err: fmt.Errorf(
+				"failed at readRecipeVersionsForRecipe(), database failure: %w",
+				err,
+			),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return recipeVersions, nil
 }
