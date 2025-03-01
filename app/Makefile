@@ -9,8 +9,8 @@ app: $(wildcard *.go)
 	go build -o $(BUILD_DIR)/lethimcook
 
 build_scripts:
-	cd ./script && npm run build
-	cd ../
+	cd ../script/ && npm run build
+	cd ../app/
 
 copy_static:
 	mkdir -p $(BUILD_DIR)/$(STATIC_DIR)

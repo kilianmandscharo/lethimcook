@@ -2,5 +2,3 @@ tmp
 .env
 *.db
 build
-script/node_modules
-script/dist

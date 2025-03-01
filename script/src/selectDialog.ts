@@ -11,7 +11,11 @@ export class SelectDialog {
 
     static injectLinkIntoTextarea(title: string, id: number) {
         const { cursorPos, target, substitutionStart } = SelectDialog.state;
-        if (!cursorPos || !target || !substitutionStart) {
+        if (
+            cursorPos === undefined ||
+            target === undefined ||
+            substitutionStart === undefined
+        ) {
             return;
         }
         const link = `[${title}](${window.location.origin}/recipe/${id})`;
