@@ -230,12 +230,12 @@ func TestCreateRecipeVersion(t *testing.T) {
 
 	// When
 	recipe.Title = "Test Recipe Version"
-	recipeVersion := types.NewRecipeVersion(&recipe)
-	err := db.createRecipeVersion(recipeVersion)
+	recipeVersion := recipe.ToVersion()
+	err := db.createRecipeVersion(&recipeVersion)
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, uint(1), recipeVersion.ID)
+	assert.Equal(t, uint(1), recipeVersion.VersionID)
 }
 
 func TestReadRecipeVersionsForRecipe(t *testing.T) {
@@ -244,13 +244,13 @@ func TestReadRecipeVersionsForRecipe(t *testing.T) {
 	recipe := types.Recipe{Title: "Test Recipe"}
 	assert.NoError(t, db.createRecipe(&recipe))
 
-	recipe.Title = "Test Recipe Version"
-	recipeVersion := types.NewRecipeVersion(&recipe)
-	assert.NoError(t, db.createRecipeVersion(recipeVersion))
+	recipe.Title = "Test Recipe Version 1"
+	recipeVersion := recipe.ToVersion()
+	assert.NoError(t, db.createRecipeVersion(&recipeVersion))
 
 	recipe.Title = "Test Recipe Version 2"
-	recipeVersion2 := types.NewRecipeVersion(&recipe)
-	assert.NoError(t, db.createRecipeVersion(recipeVersion2))
+	recipeVersion2 := recipe.ToVersion()
+	assert.NoError(t, db.createRecipeVersion(&recipeVersion2))
 
 	// When
 	recipeVersions, err := db.readRecipeVersionsForRecipe(recipe.ID)
@@ -258,7 +258,7 @@ func TestReadRecipeVersionsForRecipe(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, []types.RecipeVersion{
-		{ID: 2, Title: "Test Recipe Version 2", RecipeID: 1},
-		{ID: 1, Title: "Test Recipe Version", RecipeID: 1},
+		{VersionID: 2, Recipe: types.Recipe{Title: "Test Recipe Version 2"}, RecipeID: 1},
+		{VersionID: 1, Recipe: types.Recipe{Title: "Test Recipe Version 1"}, RecipeID: 1},
 	}, recipeVersions)
 }

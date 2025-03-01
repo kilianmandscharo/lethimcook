@@ -117,6 +117,13 @@ func (r *Recipe) RenderMarkdown() error {
 	return nil
 }
 
+func (r *Recipe) ToVersion() RecipeVersion {
+	return RecipeVersion{
+		Recipe:   *r,
+		RecipeID: r.ID,
+	}
+}
+
 func NewTestRecipe() Recipe {
 	return Recipe{
 		Title:        "Test title",
@@ -179,35 +186,7 @@ type RecipeLinkData struct {
 }
 
 type RecipeVersion struct {
-	ID             uint   `json:"id"`
-	Author         string `json:"author"`
-	Source         string `json:"source"`
-	Title          string `json:"title"`
-	Description    string `json:"description"`
-	Duration       int    `json:"duration"`
-	Ingredients    string `json:"ingredients"`
-	Instructions   string `json:"instructions"`
-	Tags           string `json:"tags"`
-	Pending        bool   `json:"-"`
-	CreatedAt      string `json:"createdAt"`
-	LastModifiedAt string `json:"-"`
-	RecipeID       uint   `json:"-"`
-	Recipe         Recipe `gorm:"constraint:OnDelete:CASCADE;"`
-}
-
-func NewRecipeVersion(recipe *Recipe) *RecipeVersion {
-	return &RecipeVersion{
-		Author:         recipe.Author,
-		Source:         recipe.Source,
-		Title:          recipe.Title,
-		Description:    recipe.Description,
-		Duration:       recipe.Duration,
-		Ingredients:    recipe.Ingredients,
-		Instructions:   recipe.Instructions,
-		Tags:           recipe.Tags,
-		Pending:        recipe.Pending,
-		CreatedAt:      recipe.CreatedAt,
-		LastModifiedAt: recipe.LastModifiedAt,
-		RecipeID:       recipe.ID,
-	}
+	VersionID uint `gorm:"primaryKey"`
+	RecipeID  uint
+	Recipe    Recipe
 }

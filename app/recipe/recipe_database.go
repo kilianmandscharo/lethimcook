@@ -172,7 +172,7 @@ func (db *recipeDatabase) createRecipeVersion(recipeVersion *types.RecipeVersion
 
 func (db *recipeDatabase) readRecipeVersionsForRecipe(id uint) ([]types.RecipeVersion, error) {
 	var recipeVersions []types.RecipeVersion
-	if err := db.handler.Order("id desc").Where("recipe_id = ?", id).Find(&recipeVersions).Error; err != nil {
+	if err := db.handler.Order("version_id desc").Where("recipe_id = ?", id).Find(&recipeVersions).Error; err != nil {
 		return recipeVersions, &errutil.AppError{
 			UserMessage: "Datenbankfehler",
 			Err: fmt.Errorf(
