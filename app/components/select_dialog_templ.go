@@ -52,11 +52,7 @@ func SelectDialog(options []types.RecipeLinkData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-<<<<<<< Updated upstream
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"select-dialog\"><div class=\"header\"><div class=\"title-container\"><i class=\"fa-solid fa-caret-right\"></i><div>Rezept auswählen</div></div>")
-=======
 		templ_7745c5c3_Err = Modal("select-dialog", "Rezept auswählen", modalContent(options)).Render(ctx, templ_7745c5c3_Buffer)
->>>>>>> Stashed changes
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,11 +66,6 @@ func modalContent(options []types.RecipeLinkData) templ.Component {
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
 			return templ_7745c5c3_CtxErr
 		}
-<<<<<<< Updated upstream
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<i onclick=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-=======
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 		if !templ_7745c5c3_IsBuffer {
 			defer func() {
@@ -83,19 +74,14 @@ func modalContent(options []types.RecipeLinkData) templ.Component {
 					templ_7745c5c3_Err = templ_7745c5c3_BufErr
 				}
 			}()
->>>>>>> Stashed changes
 		}
 		ctx = templ.InitializeContext(ctx)
 		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
 		if templ_7745c5c3_Var2 == nil {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
-<<<<<<< Updated upstream
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"fa-regular fa-circle-xmark fa-xl\"></i></div><div id=\"options-container\">")
-=======
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"options-container\">")
->>>>>>> Stashed changes
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -104,11 +90,7 @@ func modalContent(options []types.RecipeLinkData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-<<<<<<< Updated upstream
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div onclick=\"")
-=======
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div onclick=\"")
->>>>>>> Stashed changes
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -117,11 +99,7 @@ func modalContent(options []types.RecipeLinkData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-<<<<<<< Updated upstream
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">")
-=======
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
->>>>>>> Stashed changes
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -134,20 +112,12 @@ func modalContent(options []types.RecipeLinkData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-<<<<<<< Updated upstream
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
-=======
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
->>>>>>> Stashed changes
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-<<<<<<< Updated upstream
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div>")
-=======
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div>")
->>>>>>> Stashed changes
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

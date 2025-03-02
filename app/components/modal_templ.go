@@ -10,13 +10,13 @@ import templruntime "github.com/a-h/templ/runtime"
 
 func onLoad(id string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_onLoad_bdf8`,
-		Function: `function __templ_onLoad_bdf8(id){setTimeout(() => {
+		Name: `__templ_onLoad_b3b0`,
+		Function: `function __templ_onLoad_b3b0(id){setTimeout(() => {
         const container = document.getElementById(id);
         if (!container) {
             return;
         }
-        // container.style.top = container.getBoundingClientRect().top.toString();
+
         container.style.top = 0;
 
         const listenForClose = (e) => {
@@ -28,8 +28,8 @@ func onLoad(id string) templ.ComponentScript {
         document.addEventListener("keydown", listenForClose);
     }, 0);
 }`,
-		Call:       templ.SafeScript(`__templ_onLoad_bdf8`, id),
-		CallInline: templ.SafeScriptInline(`__templ_onLoad_bdf8`, id),
+		Call:       templ.SafeScript(`__templ_onLoad_b3b0`, id),
+		CallInline: templ.SafeScriptInline(`__templ_onLoad_b3b0`, id),
 	}
 }
 

@@ -438,8 +438,6 @@ func copyUrlToClipboardButton() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		return nil
-<<<<<<< Updated upstream
-=======
 	})
 }
 
@@ -482,7 +480,6 @@ func PreviewButton(key string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		return nil
->>>>>>> Stashed changes
 	})
 }
 

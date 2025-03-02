@@ -35,6 +35,7 @@ export class SelectDialog {
 
     static open(data: string) {
         const container = document.createElement("div");
+        container.id = "select-dialog-container"
         container.innerHTML = data;
         replaceScripts(container);
         document.body.appendChild(container);
