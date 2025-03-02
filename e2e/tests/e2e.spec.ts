@@ -1,7 +1,29 @@
 import { test, expect } from "@playwright/test";
-import { clickButtonByTitle, navigateToEditPage, navigateToHomePage, navigateToAdminPage, navigateToRecipePage } from "../utils/utils";
-import { checkRecipeList, checkRecipePage, createRecipe, deleteRecipe, editRecipe, editedRecipe, recipe } from "../utils/recipe";
-import { changePassword, login, logout, testInvalidPassword, testInvalidPasswordChange, testPasswordChangeTooShort } from "../utils/admin";
+import {
+    clickButtonByTitle,
+    navigateToEditPage,
+    navigateToHomePage,
+    navigateToAdminPage,
+    navigateToRecipePage,
+    navigateToNewRecipePage,
+} from "../utils/utils";
+import {
+    checkRecipeList,
+    checkRecipePage,
+    createRecipe,
+    deleteRecipe,
+    editRecipe,
+    editedRecipe,
+    recipe,
+} from "../utils/recipe";
+import {
+    changePassword,
+    login,
+    logout,
+    testInvalidPassword,
+    testInvalidPasswordChange,
+    testPasswordChangeTooShort,
+} from "../utils/admin";
 
 test("check title", async ({ page }) => {
     await page.goto("");
@@ -27,6 +49,24 @@ test("admin tests", async ({ page }) => {
     await login(page, "admin");
 });
 
+// test("save wip recipe in local storage", async ({ page }) => {
+//     await page.goto("");
+//     await navigateToAdminPage(page);
+//     await login(page, "admin");
+//     await navigateToHomePage(page);
+//     await navigateToNewRecipePage(page);
+//     await fillInputByPlaceholder(page, "Zutaten", "Test Zutaten");
+//     await page.keyboard.press("Tab");
+//     await navigateToHomePage(page);
+//     await navigateToNewRecipePage(page);
+//     await expect(async () => {
+//         const value = await page.getByPlaceholder("Zutaten").inputValue();
+//         console.log("VALUE:", value);
+//         expect(page.getByPlaceholder("Zutaten")).toHaveValue("Test Zutaten");
+//     }).toPass({ timeout: 5_000, intervals: [1_000] });
+// });
+//
+
 test("create recipe", async ({ page }) => {
     await page.goto("");
     await navigateToAdminPage(page);
@@ -36,6 +76,23 @@ test("create recipe", async ({ page }) => {
     await checkRecipeList(page, recipe);
     await navigateToRecipePage(page, recipe.title);
     await checkRecipePage(page, recipe);
+});
+
+// TODO: create second recipe and test select dialog
+
+test("recipe link completion", async ({ page }) => {
+    await page.goto("");
+    await navigateToNewRecipePage(page);
+    const input = page.getByPlaceholder("Zutaten");
+    await expect(input).toBeVisible();
+    await input.click();
+    await expect(input).toBeFocused();
+
+    await input.pressSequentially("[!Naan]");
+
+    await expect(page.getByPlaceholder("Zutaten")).toHaveValue(
+        /\[Naan\]\(http:\/\/127\.0\.0\.1:8080\/recipe\/\d+\)/,
+    );
 });
 
 test("edit recipe", async ({ page }) => {

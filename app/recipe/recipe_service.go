@@ -211,12 +211,11 @@ func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {
 func (rs *recipeService) updateRecipeWithFormData(c echo.Context, recipe *types.Recipe) (map[string]error, error) {
 	formErrors := make(map[string]error)
 
-	if err := c.Request().ParseForm(); err != nil {
-		return formErrors, &errutil.AppError{
-			UserMessage: "Fehlerhaftes Formular",
-			Err:         fmt.Errorf("failed at updateRecipeWithFormData(): %w", err),
-			StatusCode:  http.StatusBadRequest,
-		}
+	if err := rs.parseForm(c); err != nil {
+		return formErrors, errutil.AddMessageToAppError(
+			err,
+			"failed at updateRecipeWithFormData()",
+		)
 	}
 
 	recipe.Author = strings.TrimSpace(c.Request().FormValue("author"))
@@ -382,21 +381,59 @@ func (rs *recipeService) renderMarkdown(markdown string) (string, error) {
 	return buf.String(), nil
 }
 
-func (rs *recipeService) extractFirstFormEntry(c echo.Context) (string, string, error) {
+func (rs *recipeService) parseForm(c echo.Context) error {
 	if err := c.Request().ParseForm(); err != nil {
-		return "", "", &errutil.AppError{
+		return &errutil.AppError{
 			UserMessage: "Fehlerhaftes Formular",
-			Err:         fmt.Errorf("failed at extractFirstFormEntry(): %w", err),
+			Err:         fmt.Errorf("failed at parseForm(): %w", err),
 			StatusCode:  http.StatusBadRequest,
 		}
 	}
+	return nil
+}
 
-	for k, v := range c.Request().Form {
-		if len(v) > 0 {
-			return k, v[0], nil
-		}
-		return k, "", nil
+func (rs *recipeService) extractFirstFormEntry(c echo.Context) (string, string, error) {
+	if err := rs.parseForm(c); err != nil {
+		return "", "", errutil.AddMessageToAppError(
+			err,
+			"failed at extractFirstFormEntry()",
+		)
 	}
 
-	return "", "", nil
+	if len(c.Request().Form) != 1 {
+		return "", "", &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err: fmt.Errorf(
+				"Failed at extractFirstFormEntry(), got %d form fields, want 1",
+				len(c.Request().Form),
+			),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	key := ""
+	value := ""
+
+	for k, v := range c.Request().Form {
+		key = k
+		if len(v) > 0 {
+			value = v[0]
+		}
+	}
+
+	switch key {
+	case "ingredients":
+		return "Zutaten", value, nil
+	case "instructions":
+		return "Anleitung", value, nil
+	}
+
+	return "", "", &errutil.AppError{
+		UserMessage: "Fehlerhaftes Formular",
+		Err: fmt.Errorf(
+			"Failed at extractFirstFormEntry() with key %s",
+			key,
+		),
+		StatusCode: http.StatusBadRequest,
+	}
 }

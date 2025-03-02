@@ -65,6 +65,25 @@ export async function createRecipe(page: Page, pending?: boolean) {
     await page.getByPlaceholder("Tags").fill(recipe.tags);
     await page.getByPlaceholder("Zutaten").fill(recipe.ingredients);
     await page.getByPlaceholder("Anleitung").fill(recipe.instructions);
+
+    const previewButtonIngredients = page.getByTitle("Vorschau").first()
+    await expect(previewButtonIngredients).toBeVisible();
+    await previewButtonIngredients.click();
+
+    await expect(page.locator("#preview-modal")).toBeVisible();
+    await expect(page.locator(".recipe").getByText("Zutaten")).toBeVisible();
+    page.keyboard.down("Escape");
+    await expect(page.locator("#preview-modal")).not.toBeVisible();
+
+    const previewButtonInstructions = page.getByTitle("Vorschau").nth(1);
+    await expect(previewButtonInstructions).toBeVisible();
+    await previewButtonInstructions.click();
+
+    await expect(page.locator("#preview-modal")).toBeVisible();
+    await expect(page.locator(".recipe").getByText("Anleitung")).toBeVisible();
+    page.keyboard.down("Escape");
+    await expect(page.locator("#preview-modal")).not.toBeVisible();
+
     await page
         .getByRole("button", {
             name: pending ? "Rezept einreichen" : "Rezept erstellen",

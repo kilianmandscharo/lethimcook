@@ -410,7 +410,7 @@ func (rc *RecipeController) HandlePostRecipePreview(c echo.Context) error {
 		)
 	}
 
-	key, value, err := rc.recipeService.extractFirstFormEntry(c)
+	title, value, err := rc.recipeService.extractFirstFormEntry(c)
 	if err != nil {
 		return createError(err)
 	}
@@ -418,13 +418,6 @@ func (rc *RecipeController) HandlePostRecipePreview(c echo.Context) error {
 	html, err := rc.recipeService.renderMarkdown(value)
 	if err != nil {
 		return createError(err)
-	}
-
-	title := ""
-	if key == "ingredients" {
-		title = "Zutaten"
-	} else if key == "instructions" {
-		title = "Anleitung"
 	}
 
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
