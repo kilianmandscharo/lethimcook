@@ -15,17 +15,17 @@ templ RecipeNewPage(recipeForm []types.FormElement, isAdmin bool) {
         </div>
         @divider()
 		<form 
-            if isAdmin {
-                hx-post="/recipe" 
-            } else {
-                hx-post="/recipe?pending=true" 
-                hx-confirm="Rezept einreichen? Nach der Freischaltung durch den Admin wird das Rezept auf der Hauptseite erscheinen."
-            }
             hx-target="#content"
             hx-push-url="/"
         >
 			@form(recipeForm)
 			<input 
+                if isAdmin {
+                    hx-post="/recipe" 
+                } else {
+                    hx-post="/recipe?pending=true" 
+                    hx-confirm="Rezept einreichen? Nach der Freischaltung durch den Admin wird das Rezept auf der Hauptseite erscheinen."
+                }
                 id="recipe-new-submit"
                 type="submit" 
                 if isAdmin {

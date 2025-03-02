@@ -44,6 +44,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.PUT("/recipe/:id/pending/:pending", rc.HandleUpdatePending)
 	e.DELETE("/recipe/:id", rc.HandleDeleteRecipe)
 	e.GET("/recipe/link", rc.HandleGetRecipeLinks)
+	e.POST("/recipe/preview", rc.HandlePostRecipePreview)
 }
 
 func (rc *RecipeController) RenderRecipeListPage(c echo.Context) error {
@@ -395,8 +396,40 @@ func (rc *RecipeController) HandleGetRecipeLinks(c echo.Context) error {
 		return c.String(http.StatusOK, string(payload))
 	}
 	return rc.renderer.RenderComponent(render.RenderComponentOptions{
-		Context:   c,
-		Component: components.SelectDialog(recipes),
+		Context:       c,
+		Component:     components.SelectDialog(recipes),
+		OnlyComponent: true,
+	})
+}
+
+func (rc *RecipeController) HandlePostRecipePreview(c echo.Context) error {
+	createError := func(err error) error {
+		return rc.renderer.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at HandlePostRecipePreview()"),
+		)
+	}
+
+	key, value, err := rc.recipeService.extractFirstFormEntry(c)
+	if err != nil {
+		return createError(err)
+	}
+
+	html, err := rc.recipeService.renderMarkdown(value)
+	if err != nil {
+		return createError(err)
+	}
+
+	title := ""
+	if key == "ingredients" {
+		title = "Zutaten"
+	} else if key == "instructions" {
+		title = "Anleitung"
+	}
+
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
+		Context:       c,
+		Component:     components.PreviewModal(title, html),
 		OnlyComponent: true,
 	})
 }

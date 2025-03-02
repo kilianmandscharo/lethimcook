@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,11 +11,13 @@ import (
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/cache"
+	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
+	"github.com/yuin/goldmark"
 )
 
 type recipeService struct {
@@ -211,7 +214,7 @@ func (rs *recipeService) updateRecipeWithFormData(c echo.Context, recipe *types.
 	if err := c.Request().ParseForm(); err != nil {
 		return formErrors, &errutil.AppError{
 			UserMessage: "Fehlerhaftes Formular",
-			Err:         fmt.Errorf("failed at parseFormData(): %w", err),
+			Err:         fmt.Errorf("failed at updateRecipeWithFormData(): %w", err),
 			StatusCode:  http.StatusBadRequest,
 		}
 	}
@@ -324,22 +327,24 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 			Placeholder: "Tags",
 		},
 		{
-			Type:        types.FormElementTextArea,
-			Name:        "ingredients",
-			Err:         formErrors["ingredients"],
-			Value:       recipe.Ingredients,
-			Label:       "Zutaten (Markdown)",
-			Placeholder: "Zutaten",
-			Required:    true,
+			Type:           types.FormElementTextArea,
+			Name:           "ingredients",
+			Err:            formErrors["ingredients"],
+			Value:          recipe.Ingredients,
+			Label:          "Zutaten (Markdown)",
+			Placeholder:    "Zutaten",
+			Required:       true,
+			LabelComponent: components.PreviewButton("ingredients"),
 		},
 		{
-			Type:        types.FormElementTextArea,
-			Name:        "instructions",
-			Err:         formErrors["instructions"],
-			Value:       recipe.Instructions,
-			Label:       "Anleitung (Markdown)",
-			Placeholder: "Anleitung",
-			Required:    true,
+			Type:           types.FormElementTextArea,
+			Name:           "instructions",
+			Err:            formErrors["instructions"],
+			Value:          recipe.Instructions,
+			Label:          "Anleitung (Markdown)",
+			Placeholder:    "Anleitung",
+			Required:       true,
+			LabelComponent: components.PreviewButton("instructions"),
 		},
 	}
 }
@@ -363,4 +368,35 @@ func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]types.Rec
 		})
 	}
 	return links, nil
+}
+
+func (rs *recipeService) renderMarkdown(markdown string) (string, error) {
+	var buf bytes.Buffer
+	if err := goldmark.Convert([]byte(markdown), &buf); err != nil {
+		return "", &errutil.AppError{
+			UserMessage: "Fehler beim Markdownparsing",
+			StatusCode:  http.StatusInternalServerError,
+			Err:         fmt.Errorf("failed at renderMarkdown(): %w", err),
+		}
+	}
+	return buf.String(), nil
+}
+
+func (rs *recipeService) extractFirstFormEntry(c echo.Context) (string, string, error) {
+	if err := c.Request().ParseForm(); err != nil {
+		return "", "", &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err:         fmt.Errorf("failed at extractFirstFormEntry(): %w", err),
+			StatusCode:  http.StatusBadRequest,
+		}
+	}
+
+	for k, v := range c.Request().Form {
+		if len(v) > 0 {
+			return k, v[0], nil
+		}
+		return k, "", nil
+	}
+
+	return "", "", nil
 }
