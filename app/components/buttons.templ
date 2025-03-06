@@ -167,4 +167,16 @@ templ copyUrlToClipboardButton() {
     </button>
 }
 
-
+templ PreviewButton(key string) {
+    <button
+        id="preview-button"
+        class="secondary-button"
+        title="Vorschau"
+        hx-post="/recipe/preview"
+        hx-swap="beforeend"
+        hx-target="body"
+        hx-params={ key }
+    >
+        Vorschau
+    </button>
+}

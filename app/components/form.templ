@@ -8,10 +8,15 @@ script onBlurHandler() {
 
 templ form(form []types.FormElement) {
     for _, element := range form {
-        <div>
-            <label for={ element.Name }>
-                { element.GetLabel() }
-            </label>
+        <div class="form-element-container">
+            <div class="form-label-container">
+                <label for={ element.Name }>
+                    { element.GetLabel() }
+                </label>
+                if element.LabelComponent != nil {
+                    @element.LabelComponent
+                }
+            </div>
             if element.Type == types.FormElementInput {
                 <input 
                     id={ element.Name } 

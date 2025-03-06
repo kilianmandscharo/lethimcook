@@ -564,3 +564,61 @@ func TestGetRecipeLinks(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []types.RecipeLinkData{}, links)
 }
+
+func TestRenderMarkdown(t *testing.T) {
+	recipeService := newTestRecipeService()
+	markdown := "*Für 2 Personen*\n**Soße:**\n- 2 EL Sojasoße\n- 2 EL Fischsoße"
+	html, err := recipeService.renderMarkdown(markdown)
+	assert.NoError(t, err)
+	assert.Equal(t, "<p><em>Für 2 Personen</em>\n<strong>Soße:</strong></p>\n<ul>\n<li>2 EL Sojasoße</li>\n<li>2 EL Fischsoße</li>\n</ul>\n", html)
+}
+
+func TestExtractFirstFormEntry(t *testing.T) {
+	recipeService := newTestRecipeService()
+
+	testCases := []struct {
+		formData      string
+		expectedKey   string
+		expectedValue string
+		expectError   bool
+	}{
+		{
+			formData:      "ingredients=content",
+			expectedKey:   "Zutaten",
+			expectedValue: "content",
+		},
+		{
+			formData:      "instructions=content",
+			expectedKey:   "Anleitung",
+			expectedValue: "content",
+		},
+		{
+			formData:    "instructions=content&ingredients=content",
+			expectError: true,
+		},
+		{
+			formData:    "",
+			expectError: true,
+		},
+		{
+			formData:    "otherKey=content",
+			expectError: true,
+		},
+	}
+
+	for _, test := range testCases {
+		c := newTestContext(t, newTestContextOptions{
+			formData: test.formData,
+		})
+
+		key, value, err := recipeService.extractFirstFormEntry(c)
+
+		assert.Equal(t, test.expectedKey, key)
+		assert.Equal(t, test.expectedValue, value)
+		if test.expectError {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}

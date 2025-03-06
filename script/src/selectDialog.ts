@@ -35,15 +35,9 @@ export class SelectDialog {
 
     static open(data: string) {
         const container = document.createElement("div");
-        container.id = "select-dialog-container";
-        container.style.top = container.getBoundingClientRect().top.toString();
+        container.id = "select-dialog-container"
         container.innerHTML = data;
         replaceScripts(container);
         document.body.appendChild(container);
-        const listenForCloseDialog = () => {
-            SelectDialog.close();
-            document.removeEventListener("keydown", listenForCloseDialog);
-        };
-        document.addEventListener("keydown", listenForCloseDialog);
     }
 }

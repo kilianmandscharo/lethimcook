@@ -12,25 +12,17 @@ script exitButtonOnClickHandler() {
 }
 
 templ SelectDialog(options []types.RecipeLinkData) {
-    <div id="select-dialog">
-        <div class="header">
-            <div class="title-container">
-                <i class="fa-solid fa-caret-right"></i>
-                <div>Rezept auswählen</div>
+    @Modal("select-dialog", "Rezept auswählen", modalContent(options))
+}
+
+templ modalContent(options []types.RecipeLinkData) {
+    <div id="options-container">
+        for _, opt := range options {
+            <div 
+                onclick={ optionOnClickHandler(opt.Title, opt.ID) }
+            >
+                { opt.Title }
             </div>
-            <i 
-                onclick={ exitButtonOnClickHandler() } 
-                class="fa-regular fa-circle-xmark fa-xl"
-            ></i>
-        </div>
-        <div id="options-container">
-            for _, opt := range options {
-                <div 
-                    onclick={ optionOnClickHandler(opt.Title, opt.ID) }
-                >
-                    { opt.Title }
-                </div>
-            }
-        </div>
+        }
     </div>
 }

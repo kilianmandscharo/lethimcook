@@ -1,0 +1,14 @@
+package components
+
+templ PreviewModal(title string, html string) {
+    @Modal("preview-modal", "Vorschau", previewModalContent(title, html))
+}
+
+templ previewModalContent(title string, html string) {
+    <div class="preview-modal-content">
+        <div class="recipe">
+            <h3>{ title }</h3>
+            @templ.Raw(html)
+        </div>
+    </div>
+}

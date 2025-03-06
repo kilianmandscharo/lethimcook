@@ -10,6 +10,10 @@ export async function navigateToRecipePage(page: Page, recipeTitle: string) {
     await page.getByText(recipeTitle).click();
 }
 
+export async function navigateToNewRecipePage(page: Page) {
+    await clickButtonByTitle(page, "Neues Rezept");
+}
+
 export async function navigateToEditPage(page: Page) {
     await clickButtonByTitle(page, "Rezept bearbeiten");
 }
