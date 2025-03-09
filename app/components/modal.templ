@@ -1,0 +1,44 @@
+package components
+
+script onLoad(id string) {
+    setTimeout(() => {
+        const container = document.getElementById(id);
+        if (!container) {
+            return;
+        }
+
+        container.style.top = 0;
+
+        const listenForClose = (e) => {
+            if (e.key === "Escape") {
+                document.getElementById(id)?.remove();
+                document.removeEventListener("keydown", listenForClose);
+            }
+        }
+        document.addEventListener("keydown", listenForClose);
+    }, 0);
+}
+
+script closeOnClickHandler(id string) {
+    document.getElementById(id)?.remove();
+}
+
+templ Modal(id string, title string, content templ.Component) {
+    <div id={ id } class="modal">
+        <div class="modal-content">
+            <div class="modal-content-header">
+                <div class="modal-content-title-container">
+                    <i class="fa-solid fa-caret-right"></i>
+                    <div>{ title }</div>
+                </div>
+                <i 
+                    onclick={ closeOnClickHandler(id) } 
+                    class="fa-regular fa-circle-xmark fa-xl"
+                ></i>
+            </div>
+            @content
+        </div>
+        @onLoad(id)
+    </div>
+}
+
