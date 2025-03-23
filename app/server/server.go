@@ -82,6 +82,7 @@ func (s *Server) Start() {
 }
 
 func (s *Server) startDev() {
+	s.logger.Info("Starting server and listening on :8080")
 	go func() {
 		s.logger.Fatal(s.e.Start(":8080"))
 	}()
@@ -89,6 +90,7 @@ func (s *Server) startDev() {
 }
 
 func (s *Server) startProd(certFilePath, keyFilePath string) {
+	s.logger.Info("Starting server and listening on :443/:80")
 	go func() {
 		s.logger.Fatal(s.e.StartTLS(":443", certFilePath, keyFilePath))
 	}()
