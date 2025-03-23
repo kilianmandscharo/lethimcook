@@ -17,7 +17,7 @@ import (
 )
 
 func newTestRecipeService() *recipeService {
-	logger := logging.New(logging.Debug)
+	logger := logging.New(logging.Debug, false)
 	return &recipeService{
 		db:          newTestRecipeDatabase(),
 		logger:      logger,

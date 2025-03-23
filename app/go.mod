@@ -12,6 +12,7 @@ require (
 	golang.org/x/crypto v0.31.0
 	gorm.io/driver/sqlite v1.5.4
 	gorm.io/gorm v1.25.6
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

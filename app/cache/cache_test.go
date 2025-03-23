@@ -9,7 +9,7 @@ import (
 )
 
 func newTestRecipeCache() *RecipeCache {
-	return NewRecipeCache(logging.New(logging.Debug))
+	return NewRecipeCache(logging.New(logging.Debug, false))
 }
 
 func TestSet(t *testing.T) {

@@ -17,7 +17,7 @@ func newTestAuthService() *AuthService {
 	return &AuthService{
 		db:         newTestAuthDatabase(),
 		privateKey: "test_private_key",
-		logger:     logging.New(logging.Debug),
+		logger:     logging.New(logging.Debug, false),
 	}
 }
 

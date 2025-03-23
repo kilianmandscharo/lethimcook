@@ -24,7 +24,7 @@ func newTestAuthDatabase() *authDatabase {
 	}
 	db.Migrator().DropTable(&admin{})
 	db.AutoMigrate(&admin{})
-	return &authDatabase{handler: db, logger: logging.New(logging.Debug)}
+	return &authDatabase{handler: db, logger: logging.New(logging.Debug, false)}
 }
 
 func newTestAdmin() admin {

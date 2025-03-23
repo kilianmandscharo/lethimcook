@@ -17,13 +17,16 @@ func main() {
 	flag.Parse()
 
 	var logLevel logging.LoggerLevel
+	var logToFile bool
 	if *isProd {
 		logLevel = logging.Info
+		logToFile = true
 	} else {
 		logLevel = logging.Debug
+		logToFile = true
 	}
 
-	logger := logging.New(logLevel)
+	logger := logging.New(logLevel, logToFile)
 	renderer := render.New(logger)
 
 	env.LoadEnvironment(".env", logger)

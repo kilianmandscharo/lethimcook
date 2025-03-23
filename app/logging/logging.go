@@ -1,8 +1,11 @@
 package logging
 
 import (
+	"io"
 	"log"
 	"os"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type LoggerLevel int
@@ -24,15 +27,26 @@ type Logger struct {
 	fatalLogger *log.Logger
 }
 
-func New(level LoggerLevel) *Logger {
+func New(level LoggerLevel, logToFile bool) *Logger {
+	var writer io.Writer
+	if logToFile {
+		writer = io.MultiWriter(os.Stdout, &lumberjack.Logger{
+			Filename: "./logs/log.txt",
+			MaxSize:  10,
+		})
+	} else {
+		writer = io.MultiWriter(os.Stdout)
+	}
+
 	flags := log.Ldate | log.Ltime
+
 	return &Logger{
 		level:       level,
-		debugLogger: log.New(os.Stdout, "[DEBUG] ", flags),
-		infoLogger:  log.New(os.Stdout, "[INFO] ", flags),
-		warnLogger:  log.New(os.Stdout, "[WARN] ", flags),
-		errorLogger: log.New(os.Stdout, "[ERROR] ", flags),
-		fatalLogger: log.New(os.Stdout, "[FATAL] ", flags),
+		debugLogger: log.New(writer, "[DEBUG] ", flags),
+		infoLogger:  log.New(writer, "[INFO] ", flags),
+		warnLogger:  log.New(writer, "[WARN] ", flags),
+		errorLogger: log.New(writer, "[ERROR] ", flags),
+		fatalLogger: log.New(writer, "[FATAL] ", flags),
 	}
 }
 
