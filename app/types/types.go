@@ -25,6 +25,7 @@ type Recipe struct {
 	Pending        bool   `json:"-"`
 	CreatedAt      string `json:"createdAt"`
 	LastModifiedAt string `json:"-"`
+	LastModifiedBy string `json:"-"`
 }
 
 func (r *Recipe) String() string {
@@ -120,8 +121,19 @@ func (r *Recipe) RenderMarkdown() error {
 
 func (r *Recipe) ToVersion() RecipeVersion {
 	return RecipeVersion{
-		Recipe:   *r,
-		RecipeID: r.ID,
+		RecipeID:       r.ID,
+		Author:         r.Author,
+		Source:         r.Source,
+		Title:          r.Title,
+		Description:    r.Description,
+		Duration:       r.Duration,
+		Ingredients:    r.Ingredients,
+		Instructions:   r.Instructions,
+		Tags:           r.Tags,
+		Pending:        r.Pending,
+		CreatedAt:      r.CreatedAt,
+		LastModifiedAt: r.LastModifiedAt,
+		LastModifiedBy: r.LastModifiedBy,
 	}
 }
 
@@ -188,7 +200,18 @@ type RecipeLinkData struct {
 }
 
 type RecipeVersion struct {
-	VersionID uint `gorm:"primaryKey"`
-	RecipeID  uint
-	Recipe    Recipe
+	ID             uint   `gorm:"primaryKey"`
+	RecipeID       uint   `json:"recipeId"`
+	Author         string `json:"author"`
+	Source         string `json:"source"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	Duration       int    `json:"duration"`
+	Ingredients    string `json:"ingredients"`
+	Instructions   string `json:"instructions"`
+	Tags           string `json:"tags"`
+	Pending        bool   `json:"-"`
+	CreatedAt      string `json:"createdAt"`
+	LastModifiedAt string `json:"-"`
+	LastModifiedBy string `json:"-"`
 }

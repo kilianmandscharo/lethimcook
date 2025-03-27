@@ -180,3 +180,18 @@ templ PreviewButton(key string) {
         Vorschau
     </button>
 }
+
+templ showHistoryButton(recipeId uint) {
+    <button
+        id="history-button"
+		class="icon-button with-label"
+		hx-get={ fmt.Sprintf("/recipe/%d/history", recipeId) }
+        hx-target="#content"
+        hx-trigger="click"
+        hx-push-url="true"
+        title="Historie anzeigen"
+    >
+        Historie
+        <i class="fa-solid fa-timeline"></i>
+    </button>
+}

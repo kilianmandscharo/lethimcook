@@ -9,10 +9,12 @@ templ RecipePageControls(isAdmin bool, isPending bool, recipeId uint) {
                 @editRecipeButton(recipeId)
                 @pendingRecipeAcceptButton(recipeId)
                 @pendingRecipeDenyButton(recipeId)
+                @showHistoryButton(recipeId)
             } else {
                 @editRecipeButton(recipeId)
                 @recipeResetPendingButton(recipeId)
                 @recipeDeleteButton(recipeId)
+                @showHistoryButton(recipeId)
             }
         } 
     </div>

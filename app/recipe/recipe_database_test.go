@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -235,7 +236,7 @@ func TestCreateRecipeVersion(t *testing.T) {
 
 	// Then
 	assert.NoError(t, err)
-	assert.Equal(t, uint(1), recipeVersion.VersionID)
+	assert.Equal(t, uint(1), recipeVersion.ID)
 }
 
 func TestReadRecipeVersionsForRecipe(t *testing.T) {
@@ -246,10 +247,12 @@ func TestReadRecipeVersionsForRecipe(t *testing.T) {
 
 	recipe.Title = "Test Recipe Version 1"
 	recipeVersion := recipe.ToVersion()
+	log.Println("recipe version 1", recipeVersion)
 	assert.NoError(t, db.createRecipeVersion(&recipeVersion))
 
 	recipe.Title = "Test Recipe Version 2"
 	recipeVersion2 := recipe.ToVersion()
+	log.Println("recipe version 1", recipeVersion2)
 	assert.NoError(t, db.createRecipeVersion(&recipeVersion2))
 
 	// When
@@ -258,7 +261,7 @@ func TestReadRecipeVersionsForRecipe(t *testing.T) {
 	// Then
 	assert.NoError(t, err)
 	assert.Equal(t, []types.RecipeVersion{
-		{VersionID: 2, Recipe: types.Recipe{Title: "Test Recipe Version 2"}, RecipeID: 1},
-		{VersionID: 1, Recipe: types.Recipe{Title: "Test Recipe Version 1"}, RecipeID: 1},
+		{ID: 2, Title: "Test Recipe Version 2", RecipeID: 1},
+		{ID: 1, Title: "Test Recipe Version 1", RecipeID: 1},
 	}, recipeVersions)
 }

@@ -1,0 +1,32 @@
+package components
+
+import (
+	"fmt"
+	"github.com/kilianmandscharo/lethimcook/date"
+	"github.com/kilianmandscharo/lethimcook/types"
+)
+
+templ RecipeHistoryPage(recipe *types.Recipe, isAdmin bool, recipeVersions []types.RecipeVersion) {
+	@header(isAdmin)
+	<main>
+		<div class="label-with-icon">
+			<h1>Historie</h1>
+			<i class="fa-solid fa-timeline fa-xl"></i>
+		</div>
+		@divider()
+		<h2>{ recipe.Title }</h2>
+		<div>
+            @historyEntry(len(recipeVersions) + 1, recipe.LastModifiedAt, recipe.LastModifiedBy)
+			for i := 0; i < len(recipeVersions) - 1; i++ {
+                @historyEntry(len(recipeVersions) - i, recipeVersions[i].LastModifiedAt, recipeVersions[i].LastModifiedBy)
+			}
+            @historyEntry(1, recipeVersions[len(recipeVersions)-1].CreatedAt, recipeVersions[len(recipeVersions)-1].LastModifiedBy)
+		</div>
+	</main>
+}
+
+templ historyEntry(version int, modifiedAt string, modifiedBy string) {
+	<div>Version: { fmt.Sprintf("%d", version) }</div>
+	<div>Versionsdatum: { date.FormatDateString(modifiedAt) } </div>
+	<div>Letzter Bearbeiter: { modifiedBy } </div>
+}

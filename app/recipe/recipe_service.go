@@ -43,6 +43,20 @@ func (rs *recipeService) readRecipe(id uint) (types.Recipe, error) {
 	return rs.db.readRecipe(id)
 }
 
+func (rs *recipeService) readRecipeHistory(id uint) (types.Recipe, []types.RecipeVersion, error) {
+	recipe, err := rs.db.readRecipe(id)
+	if err != nil {
+		return types.Recipe{}, []types.RecipeVersion{}, errutil.AddMessageToAppError(err, "failed at readRecipeHistory()")
+	}
+
+	recipeVersions, err := rs.db.readRecipeVersionsForRecipe(id)
+	if err != nil {
+		return types.Recipe{}, []types.RecipeVersion{}, errutil.AddMessageToAppError(err, "failed at readRecipeHistory()")
+	}
+
+	return recipe, recipeVersions, nil
+}
+
 func (rs *recipeService) getReadRecipeOptionsFromRequest(c echo.Context) readRecipesOptions {
 	isAdmin := servutil.IsAuthorized(c)
 	query := c.QueryParam("search")
@@ -139,6 +153,10 @@ func (rs *recipeService) updateRecipe(recipe *types.Recipe) error {
 func (rs *recipeService) updatePending(id uint, pending bool) error {
 	rs.recipeCache.Invalidate()
 	return rs.db.updatePending(id, pending)
+}
+
+func (rs *recipeService) createRecipeVersion(recipeVersion *types.RecipeVersion) error {
+	return rs.db.createRecipeVersion(recipeVersion)
 }
 
 func (rs *recipeService) filterRecipes(recipes []types.Recipe, query string) []types.Recipe {

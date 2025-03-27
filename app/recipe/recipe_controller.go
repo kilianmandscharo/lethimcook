@@ -36,6 +36,7 @@ func (rc *RecipeController) AttachHandlerFunctions(e *echo.Echo) {
 	e.GET("/recipe/:id/edit", rc.RenderRecipeEditPage)
 	e.GET("/recipe/new", rc.RenderRecipeNewPage)
 	e.GET("/recipe/:id", rc.RenderRecipePage)
+	e.GET("/recipe/:id/history", rc.RenderRecipeHistory)
 
 	// Actions
 	e.GET("/recipe/:id/json", rc.HandleDownloadRecipeAsJson)
@@ -263,7 +264,8 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	if err != nil {
 		return createError(err)
 	}
-	rc.logger.Info("old recipe:", recipe.String())
+
+	recipeVersion := recipe.ToVersion()
 
 	formErrors, err := rc.recipeService.updateRecipeWithFormData(c, &recipe)
 	if err != nil {
@@ -284,9 +286,17 @@ func (rc *RecipeController) HandleUpdateRecipe(c echo.Context) error {
 	}
 
 	recipe.LastModifiedAt = time.Now().Format(time.RFC3339)
+	recipe.LastModifiedBy = "admin"
 	if err := rc.recipeService.updateRecipe(&recipe); err != nil {
 		return createError(err)
 	}
+	rc.logger.Debugf("Updated recipe: %v", recipe)
+
+	recipeVersion.LastModifiedBy = "admin"
+	if err := rc.recipeService.createRecipeVersion(&recipeVersion); err != nil {
+		return createError(err)
+	}
+	rc.logger.Debugf("Saved old recipe to database: %v", recipeVersion)
 
 	if err := recipe.RenderMarkdown(); err != nil {
 		return rc.renderer.RenderError(
@@ -424,5 +434,37 @@ func (rc *RecipeController) HandlePostRecipePreview(c echo.Context) error {
 		Context:       c,
 		Component:     components.PreviewModal(title, html),
 		OnlyComponent: true,
+	})
+}
+
+func (rc *RecipeController) RenderRecipeHistory(c echo.Context) error {
+	isAdmin := servutil.IsAuthorized(c)
+	if !isAdmin {
+		return rc.renderer.RenderError(
+			c,
+			errutil.NewAppErrorNotAuthorized("RenderRecipeHistory()"),
+		)
+	}
+
+	createError := func(err error) error {
+		return rc.renderer.RenderError(
+			c,
+			errutil.AddMessageToAppError(err, "failed at RenderRecipeHistory()"),
+		)
+	}
+
+	id, err := rc.recipeService.getPathId(c)
+	if err != nil {
+		return createError(err)
+	}
+
+	recipe, recipeVersions, err := rc.recipeService.readRecipeHistory(id)
+	if err != nil {
+		return createError(err)
+	}
+
+	return rc.renderer.RenderComponent(render.RenderComponentOptions{
+		Context: c,
+		Component: components.RecipeHistoryPage(&recipe, isAdmin, recipeVersions),	
 	})
 }

@@ -67,7 +67,7 @@ func RecipeEditPage(isAdmin bool, id uint, recipeForm []types.FormElement) templ
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<input type=\"submit\" value=\"Rezept aktualisieren\" name=\"submit\"></form><script>\n            setTimeout(() => {\n                attachTextAreaKeyupEventListeners();\n            }, 0);\n        </script></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<input type=\"submit\" value=\"Rezept aktualisieren\" name=\"submit\"></form><script>\n            setTimeout(() => {\n                attachTextAreaEventListeners();\n            }, 0);\n        </script></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
