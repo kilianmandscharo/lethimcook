@@ -626,7 +626,7 @@ func TestHandleGetRecipeLinks(t *testing.T) {
 		t,
 		recipeController.recipeService.createRecipe(&types.Recipe{Title: "Pita", Pending: true}),
 	)
-	t.Run("valid request", func(t *testing.T) {
+	t.Run("valid request with one search result", func(t *testing.T) {
 		testutil.AssertRequest(
 			t,
 			testutil.RequestOptions{
@@ -638,6 +638,83 @@ func TestHandleGetRecipeLinks(t *testing.T) {
 				StatusWant:     http.StatusOK,
 				AssertMessage:  true,
 				MessageWant:    "{\"id\":1,\"title\":\"Naan\"}",
+			},
+		)
+	})
+	assert.NoError(
+		t,
+		recipeController.recipeService.createRecipe(&types.Recipe{Title: "Butter Chicken"}),
+	)
+	t.Run("valid request with multiple search results", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:    recipeController.HandleGetRecipeLinks,
+				Method:         http.MethodGet,
+				Route:          "/recipe/link/:query",
+				WithQueryParam: true,
+				QueryParam:     "",
+				StatusWant:     http.StatusOK,
+			},
+		)
+	})
+}
+
+func TestHandlePostRecipePreview(t *testing.T) {
+	recipeController := newTestRecipeController()
+
+	t.Run("valid request", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:  recipeController.HandlePostRecipePreview,
+				Method:       http.MethodPost,
+				Route:        "/recipe/preview",
+				StatusWant:   http.StatusOK,
+				WithFormData: true,
+				FormData:     "ingredients=content",
+			},
+		)
+	})
+
+	t.Run("empty form", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:  recipeController.HandlePostRecipePreview,
+				Method:       http.MethodPost,
+				Route:        "/recipe/preview",
+				StatusWant:   http.StatusBadRequest,
+				WithFormData: true,
+				FormData:     "",
+			},
+		)
+	})
+
+	t.Run("too many form fields", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:  recipeController.HandlePostRecipePreview,
+				Method:       http.MethodPost,
+				Route:        "/recipe/preview",
+				StatusWant:   http.StatusBadRequest,
+				WithFormData: true,
+				FormData:     "ingredients=content&instructions=content",
+			},
+		)
+	})
+
+	t.Run("invalid key", func(t *testing.T) {
+		testutil.AssertRequest(
+			t,
+			testutil.RequestOptions{
+				HandlerFunc:  recipeController.HandlePostRecipePreview,
+				Method:       http.MethodPost,
+				Route:        "/recipe/preview",
+				StatusWant:   http.StatusBadRequest,
+				WithFormData: true,
+				FormData:     "invalidKey=content",
 			},
 		)
 	})

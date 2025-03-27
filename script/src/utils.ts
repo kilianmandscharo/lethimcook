@@ -26,7 +26,10 @@ export function getLastListNumberBeforeCursor(el: HTMLTextAreaElement) {
     return matches.length > 0 ? matches[matches.length - 1][1] : null;
 }
 
-export function insertStringInInputAtCursor(el: HTMLTextAreaElement, s: string) {
+export function insertStringInInputAtCursor(
+    el: HTMLTextAreaElement,
+    s: string,
+) {
     const cursorPos = el.selectionStart;
     const newCursorPos = cursorPos + s.length;
     el.value =
@@ -34,34 +37,66 @@ export function insertStringInInputAtCursor(el: HTMLTextAreaElement, s: string) 
     el.selectionStart = el.selectionEnd = newCursorPos;
 }
 
-export function fetchLink(target: HTMLTextAreaElement) {
-    const cursorPos = target.selectionStart;
+export function extractContentBetweenBrackets<
+    T extends {
+        selectionStart: number;
+        value: string;
+    },
+>(
+    target: T,
+): { substitutionEnd: number; substitutionStart: number; query: string } | null {
     if (target.value.length === 0) {
-        return;
+        return null;
     }
+
+    const cursorPos = target.selectionStart;
     const lastChar = target.value[cursorPos - 1];
     if (lastChar !== "]") {
-        return;
+        return null;
     }
+
     let bracketContentReversed = "";
     let i = cursorPos - 2;
-    while (i-- > 0) {
-        if (target.value[i] === "[") {
+    let closingPatternFound = false;
+    while (i > 0) {
+        if (target.value[i] === "!" && target.value[i - 1] === "[") {
+            closingPatternFound = true;
             break;
         }
         bracketContentReversed += target.value[i];
+        i--;
     }
-    const params = new URLSearchParams({
+
+    if (!closingPatternFound) {
+        return null;
+    }
+
+    return {
         query: bracketContentReversed.split("").reverse().join(""),
+        substitutionStart: i - 1,
+        substitutionEnd: cursorPos,
+    };
+}
+
+export function fetchLink(target: HTMLTextAreaElement) {
+    const extractionData = extractContentBetweenBrackets(target);
+    if (!extractionData) {
+        return;
+    }
+
+    const params = new URLSearchParams({
+        query: extractionData.query,
     });
+
     fetch(`${window.location.origin}/recipe/link?` + params.toString())
         .then((res) => res.text())
         .then((data) => {
             SelectDialog.state.target = target;
-            SelectDialog.state.cursorPos = cursorPos;
-            SelectDialog.state.substitutionStart = i;
+            SelectDialog.state.cursorPos = extractionData.substitutionEnd;
+            SelectDialog.state.substitutionStart =
+                extractionData.substitutionStart;
             try {
-                const recipe = JSON.parse(data);
+                const recipe: { title: string; id: number } = JSON.parse(data);
                 SelectDialog.injectLinkIntoTextarea(recipe.title, recipe.id);
             } catch {
                 SelectDialog.open(data);

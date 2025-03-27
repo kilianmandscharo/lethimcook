@@ -5,15 +5,18 @@
     "main": "./src/main.ts",
     "scripts": {
         "compile": "tsc",
-        "build": "tsc && esbuild ./dist/main.js --outdir='../static/js' --target=es6 --bundle --minify",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "tsc && esbuild ./dist/main.js --outdir='../app/static/js' --target=es6 --bundle --minify",
+        "test": "jest ./src"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/jest": "^29.5.14",
         "@types/node": "^22.10.2",
         "esbuild": "^0.24.0",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.2.6",
         "typescript": "^5.7.2"
     }
 }

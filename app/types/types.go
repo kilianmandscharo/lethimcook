@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/yuin/goldmark"
 )
@@ -142,15 +143,16 @@ const (
 )
 
 type FormElement struct {
-	Type        FormElementType
-	Name        string
-	Err         error
-	Value       string
-	InputType   string
-	Label       string
-	Required    bool
-	Disabled    bool
-	Placeholder string
+	Type           FormElementType
+	Name           string
+	Err            error
+	Value          string
+	InputType      string
+	Label          string
+	Required       bool
+	Disabled       bool
+	Placeholder    string
+	LabelComponent templ.Component
 }
 
 func (f *FormElement) GetPlaceholder() string {

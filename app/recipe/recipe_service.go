@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,11 +11,13 @@ import (
 	"strings"
 
 	"github.com/kilianmandscharo/lethimcook/cache"
+	"github.com/kilianmandscharo/lethimcook/components"
 	"github.com/kilianmandscharo/lethimcook/errutil"
 	"github.com/kilianmandscharo/lethimcook/logging"
 	"github.com/kilianmandscharo/lethimcook/servutil"
 	"github.com/kilianmandscharo/lethimcook/types"
 	"github.com/labstack/echo/v4"
+	"github.com/yuin/goldmark"
 )
 
 type recipeService struct {
@@ -208,12 +211,11 @@ func (rs *recipeService) getRecipeById(c echo.Context) (types.Recipe, error) {
 func (rs *recipeService) updateRecipeWithFormData(c echo.Context, recipe *types.Recipe) (map[string]error, error) {
 	formErrors := make(map[string]error)
 
-	if err := c.Request().ParseForm(); err != nil {
-		return formErrors, &errutil.AppError{
-			UserMessage: "Fehlerhaftes Formular",
-			Err:         fmt.Errorf("failed at parseFormData(): %w", err),
-			StatusCode:  http.StatusBadRequest,
-		}
+	if err := rs.parseForm(c); err != nil {
+		return formErrors, errutil.AddMessageToAppError(
+			err,
+			"failed at updateRecipeWithFormData()",
+		)
 	}
 
 	recipe.Author = strings.TrimSpace(c.Request().FormValue("author"))
@@ -324,22 +326,24 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 			Placeholder: "Tags",
 		},
 		{
-			Type:        types.FormElementTextArea,
-			Name:        "ingredients",
-			Err:         formErrors["ingredients"],
-			Value:       recipe.Ingredients,
-			Label:       "Zutaten (Markdown)",
-			Placeholder: "Zutaten",
-			Required:    true,
+			Type:           types.FormElementTextArea,
+			Name:           "ingredients",
+			Err:            formErrors["ingredients"],
+			Value:          recipe.Ingredients,
+			Label:          "Zutaten (Markdown)",
+			Placeholder:    "Zutaten",
+			Required:       true,
+			LabelComponent: components.PreviewButton("ingredients"),
 		},
 		{
-			Type:        types.FormElementTextArea,
-			Name:        "instructions",
-			Err:         formErrors["instructions"],
-			Value:       recipe.Instructions,
-			Label:       "Anleitung (Markdown)",
-			Placeholder: "Anleitung",
-			Required:    true,
+			Type:           types.FormElementTextArea,
+			Name:           "instructions",
+			Err:            formErrors["instructions"],
+			Value:          recipe.Instructions,
+			Label:          "Anleitung (Markdown)",
+			Placeholder:    "Anleitung",
+			Required:       true,
+			LabelComponent: components.PreviewButton("instructions"),
 		},
 	}
 }
@@ -363,4 +367,73 @@ func (rs *recipeService) getRecipeLinks(isAdmin bool, query string) ([]types.Rec
 		})
 	}
 	return links, nil
+}
+
+func (rs *recipeService) renderMarkdown(markdown string) (string, error) {
+	var buf bytes.Buffer
+	if err := goldmark.Convert([]byte(markdown), &buf); err != nil {
+		return "", &errutil.AppError{
+			UserMessage: "Fehler beim Markdownparsing",
+			StatusCode:  http.StatusInternalServerError,
+			Err:         fmt.Errorf("failed at renderMarkdown(): %w", err),
+		}
+	}
+	return buf.String(), nil
+}
+
+func (rs *recipeService) parseForm(c echo.Context) error {
+	if err := c.Request().ParseForm(); err != nil {
+		return &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err:         fmt.Errorf("failed at parseForm(): %w", err),
+			StatusCode:  http.StatusBadRequest,
+		}
+	}
+	return nil
+}
+
+func (rs *recipeService) extractFirstFormEntry(c echo.Context) (string, string, error) {
+	if err := rs.parseForm(c); err != nil {
+		return "", "", errutil.AddMessageToAppError(
+			err,
+			"failed at extractFirstFormEntry()",
+		)
+	}
+
+	if len(c.Request().Form) != 1 {
+		return "", "", &errutil.AppError{
+			UserMessage: "Fehlerhaftes Formular",
+			Err: fmt.Errorf(
+				"Failed at extractFirstFormEntry(), got %d form fields, want 1",
+				len(c.Request().Form),
+			),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	key := ""
+	value := ""
+
+	for k, v := range c.Request().Form {
+		key = k
+		if len(v) > 0 {
+			value = v[0]
+		}
+	}
+
+	switch key {
+	case "ingredients":
+		return "Zutaten", value, nil
+	case "instructions":
+		return "Anleitung", value, nil
+	}
+
+	return "", "", &errutil.AppError{
+		UserMessage: "Fehlerhaftes Formular",
+		Err: fmt.Errorf(
+			"Failed at extractFirstFormEntry() with key %s",
+			key,
+		),
+		StatusCode: http.StatusBadRequest,
+	}
 }

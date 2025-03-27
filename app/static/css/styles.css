@@ -160,10 +160,16 @@ form {
     gap: 1rem;
 }
 
-form>div {
+.form-element-container {
     display: flex;
     flex-direction: column;
     gap: 4px;
+}
+
+.form-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 form label {
@@ -220,6 +226,15 @@ button {
 .search-bar i {
     position: absolute;
     right: 0.5rem;
+}
+
+.secondary-button {
+    all: unset;
+    cursor: pointer;
+    border: solid 1px white;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 14px;
 }
 
 .icon-button {
@@ -670,7 +685,7 @@ textarea {
     }
 }
 
-#select-dialog-container {
+.modal {
     position: fixed;
     right: 0;
     left: 0;
@@ -684,11 +699,11 @@ textarea {
     z-index: 500;
 }
 
-#select-dialog-container i {
+.modal i {
     cursor: pointer;
 }
 
-#select-dialog {
+.modal-content {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -702,7 +717,7 @@ textarea {
     border: solid 2px var(--color-primary-200);
 }
 
-#select-dialog .header {
+.modal-content-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -712,13 +727,13 @@ textarea {
     font-size: 22px;
 }
 
-#select-dialog .header .title-container {
+.modal-content-title-container {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-#select-dialog .header .title-container i {
+.modal-content-title-container i {
     color: var(--color-primary-200);
 }
 
@@ -741,4 +756,13 @@ textarea {
 
 #options-container div:hover {
     background-color: var(--color-primary-200);
+}
+
+.preview-modal-content {
+    width: 95%;
+    height: 90%;
+    padding: 1rem;
+    background-color: var(--color-surface-100);
+    border-radius: 8px;
+    overflow-y: scroll;
 }

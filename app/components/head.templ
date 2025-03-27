@@ -3,15 +3,25 @@ package components
 templ head() {
 	<head>
 		<title>Let Him Cook</title>
+
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
 		<script src="/static/js/htmx.min.js" defer></script>
 		<script src="/static/js/main.js" defer></script>
+
+        <link rel="preload" href="/static/css/styles.css" as="style"/>
+        <link rel="preload" href="/static/css/fonts.css" as="style"/>
+        <link rel="preload" href="/static/fa/css/fontawesome.css" as="style"/>
+        <link rel="preload" href="/static/fa/css/solid.css" as="style"/>
+
 		<link rel="stylesheet" href="/static/css/styles.css"/>
 		<link rel="stylesheet" href="/static/css/fonts.css"/>
-		<link href="/static/fa/css/fontawesome.css" rel="stylesheet"/>
-		<link href="/static/fa/css/solid.css" rel="stylesheet"/>
+		<link rel="stylesheet" href="/static/fa/css/fontawesome.css" />
+		<link rel="stylesheet" href="/static/fa/css/solid.css"/>
+
 		<link rel="icon" type="image/x-icon" href="/static/favicon.ico"/>
+
 		<meta
 			name="htmx-config"
 			content='{

@@ -12,9 +12,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 RUN node --version
 RUN npm --version
 
-WORKDIR /app/script
-RUN npm install
-
 WORKDIR /app
 RUN make
 

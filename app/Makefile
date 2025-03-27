@@ -3,14 +3,10 @@ STATIC_DIR := static
 
 .PHONY: all clean
 
-all: app build_scripts copy_static copy_env
+all: app copy_static copy_env
 
 app: $(wildcard *.go)
 	go build -o $(BUILD_DIR)/lethimcook
-
-build_scripts:
-	cd ./script && npm run build
-	cd ../
 
 copy_static:
 	mkdir -p $(BUILD_DIR)/$(STATIC_DIR)
