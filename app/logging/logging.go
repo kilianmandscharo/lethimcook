@@ -4,8 +4,15 @@ import (
 	"io"
 	"log"
 	"os"
+<<<<<<< Updated upstream
 
 	"gopkg.in/natefinch/lumberjack.v2"
+=======
+	"strconv"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+>>>>>>> Stashed changes
 )
 
 type LoggerLevel int
@@ -111,5 +118,29 @@ func (l *Logger) Fatal(v ...any) {
 func (l *Logger) Fatalf(format string, v ...any) {
 	if l.level <= Fatal {
 		l.fatalLogger.Fatalf(format, v...)
+	}
+}
+
+func LoggerMiddleware(l *Logger) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			req := c.Request()
+			var sb strings.Builder
+			sb.WriteString("incoming request --> ")
+			sb.WriteString(req.Host)
+			sb.WriteString(", ")
+			sb.WriteString(req.Method)
+			sb.WriteString(", ")
+			sb.WriteString(req.URL.Path)
+			sb.WriteString(", ")
+			sb.WriteString(req.URL.RawQuery)
+			sb.WriteString(", ")
+			sb.WriteString(req.Proto)
+			sb.WriteString(", ")
+			sb.WriteString(strconv.Itoa(int(req.ContentLength)))
+			sb.WriteString(", ")
+			l.Info(sb.String())
+			return next(c)
+		}
 	}
 }

@@ -29,7 +29,7 @@ func searchBar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"search-bar\"><i class=\"fa-solid fa-magnifying-glass fa-xl\"></i> <input id=\"search-input\" placeholder=\"Rezept suchen...\" type=\"text\" name=\"query\" hx-trigger=\"keyup delay:500ms\" hx-get=\"/\" hx-vals=\"js:{search: document.getElementById(&#39;search-input&#39;)?.value || &#39;&#39;}\" hx-target=\"#recipe-list\" hx-swap=\"outerHTML\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"search-bar\"><i class=\"fa-solid fa-magnifying-glass fa-xl\"></i> <input id=\"search-input\" placeholder=\"Rezept suchen...\" type=\"text\" name=\"search\" hx-trigger=\"keyup delay:500ms\" hx-get=\"/\" hx-target=\"#recipe-list\" hx-swap=\"outerHTML\" hx-push-url=\"true\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

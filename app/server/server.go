@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,7 +33,7 @@ func New(
 ) Server {
 	e := echo.New()
 
-	e.Use(authController.ValidateTokenMiddleware)
+	e.Use(authController.ValidateTokenMiddleware, logging.LoggerMiddleware(logger))
 	e.Static("/static", "./static")
 
 	e.GET("/imprint", func(c echo.Context) error {
@@ -109,6 +108,6 @@ func (s *Server) listenForShutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := s.e.Shutdown(ctx); err != nil {
-		log.Fatal("Error shutting down server: ", err)
+		s.logger.Fatal("Error shutting down server: ", err)
 	}
 }

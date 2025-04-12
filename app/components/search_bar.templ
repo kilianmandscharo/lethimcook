@@ -7,12 +7,12 @@ templ searchBar() {
 			id="search-input"
 			placeholder="Rezept suchen..."
 			type="text"
-			name="query"
+			name="search"
 			hx-trigger="keyup delay:500ms"
 			hx-get="/"
-			hx-vals="js:{search: document.getElementById('search-input')?.value || ''}"
 			hx-target="#recipe-list"
 			hx-swap="outerHTML"
+            hx-push-url="true"
 		/>
 	</div>
 }
