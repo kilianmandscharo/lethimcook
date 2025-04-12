@@ -23,7 +23,7 @@ func main() {
 		logToFile = true
 	} else {
 		logLevel = logging.Debug
-		logToFile = true
+		logToFile = false
 	}
 
 	logger := logging.New(logLevel, logToFile)
