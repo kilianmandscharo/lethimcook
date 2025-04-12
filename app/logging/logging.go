@@ -4,15 +4,11 @@ import (
 	"io"
 	"log"
 	"os"
-<<<<<<< Updated upstream
-
-	"gopkg.in/natefinch/lumberjack.v2"
-=======
 	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
->>>>>>> Stashed changes
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type LoggerLevel int
