@@ -2,7 +2,8 @@ export class LocalStorageUtil {
     static INPUTS = [
         "title",
         "description",
-        "duration",
+        "cookingDuration",
+        "totalDuration",
         "author",
         "source",
         "tags",

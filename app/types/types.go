@@ -19,6 +19,7 @@ type Recipe struct {
 	Title          string `json:"title"`
 	Description    string `json:"description"`
 	Duration       int    `json:"duration"`
+	TotalDuration  int    `json:"totalDuration"`
 	Ingredients    string `json:"ingredients"`
 	Instructions   string `json:"instructions"`
 	Tags           string `json:"tags"`
@@ -39,8 +40,10 @@ func (r *Recipe) String() string {
 	buf.WriteString(r.Title)
 	buf.WriteString("\n    description: ")
 	buf.WriteString(r.Description)
-	buf.WriteString("\n    duration: ")
+	buf.WriteString("\n    cooking duration: ")
 	buf.WriteString(strconv.Itoa(r.Duration))
+	buf.WriteString("\n    total duration: ")
+	buf.WriteString(strconv.Itoa(r.TotalDuration))
 	buf.WriteString("\n    ingredients: ")
 	buf.WriteString(r.Ingredients)
 	buf.WriteString("\n    instructions: ")
@@ -126,6 +129,13 @@ func NewTestRecipe() Recipe {
 		Ingredients:  "Test ingredients",
 		Instructions: "Test instructions",
 	}
+}
+
+func (r *Recipe) GetTotalDuration() int {
+	if r.TotalDuration > 0 {
+		return r.TotalDuration
+	}
+	return r.Duration
 }
 
 type FormElementType int

@@ -24,7 +24,8 @@ templ recipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) {
             @recipeTags(tags)
             <div class="recipe-info-right-section">
                 @recipePageInfoSectionInfoItem("Beschreibung", recipe.Description)
-                @recipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration))
+                @recipePageInfoSectionInfoItem("Kochzeit", fmt.Sprintf("%d Minuten", recipe.Duration))
+                @recipePageInfoSectionInfoItem("Gesamtzeit", fmt.Sprintf("%d Minuten", recipe.GetTotalDuration()))
                 @recipePageInfoSectionInfoItem("Quelle", recipe.Source)
             </div>
         </div>
