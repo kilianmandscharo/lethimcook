@@ -86,13 +86,15 @@ func AssertRequest(t *testing.T, options RequestOptions) (*httptest.ResponseReco
 }
 
 type TestFormDataStringOptions struct {
-	TitleEmpty        bool
-	DescriptionEmpty  bool
-	DurationEmpty     bool
-	InvalidDuration   bool
-	TagsEmpty         bool
-	IngredientsEmpty  bool
-	InstructionsEmpty bool
+	TitleEmpty             bool
+	DescriptionEmpty       bool
+	CookingDurationEmpty   bool
+	InvalidCookingDuration bool
+	TotalDurationEmpty     bool
+	InvalidTotalDuration   bool
+	TagsEmpty              bool
+	IngredientsEmpty       bool
+	InstructionsEmpty      bool
 }
 
 func ConstructTestFormDataString(options TestFormDataStringOptions) string {
@@ -107,14 +109,24 @@ func ConstructTestFormDataString(options TestFormDataStringOptions) string {
 		}
 		formData += "description=description"
 	}
-	if !options.DurationEmpty {
+	if !options.CookingDurationEmpty {
 		if len(formData) != 0 {
 			formData += "&"
 		}
-		if options.InvalidDuration {
-			formData += "duration=duration"
+		if options.InvalidCookingDuration {
+			formData += "cookingDuration=cookingDuration"
 		} else {
-			formData += "duration=10"
+			formData += "cookingDuration=10"
+		}
+	}
+	if !options.TotalDurationEmpty {
+		if len(formData) != 0 {
+			formData += "&"
+		}
+		if options.InvalidTotalDuration {
+			formData += "totalDuration=totalDuration"
+		} else {
+			formData += "totalDuration=10"
 		}
 	}
 	if !options.TagsEmpty {

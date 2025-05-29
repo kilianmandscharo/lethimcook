@@ -189,18 +189,26 @@ func TestUpdateRecipeWithFormData(t *testing.T) {
 		{
 			formData: testutil.ConstructTestFormDataString(
 				testutil.TestFormDataStringOptions{
-					DurationEmpty: true,
+					CookingDurationEmpty: true,
 				},
 			),
-			formErrors: []error{errutil.FormErrorNoDuration},
+			formErrors: []error{errutil.FormErrorNoCookingDuration},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
 				testutil.TestFormDataStringOptions{
-					InvalidDuration: true,
+					InvalidCookingDuration: true,
 				},
 			),
-			formErrors: []error{errutil.FormErrorNoDuration},
+			formErrors: []error{errutil.FormErrorNoCookingDuration},
+		},
+		{
+			formData: testutil.ConstructTestFormDataString(
+				testutil.TestFormDataStringOptions{
+					InvalidTotalDuration: true,
+				},
+			),
+			formErrors: []error{errutil.FormErrorNoTotalDuration},
 		},
 		{
 			formData: testutil.ConstructTestFormDataString(
@@ -223,7 +231,7 @@ func TestUpdateRecipeWithFormData(t *testing.T) {
 				testutil.TestFormDataStringOptions{
 					TitleEmpty:        true,
 					DescriptionEmpty:  true,
-					DurationEmpty:     true,
+					CookingDurationEmpty:     true,
 					IngredientsEmpty:  true,
 					InstructionsEmpty: true,
 				},
@@ -231,7 +239,7 @@ func TestUpdateRecipeWithFormData(t *testing.T) {
 			formErrors: []error{
 				errutil.FormErrorNoTitle,
 				errutil.FormErrorNoDescription,
-				errutil.FormErrorNoDuration,
+				errutil.FormErrorNoCookingDuration,
 				errutil.FormErrorNoIngredients,
 				errutil.FormErrorNoInstructions,
 			},
@@ -260,7 +268,7 @@ func TestUpdateRecipeWithFormData(t *testing.T) {
 	}
 
 	// Given
-	formData := "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=20&tags=vegan"
+	formData := "title=title&description=description&ingredients=ingredients&instructions=instructions&cookingDuration=20&tags=vegan"
 	c := newTestContext(t, newTestContextOptions{
 		formData: formData,
 		pathId:   "1",
@@ -326,7 +334,7 @@ func TestGetRecipeAsJson(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(
 		t,
-		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\",\"createdAt\":\"\"}"),
+		[]byte("{\"id\":1,\"author\":\"Phillip Jeffries\",\"source\":\"\",\"title\":\"Naan\",\"description\":\"\",\"duration\":0,\"totalDuration\":0,\"ingredients\":\"\",\"instructions\":\"\",\"tags\":\"\",\"createdAt\":\"\"}"),
 		recipeJson,
 	)
 }

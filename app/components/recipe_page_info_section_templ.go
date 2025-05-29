@@ -102,7 +102,11 @@ func recipePageInfoSection(isAdmin bool, recipe types.Recipe, tags []string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Zubereitungszeit", fmt.Sprintf("%d Minuten", recipe.Duration)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Kochzeit", fmt.Sprintf("%d Minuten", recipe.Duration)).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = recipePageInfoSectionInfoItem("Gesamtzeit", fmt.Sprintf("%d Minuten", recipe.GetTotalDuration())).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

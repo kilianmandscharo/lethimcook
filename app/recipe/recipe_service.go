@@ -239,11 +239,18 @@ func (rs *recipeService) updateRecipeWithFormData(c echo.Context, recipe *types.
 		formErrors["instructions"] = errutil.FormErrorNoInstructions
 	}
 
-	duration, err := strconv.Atoi(c.Request().FormValue("duration"))
+	cookingDuration, err := strconv.Atoi(c.Request().FormValue("cookingDuration"))
 	if err != nil {
-		formErrors["duration"] = errutil.FormErrorNoDuration
+		formErrors["cookingDuration"] = errutil.FormErrorNoCookingDuration
 	} else {
-		recipe.Duration = duration
+		recipe.Duration = cookingDuration
+	}
+
+	totalDuration, err := strconv.Atoi(c.Request().FormValue("totalDuration"))
+	if err != nil {
+		formErrors["totalDuration"] = errutil.FormErrorNoTotalDuration
+	} else {
+		recipe.TotalDuration = totalDuration
 	}
 
 	return formErrors, nil
@@ -266,9 +273,14 @@ func (rs *recipeService) getRecipeAsJson(id uint) ([]byte, error) {
 }
 
 func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[string]error) []types.FormElement {
-	duration := ""
+	cookingDuration := ""
 	if recipe.Duration != 0 {
-		duration = fmt.Sprintf("%d", recipe.Duration)
+		cookingDuration = fmt.Sprintf("%d", recipe.Duration)
+	}
+
+	totalDuration := ""
+	if recipe.Duration != 0 {
+		totalDuration = fmt.Sprintf("%d", recipe.TotalDuration)
 	}
 
 	return []types.FormElement{
@@ -292,12 +304,22 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 		},
 		{
 			Type:        types.FormElementInput,
-			Name:        "duration",
-			Err:         formErrors["duration"],
-			Value:       duration,
+			Name:        "cookingDuration",
+			Err:         formErrors["cookingDuration"],
+			Value:       cookingDuration,
 			InputType:   "number",
-			Label:       "Zubereitungszeit (Minuten)",
-			Placeholder: "Zubereitungszeit",
+			Label:       "Kochzeit (Minuten)",
+			Placeholder: "Kochzeit",
+			Required:    true,
+		},
+		{
+			Type:        types.FormElementInput,
+			Name:        "totalDuration",
+			Err:         formErrors["totalDuration"],
+			Value:       totalDuration,
+			InputType:   "number",
+			Label:       "Gesamtzeit (Minuten)",
+			Placeholder: "Gesamtzeit",
 			Required:    true,
 		},
 		{

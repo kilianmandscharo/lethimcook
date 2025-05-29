@@ -20,7 +20,10 @@ templ recipeCard(isAdmin bool, recipe types.Recipe) {
     >
         <div>
             <p class="recipe-list-item-title">{ recipe.Title }</p>
-            <p class="recipe-list-item-duration">{ fmt.Sprintf("%d Minuten", recipe.Duration) }</p>
+            <div>
+                <i class="fa-solid fa-clock"></i>
+                <p class="recipe-list-item-duration">{ fmt.Sprintf("%d Min", recipe.GetTotalDuration()) }</p>
+            </div>
         </div>
         <p class="recipe-list-item-description">{ recipe.Description }</p>
         @recipeTags(recipe.ParseTags())

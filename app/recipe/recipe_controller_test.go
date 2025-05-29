@@ -201,7 +201,7 @@ func TestHandleCreateRecipe(t *testing.T) {
 				WithQueryParam: true,
 				QueryParam:     "?pending=true",
 				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				FormData:       "title=title&description=description&ingredients=ingredients&instructions=instructions&cookingDuration=30&totalDuration=30",
 				AssertMessage:  true,
 				MessageWant:    "Rezept eingereicht",
 			},
@@ -231,7 +231,7 @@ func TestHandleCreateRecipe(t *testing.T) {
 				Authorized:   true,
 				StatusWant:   http.StatusBadRequest,
 				WithFormData: true,
-				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=xx",
+				FormData:     "title=title&description=description&ingredients=ingredients&instructions=instructions&cookingDuration=xx&totalDuration=xx",
 			},
 		)
 	})
@@ -246,7 +246,7 @@ func TestHandleCreateRecipe(t *testing.T) {
 				Authorized:    true,
 				StatusWant:    http.StatusOK,
 				WithFormData:  true,
-				FormData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				FormData:      "title=title&description=description&ingredients=ingredients&instructions=instructions&cookingDuration=30&totalDuration=30",
 				AssertMessage: true,
 				MessageWant:   "Rezept erstellt",
 			},
@@ -442,7 +442,7 @@ func TestHandleUpdateRecipe(t *testing.T) {
 				Authorized:     true,
 				StatusWant:     http.StatusBadRequest,
 				WithFormData:   true,
-				FormData:       "title=title&description=description&ingredients=ingredients&&duration=xx",
+				FormData:       "title=title&description=description&ingredients=ingredients&cookingDuration=xx&totalDuration=xx",
 				AssertMessage:  true,
 				MessageWant:    "Fehlerhaftes Formular",
 			},
@@ -465,7 +465,7 @@ func TestHandleUpdateRecipe(t *testing.T) {
 				Authorized:      true,
 				StatusWant:      http.StatusOK,
 				WithFormData:    true,
-				FormData:        "title=title&description=description&ingredients=ingredients&instructions=instructions&duration=30",
+				FormData:        "title=title&description=description&ingredients=ingredients&instructions=instructions&cookingDuration=30&totalDuration=30",
 			},
 		)
 	})
