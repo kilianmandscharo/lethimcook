@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,7 +33,7 @@ func New(
 ) Server {
 	e := echo.New()
 
-	e.Use(authController.ValidateTokenMiddleware)
+	e.Use(authController.ValidateTokenMiddleware, logging.LoggerMiddleware(logger))
 	e.Static("/static", "./static")
 
 	e.GET("/imprint", func(c echo.Context) error {
@@ -82,6 +81,7 @@ func (s *Server) Start() {
 }
 
 func (s *Server) startDev() {
+	s.logger.Info("Starting server and listening on :8080")
 	go func() {
 		s.logger.Fatal(s.e.Start(":8080"))
 	}()
@@ -89,6 +89,7 @@ func (s *Server) startDev() {
 }
 
 func (s *Server) startProd(certFilePath, keyFilePath string) {
+	s.logger.Info("Starting server and listening on :443/:80")
 	go func() {
 		s.logger.Fatal(s.e.StartTLS(":443", certFilePath, keyFilePath))
 	}()
@@ -107,6 +108,6 @@ func (s *Server) listenForShutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := s.e.Shutdown(ctx); err != nil {
-		log.Fatal("Error shutting down server: ", err)
+		s.logger.Fatal("Error shutting down server: ", err)
 	}
 }

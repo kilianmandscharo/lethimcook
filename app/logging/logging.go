@@ -1,8 +1,14 @@
 package logging
 
 import (
+	"io"
 	"log"
 	"os"
+	"strconv"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type LoggerLevel int
@@ -24,15 +30,26 @@ type Logger struct {
 	fatalLogger *log.Logger
 }
 
-func New(level LoggerLevel) *Logger {
+func New(level LoggerLevel, logToFile bool) *Logger {
+	var writer io.Writer
+	if logToFile {
+		writer = io.MultiWriter(os.Stdout, &lumberjack.Logger{
+			Filename: "./logs/log.txt",
+			MaxSize:  10,
+		})
+	} else {
+		writer = io.MultiWriter(os.Stdout)
+	}
+
 	flags := log.Ldate | log.Ltime
+
 	return &Logger{
 		level:       level,
-		debugLogger: log.New(os.Stdout, "[DEBUG] ", flags),
-		infoLogger:  log.New(os.Stdout, "[INFO] ", flags),
-		warnLogger:  log.New(os.Stdout, "[WARN] ", flags),
-		errorLogger: log.New(os.Stdout, "[ERROR] ", flags),
-		fatalLogger: log.New(os.Stdout, "[FATAL] ", flags),
+		debugLogger: log.New(writer, "[DEBUG] ", flags),
+		infoLogger:  log.New(writer, "[INFO] ", flags),
+		warnLogger:  log.New(writer, "[WARN] ", flags),
+		errorLogger: log.New(writer, "[ERROR] ", flags),
+		fatalLogger: log.New(writer, "[FATAL] ", flags),
 	}
 }
 
@@ -97,5 +114,29 @@ func (l *Logger) Fatal(v ...any) {
 func (l *Logger) Fatalf(format string, v ...any) {
 	if l.level <= Fatal {
 		l.fatalLogger.Fatalf(format, v...)
+	}
+}
+
+func LoggerMiddleware(l *Logger) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			req := c.Request()
+			var sb strings.Builder
+			sb.WriteString("incoming request --> ")
+			sb.WriteString(req.Host)
+			sb.WriteString(", ")
+			sb.WriteString(req.Method)
+			sb.WriteString(", ")
+			sb.WriteString(req.URL.Path)
+			sb.WriteString(", ")
+			sb.WriteString(req.URL.RawQuery)
+			sb.WriteString(", ")
+			sb.WriteString(req.Proto)
+			sb.WriteString(", ")
+			sb.WriteString(strconv.Itoa(int(req.ContentLength)))
+			sb.WriteString(", ")
+			l.Info(sb.String())
+			return next(c)
+		}
 	}
 }

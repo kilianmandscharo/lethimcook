@@ -30,7 +30,7 @@ func TestEnvironment(t *testing.T) {
 	assert.Equal(t, "", Get(EnvKeyJWTPrivateKey))
 
 	// When
-	LoadEnvironment(testFileName, logging.New(logging.Debug))
+	LoadEnvironment(testFileName, logging.New(logging.Debug, false))
 
 	// Then
 	assert.Equal(t, testCertFilePath, Get(EnvKeyCertFilePath))

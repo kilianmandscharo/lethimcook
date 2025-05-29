@@ -25,7 +25,7 @@ func newTestRecipeDatabase() *recipeDatabase {
 	}
 	db.Migrator().DropTable(&types.Recipe{})
 	db.AutoMigrate(&types.Recipe{})
-	return &recipeDatabase{handler: db, logger: logging.New(logging.Debug)}
+	return &recipeDatabase{handler: db, logger: logging.New(logging.Debug, false)}
 }
 
 func TestCreateRecipe(t *testing.T) {
