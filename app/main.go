@@ -13,7 +13,9 @@ import (
 
 func main() {
 	var password = flag.String("init-admin", "", "the admin password")
-	var isProd = flag.Bool("prod", false, "shoudl the app run in production mode")
+	var isProd = flag.Bool("prod", false, "should the app run in production mode")
+	var shouldLogToFile = flag.Bool("log-file", false, "should the app log to a file")
+
 	flag.Parse()
 
 	var logLevel logging.LoggerLevel
@@ -23,7 +25,7 @@ func main() {
 		logToFile = true
 	} else {
 		logLevel = logging.Debug
-		logToFile = false
+		logToFile = *shouldLogToFile
 	}
 
 	logger := logging.New(logLevel, logToFile)

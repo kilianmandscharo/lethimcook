@@ -27,7 +27,7 @@ func (a *AppError) AddMessage(message string) {
 func NewAppErrorNotAuthorized(functionName string) error {
 	return &AppError{
 		UserMessage: "Nicht authorisiert",
-		Err:         errors.New(fmt.Sprintf("failed at %s, not authorized", functionName)),
+		Err:         fmt.Errorf("failed at %s, not authorized", functionName),
 		StatusCode:  http.StatusUnauthorized,
 	}
 }
@@ -60,7 +60,7 @@ var (
 
 	FormErrorNoTitle           = errors.New("Bitte trage einen Rezepttitel ein")
 	FormErrorNoDescription     = errors.New("Bitte trage eine Rezeptbeschreibung ein")
-	FormErrorNoCookingDuration = errors.New("Bitte trage die Kochzeit ein")
+	FormErrorNoCookingDuration = errors.New("Bitte trage die Präsenzzeit ein")
 	FormErrorNoTotalDuration   = errors.New("Bitte trage die Gesamtzeit ein")
 	FormErrorNoIngredients     = errors.New("Bitte trage die Rezeptzutaten ein")
 	FormErrorNoInstructions    = errors.New("Bitte trage die Rezeptanleitung ein")

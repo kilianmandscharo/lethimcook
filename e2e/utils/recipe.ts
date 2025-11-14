@@ -135,7 +135,7 @@ export async function createRecipe(
     await clickButtonByTitle(page, "Neues Rezept");
     await page.getByPlaceholder("Titel").fill(recipe.title);
     await page.getByPlaceholder("Beschreibung").fill(recipe.description);
-    await page.getByPlaceholder("Kochzeit").fill(recipe.cookingDuration);
+    await page.getByPlaceholder("Präsenzzeit").fill(recipe.cookingDuration);
     await page.getByPlaceholder("Gesamtzeit").fill(recipe.totalDuration);
     await page.getByPlaceholder("Autor").fill(recipe.author);
     await page.getByPlaceholder("Quelle").fill(recipe.source);
@@ -194,7 +194,7 @@ export async function checkRecipePage(page: Page, testRecipe: Recipe) {
 export async function editRecipe(page: Page, editedRecipe: Recipe) {
     await page.getByLabel("Titel").fill(editedRecipe.title);
     await page
-        .getByLabel("Kochzeit (Minuten)")
+        .getByLabel("Präsenzzeit (Minuten)")
         .fill(editedRecipe.cookingDuration);
     await page
         .getByLabel("Gesamtzeit (Minuten)")

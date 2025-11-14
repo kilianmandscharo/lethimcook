@@ -308,8 +308,8 @@ func (rs *recipeService) createRecipeForm(recipe types.Recipe, formErrors map[st
 			Err:         formErrors["cookingDuration"],
 			Value:       cookingDuration,
 			InputType:   "number",
-			Label:       "Kochzeit (Minuten)",
-			Placeholder: "Kochzeit",
+			Label:       "Präsenzzeit (Minuten)",
+			Placeholder: "Präsenzzeit",
 			Required:    true,
 		},
 		{
